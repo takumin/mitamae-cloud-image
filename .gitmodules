@@ -1,0 +1,3 @@
+[submodule "plugins/mitamae-plugin-resource-mount"]
+	path = plugins/mitamae-plugin-resource-mount
+	url = git@github.com:takumin/mitamae-plugin-resource-mount.git
