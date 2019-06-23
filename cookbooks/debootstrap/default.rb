@@ -157,8 +157,6 @@ tmpfs      = node[:debootstrap][:target_tmpfs]
 # Check Variables
 #
 
-puts node[:debootstrap]
-
 unless params.key?(dist) then
   raise ArgumentError, "node[:debootstrap][:distribution] require #{params.keys.join(' or ')}"
 end
