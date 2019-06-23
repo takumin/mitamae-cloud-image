@@ -76,7 +76,7 @@ if ENV['DEBOOTSTRAP_TARGET_DIR'] then
   node[:debootstrap][:target_dir] = ENV['DEBOOTSTRAP_TARGET_DIR']
 end
 
-if ENV['DEBOOTSTRAP_TARGET_TMPFS'] and ENV['DEBOOTSTRAP_TARGET_TMPFS'] =~ /^(true|false)$/i then
+if ENV['DEBOOTSTRAP_TARGET_TMPFS'] then
   if ENV['DEBOOTSTRAP_TARGET_TMPFS'] =~ /^(true|false)$/i then
     if $1.downcase == 'true' then
       node[:debootstrap][:target_tmpfs] = true
