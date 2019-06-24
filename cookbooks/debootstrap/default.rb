@@ -217,6 +217,7 @@ if tmpfs then
   mount target do
     device 'tmpfs'
     type   'tmpfs'
+    user   'root'
   end
 end
 
@@ -239,5 +240,6 @@ cmd << mirror
 #
 
 execute cmd.join(' ') do
+  user 'root'
   not_if "test -x #{target}/usr/bin/apt-get"
 end
