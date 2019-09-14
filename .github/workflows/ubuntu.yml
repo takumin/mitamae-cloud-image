@@ -8,8 +8,8 @@ jobs:
       uses: actions/checkout@master
     - name: Install debootstrap
       run: |-
-        sudo apt-get update
-        sudo apt-get install debootstrap
+        sudo apt-get -yqq update
+        sudo apt-get -yqq install debootstrap
     - name: Install mitamae
       run: make mitamae
     - name: Check Version

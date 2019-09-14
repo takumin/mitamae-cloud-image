@@ -15,7 +15,7 @@ mitamae: $(CURDIR)/.bin/mitamae
 $(CURDIR)/.bin/mitamae:
 	@mkdir -p "$(dir $@)"
 	@if [ "$(subst MItamae v,,$(shell mitamae version))" != "$(MITAMAE_RELEASE)" ]; then \
-		rm "$@"; \
+		rm -f "$@"; \
 	fi
 	@if [ ! -f "$@" ]; then \
 		curl -fsSL -o "$@" "$(MITAMAE_URL)"; \
