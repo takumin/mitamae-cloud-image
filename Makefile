@@ -4,13 +4,14 @@ MITAMAE_ARCH    ?= $(shell uname -m)
 MITAMAE_URL     ?= https://$(MITAMAE_REPOS)/releases/download/v$(MITAMAE_RELEASE)/mitamae-$(MITAMAE_ARCH)-linux
 
 .PHONY: all
-all: $(CURDIR)/.bin/mitamae ubuntu-bionic-generic-amd64-server
+all: mitamae ubuntu-bionic-generic-amd64-server
 
 .PHONY: ubuntu-bionic-generic-amd64-server
 ubuntu-bionic-generic-amd64-server:
 	@$(CURDIR)/.bin/mitamae local -y "$(CURDIR)/profiles/$(subst -,/,$@).yml" "$(CURDIR)/cookbooks/debootstrap/default.rb"
 
-.PHONY: $(CURDIR)/.bin/mitamae
+.PHONY: mitamae
+mitamae: $(CURDIR)/.bin/mitamae
 $(CURDIR)/.bin/mitamae:
 	@mkdir -p "$(dir $@)"
 	@if [ "$(subst MItamae v,,$(shell mitamae version))" != "$(MITAMAE_RELEASE)" ]; then \
