@@ -6,11 +6,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
-    - name: Install debootstrap
+    - name: Required
       run: |-
         sudo apt-get -yqq update
         sudo apt-get -yqq install debootstrap
-    - name: Install mitamae
-      run: make mitamae
-    - name: Check Version
-      run: .bin/mitamae version
+        make mitamae
+        cat /etc/apt/sources.list
