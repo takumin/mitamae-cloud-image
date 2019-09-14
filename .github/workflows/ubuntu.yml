@@ -1,0 +1,16 @@
+name: Ubuntu Cloud Image
+on: [push, pull_request]
+jobs:
+  ubuntu-bionic-generic-amd64-server:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Install debootstrap
+      run: |-
+        sudo apt-get update
+        sudo apt-get install debootstrap
+    - name: Install mitamae
+      run: make mitamae
+    - name: Check Version
+      run: .bin/mitamae version
