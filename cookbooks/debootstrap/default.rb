@@ -34,10 +34,6 @@ end
 unless node[:debootstrap][:target_dir].is_a?(String) then
   node[:debootstrap][:target_dir] = ''
 end
-unless node[:debootstrap][:target_tmpfs].kind_of?(FalseClass) ||
-       node[:debootstrap][:target_tmpfs].kind_of?(TrueClass) then
-  node[:debootstrap][:target_tmpfs] = false
-end
 
 #
 # Default Variables
@@ -76,18 +72,6 @@ end
 
 if ENV['DEBOOTSTRAP_TARGET_DIR'] then
   node[:debootstrap][:target_dir] = ENV['DEBOOTSTRAP_TARGET_DIR']
-end
-
-if ENV['DEBOOTSTRAP_TARGET_TMPFS'] then
-  if ENV['DEBOOTSTRAP_TARGET_TMPFS'] =~ /^(true|false)$/i then
-    if $1.downcase == 'true' then
-      node[:debootstrap][:target_tmpfs] = true
-    else
-      node[:debootstrap][:target_tmpfs] = false
-    end
-  else
-    raise ArgumentError, "ENV['DEBOOTSTRAP_TARGET_TMPFS'] true or false"
-  end
 end
 
 #
@@ -153,7 +137,6 @@ includes   = node[:debootstrap][:includes]
 excludes   = node[:debootstrap][:excludes]
 mirror     = node[:debootstrap][:mirror_url]
 target     = node[:debootstrap][:target_dir]
-tmpfs      = node[:debootstrap][:target_tmpfs]
 
 #
 # Check Variables
@@ -203,25 +186,12 @@ MItamae.logger.info "  Includes:     #{includes}"
 MItamae.logger.info "  Excludes:     #{excludes}"
 MItamae.logger.info "  Mirror Url:   #{mirror}"
 MItamae.logger.info "  Target Dir:   #{target}"
-MItamae.logger.info "  Target Tmpfs: #{tmpfs}"
 
 #
 # Target Directory
 #
 
 directory target
-
-#
-# Mount Target Dir Tmpfs
-#
-
-if tmpfs then
-  mount target do
-    device 'tmpfs'
-    type   'tmpfs'
-    user   'root'
-  end
-end
 
 #
 # Command Builder
