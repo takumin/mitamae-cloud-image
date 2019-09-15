@@ -3,6 +3,6 @@ generate cloud image from mitamae recipe
 
 # TODO
 - [ ] initialization
-- [ ] support cdebootstrap
+- [x] support cdebootstrap
 - [ ] systemd-nspawn mitamae
 - [ ] finalization
