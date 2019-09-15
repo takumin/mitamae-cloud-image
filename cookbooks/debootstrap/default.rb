@@ -9,7 +9,7 @@ node[:debootstrap][:command]      ||= String.new
 node[:debootstrap][:distribution] ||= String.new
 node[:debootstrap][:architecture] ||= String.new
 node[:debootstrap][:suite]        ||= String.new
-node[:debootstrap][:variant]      ||= String.new
+node[:debootstrap][:flavour]      ||= String.new
 node[:debootstrap][:components]   ||= Array.new
 node[:debootstrap][:includes]     ||= Array.new
 node[:debootstrap][:excludes]     ||= Array.new
@@ -27,7 +27,7 @@ if node.key?(:target)
       if node[:target][k].is_a?(String) and !node[:target][k].empty?
         node[:debootstrap][:target_dir] = v
       end
-    when :distribution, :architecture, :suite, :variant, :mirror_url
+    when :distribution, :architecture, :suite, :flavour, :mirror_url
       if node[:target][k].is_a?(String) and !node[:target][k].empty?
         node[:debootstrap][k] = v
       end
@@ -71,7 +71,7 @@ if node[:debootstrap][:target_dir].empty? then
     node[:debootstrap][:distribution],
     node[:debootstrap][:architecture],
     node[:debootstrap][:suite],
-    node[:debootstrap][:variant],
+    node[:debootstrap][:flavour],
   ].join('-')}"
 end
 
@@ -98,7 +98,7 @@ node.validate! do
       distribution: match(/^(?:debian|ubuntu)$/),
       architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
       suite:        string,
-      variant:      match(/^(?:default|minimal|build)$/),
+      flavour:      match(/^(?:default|minimal|build)$/),
       components:   array_of(string),
       includes:     array_of(string),
       excludes:     array_of(string),
@@ -137,7 +137,7 @@ cmd        = node[:debootstrap][:command]
 dist       = node[:debootstrap][:distribution]
 arch       = node[:debootstrap][:architecture]
 suite      = node[:debootstrap][:suite]
-variant    = node[:debootstrap][:variant]
+flavour    = node[:debootstrap][:flavour]
 components = node[:debootstrap][:components]
 includes   = node[:debootstrap][:includes]
 excludes   = node[:debootstrap][:excludes]
@@ -153,7 +153,7 @@ MItamae.logger.info "  Command:      #{cmd}"
 MItamae.logger.info "  Distribution: #{dist}"
 MItamae.logger.info "  Architecture: #{arch}"
 MItamae.logger.info "  Suite:        #{suite}"
-MItamae.logger.info "  Variant:      #{variant}"
+MItamae.logger.info "  Flavour:      #{flavour}"
 MItamae.logger.info "  Components:   #{components}"
 MItamae.logger.info "  Includes:     #{includes}"
 MItamae.logger.info "  Excludes:     #{excludes}"
@@ -174,7 +174,7 @@ if cmd == 'cdebootstrap'
   end
 end
 cmds << "--arch=#{arch}"
-case variant
+case flavour
 when 'minimal'
   case cmd
   when 'debootstrap'

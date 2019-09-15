@@ -13,5 +13,5 @@ target:
 # Debootstrap Config
 #
 debootstrap:
-  variant:  'minimal'
+  flavour:  'minimal'
   includes: ['gnupg']
