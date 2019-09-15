@@ -4,36 +4,16 @@
 # Public Variables
 #
 
-unless node[:debootstrap].is_a?(Hash) then
-  node[:debootstrap] = Hashie::Mash.new
-end
-unless node[:debootstrap][:distribution].is_a?(String) then
-  node[:debootstrap][:distribution] = ''
-end
-unless node[:debootstrap][:architecture].is_a?(String) then
-  node[:debootstrap][:architecture] = ''
-end
-unless node[:debootstrap][:suite].is_a?(String) then
-  node[:debootstrap][:suite] = ''
-end
-unless node[:debootstrap][:variant].is_a?(String) then
-  node[:debootstrap][:variant] = ''
-end
-unless node[:debootstrap][:components].is_a?(Array) then
-  node[:debootstrap][:components] = []
-end
-unless node[:debootstrap][:includes].is_a?(Array) then
-  node[:debootstrap][:includes] = []
-end
-unless node[:debootstrap][:excludes].is_a?(Array) then
-  node[:debootstrap][:excludes] = []
-end
-unless node[:debootstrap][:mirror_url].is_a?(String) then
-  node[:debootstrap][:mirror_url] = ''
-end
-unless node[:debootstrap][:target_dir].is_a?(String) then
-  node[:debootstrap][:target_dir] = ''
-end
+node[:debootstrap]                ||= Hashie::Mash.new
+node[:debootstrap][:distribution] ||= String.new
+node[:debootstrap][:architecture] ||= String.new
+node[:debootstrap][:suite]        ||= String.new
+node[:debootstrap][:variant]      ||= String.new
+node[:debootstrap][:components]   ||= Array.new
+node[:debootstrap][:includes]     ||= Array.new
+node[:debootstrap][:excludes]     ||= Array.new
+node[:debootstrap][:mirror_url]   ||= String.new
+node[:debootstrap][:target_dir]   ||= String.new
 
 #
 # Default Variables
