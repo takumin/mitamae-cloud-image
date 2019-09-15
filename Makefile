@@ -20,11 +20,6 @@ all: bootstrap
 mitamae: .bin/mitamae
 .bin/mitamae:
 	@mkdir -p "$(dir $@)"
-	@if [ -f "$@" ]; then \
-		if [ "$(subst MItamae v,,$(shell $@ version))" != "$(MITAMAE_RELEASE)" ]; then \
-			rm -f "$@"; \
-		fi \
-	fi
 	@if [ ! -f "$@" ]; then \
 		curl -fsSL -o "$@" "$(MITAMAE_URL)"; \
 	fi
