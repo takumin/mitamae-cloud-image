@@ -157,12 +157,6 @@ MItamae.logger.info "  Mirror Url:   #{mirror}"
 MItamae.logger.info "  Target Dir:   #{target}"
 
 #
-# Target Directory
-#
-
-directory target
-
-#
 # Command Builder
 #
 
