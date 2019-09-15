@@ -9,7 +9,7 @@ jobs:
     - name: Required
       run: |-
         sudo apt-get -yqq update
-        sudo apt-get -yqq install cdebootstrap
+        sudo apt-get -yqq install cdebootstrap debian-keyring ubuntu-keyring
         make mitamae
     - name: Debootstrap
       run: make ubuntu-bionic-generic-amd64-server
