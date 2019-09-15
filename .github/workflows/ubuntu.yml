@@ -6,6 +6,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
+      with:
+        submodules: true
     - name: Update
       run: sudo apt-get -y update
     - name: MItamae
