@@ -5,6 +5,7 @@
 #
 
 node[:debootstrap]                ||= Hashie::Mash.new
+node[:debootstrap][:command]      ||= String.new
 node[:debootstrap][:distribution] ||= String.new
 node[:debootstrap][:architecture] ||= String.new
 node[:debootstrap][:suite]        ||= String.new
@@ -37,6 +38,15 @@ end
 #
 # Default Variables
 #
+
+if node[:debootstrap][:command].empty? then
+  %w{cdebootstrap debootstrap}.each do |cmd|
+    if run_command("#{cmd} --version", error: false).success?
+      node[:debootstrap][:command] = cmd
+      break
+    end
+  end
+end
 
 if node[:debootstrap][:mirror_url].empty? then
   case node[:debootstrap][:distribution]
@@ -80,6 +90,7 @@ end
 node.validate! do
   {
     debootstrap: {
+      command:      match(/^(?:c?debootstrap)$/),
       distribution: match(/debian|ubuntu/),
       architecture: match(/i386|amd64|armhf|arm64/),
       suite:        string,
@@ -118,6 +129,7 @@ end
 # Private Variables
 #
 
+cmd        = node[:debootstrap][:command]
 dist       = node[:debootstrap][:distribution]
 arch       = node[:debootstrap][:architecture]
 suite      = node[:debootstrap][:suite]
@@ -133,6 +145,7 @@ target     = node[:debootstrap][:target_dir]
 #
 
 MItamae.logger.info "Debootstrap Infomation"
+MItamae.logger.info "  Command:      #{cmd}"
 MItamae.logger.info "  Distribution: #{dist}"
 MItamae.logger.info "  Architecture: #{arch}"
 MItamae.logger.info "  Suite:        #{suite}"
@@ -153,21 +166,21 @@ directory target
 # Command Builder
 #
 
-cmd = ['debootstrap']
-cmd << "--arch=#{arch}"
-cmd << "--variant=#{variant}" if variant != 'default'
-cmd << "--components=#{components.join(',')}"
-cmd << "--include=#{includes.join(',')}" unless includes.empty?
-cmd << "--exclude=#{excludes.join(',')}" unless excludes.empty?
-cmd << suite
-cmd << target
-cmd << mirror
+cmds = [cmd]
+cmds << "--arch=#{arch}"
+cmds << "--variant=#{variant}" if variant != 'default'
+cmds << "--components=#{components.join(',')}"
+cmds << "--include=#{includes.join(',')}" unless includes.empty?
+cmds << "--exclude=#{excludes.join(',')}" unless excludes.empty?
+cmds << suite
+cmds << target
+cmds << mirror
 
 #
 # Run Debootstrap
 #
 
-execute cmd.join(' ') do
+execute cmds.join(' ') do
   user 'root'
   not_if "test -x #{target}/usr/bin/apt-get"
 end
