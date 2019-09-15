@@ -44,7 +44,9 @@ end
 #
 
 if node[:debootstrap][:command].empty? then
-  %w{cdebootstrap debootstrap}.each do |cmd|
+  node[:debootstrap][:command] = 'debootstrap'
+
+  %w{cdebootstrap}.each do |cmd|
     if run_command("#{cmd} --version", error: false).success?
       node[:debootstrap][:command] = cmd
       break
@@ -131,6 +133,24 @@ includes   = node[:debootstrap][:includes]
 excludes   = node[:debootstrap][:excludes]
 mirror     = node[:debootstrap][:mirror_url]
 target     = node[:debootstrap][:target_dir]
+
+#
+# Required Packages
+#
+
+case cmd
+when 'debootstrap'
+  package 'debootstrap'
+when 'cdebootstrap'
+  package 'cdebootstrap'
+end
+
+case dist
+when 'debian'
+  package 'debian-keyring'
+when 'ubuntu'
+  package 'ubuntu-keyring'
+end
 
 #
 # Show Variables

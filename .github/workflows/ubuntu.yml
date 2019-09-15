@@ -6,10 +6,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
-    - name: Required
-      run: |-
-        sudo apt-get -y update
-        sudo apt-get -y --no-install-recommends install cdebootstrap ubuntu-keyring systemd-container
+    - name: Update
+      run: sudo apt-get -y update
     - name: MItamae
       run: make mitamae
     - name: Bootstrap

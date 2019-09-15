@@ -120,6 +120,12 @@ apt_repository "#{node[:apt][:target_dir]}/etc/apt/sources.list" do
 end
 
 #
+# Required Packages
+#
+
+package 'systemd-container'
+
+#
 # Handler
 #
 
