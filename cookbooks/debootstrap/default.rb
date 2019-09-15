@@ -13,8 +13,8 @@ node[:debootstrap][:flavour]      ||= String.new
 node[:debootstrap][:components]   ||= Array.new
 node[:debootstrap][:includes]     ||= Array.new
 node[:debootstrap][:excludes]     ||= Array.new
-node[:debootstrap][:mirror_url]   ||= String.new
-node[:debootstrap][:target_dir]   ||= String.new
+node[:debootstrap][:mirror_url]   ||= ENV['APT_REPO_URL_UBUNTU'] || String.new
+node[:debootstrap][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || String.new
 
 #
 # Override Variables
@@ -73,18 +73,6 @@ if node[:debootstrap][:target_dir].empty? then
     node[:debootstrap][:suite],
     node[:debootstrap][:flavour],
   ].join('-')}"
-end
-
-#
-# Environment Variables
-#
-
-if ENV['DEBOOTSTRAP_MIRROR_URL'] then
-  node[:debootstrap][:mirror_url] = ENV['DEBOOTSTRAP_MIRROR_URL']
-end
-
-if ENV['DEBOOTSTRAP_TARGET_DIR'] then
-  node[:debootstrap][:target_dir] = ENV['DEBOOTSTRAP_TARGET_DIR']
 end
 
 #
