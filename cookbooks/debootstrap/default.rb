@@ -184,7 +184,9 @@ when 'build'
     cmds << '--flavour=build'
   end
 end
-cmds << "--components=#{components.join(',')}"
+if cmd == 'debootstrap'
+  cmds << "--components=#{components.join(',')}"
+end
 cmds << "--include=#{includes.join(',')}" unless includes.empty?
 cmds << "--exclude=#{excludes.join(',')}" unless excludes.empty?
 cmds << suite
