@@ -1,0 +1,18 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'debian'
+  suite:        'buster'
+  profile:      'server'
+  architecture: 'amd64'
+  components:   ['main', 'contrib', 'non-free']
+  directory:    '/tmp/debian-buster-server-amd64'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'cdebootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']
