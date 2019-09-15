@@ -10,8 +10,10 @@ jobs:
       run: |-
         sudo apt-get -y update
         sudo apt-get -y --no-install-recommends install cdebootstrap ubuntu-keyring systemd-container
-        make mitamae
-    - name: Debootstrap
-      run: make ubuntu-bionic-generic-amd64-server
+    - name: MItamae
+      run: make mitamae
+    - name: Bootstrap
+      run: make bootstrap
       env:
+        PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
         APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
