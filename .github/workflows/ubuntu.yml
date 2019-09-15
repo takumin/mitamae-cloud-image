@@ -14,4 +14,4 @@ jobs:
     - name: Debootstrap
       run: make ubuntu-bionic-generic-amd64-server
       env:
-        DEBOOTSTRAP_MIRROR_URL: http://azure.archive.ubuntu.com/ubuntu/
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
