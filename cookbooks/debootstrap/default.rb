@@ -94,7 +94,7 @@ node.validate! do
       distribution: match(/^(?:debian|ubuntu)$/),
       architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
       suite:        string,
-      variant:      match(/^(?:default|minbase|buildd|fakechroot)?/),
+      variant:      match(/^(?:default|minimal|build)$/),
       components:   array_of(string),
       includes:     array_of(string),
       excludes:     array_of(string),
@@ -168,7 +168,22 @@ directory target
 
 cmds = [cmd]
 cmds << "--arch=#{arch}"
-cmds << "--variant=#{variant}" if variant != 'default'
+case variant
+when 'minimal'
+  case cmd
+  when 'debootstrap'
+    cmds << '--variant=minbase'
+  when 'cdebootstrap'
+    cmds << '--flavour=minimal'
+  end
+when 'build'
+  case cmd
+  when 'debootstrap'
+    cmds << '--variant=buildd'
+  when 'cdebootstrap'
+    cmds << '--flavour=build'
+  end
+end
 cmds << "--components=#{components.join(',')}"
 cmds << "--include=#{includes.join(',')}" unless includes.empty?
 cmds << "--exclude=#{excludes.join(',')}" unless excludes.empty?
