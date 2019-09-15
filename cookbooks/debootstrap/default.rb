@@ -91,10 +91,10 @@ node.validate! do
   {
     debootstrap: {
       command:      match(/^(?:c?debootstrap)$/),
-      distribution: match(/debian|ubuntu/),
-      architecture: match(/i386|amd64|armhf|arm64/),
+      distribution: match(/^(?:debian|ubuntu)$/),
+      architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
       suite:        string,
-      variant:      match(/default|minbase|buildd|fakechroot/),
+      variant:      match(/^(?:default|minbase|buildd|fakechroot)?/),
       components:   array_of(string),
       includes:     array_of(string),
       excludes:     array_of(string),
@@ -109,8 +109,8 @@ when 'ubuntu'
   node.validate! do
     {
       debootstrap: {
-        suite:        match(/xenial|bionic/),
-        components:   array_of(match(/main|restricted|universe|multiverse/)),
+        suite:        match(/^(?:xenial|bionic)$/),
+        components:   array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }
   end
@@ -118,8 +118,8 @@ when 'debian'
   node.validate! do
     {
       debootstrap: {
-        suite:        match(/jessie|stretch|buster/),
-        components:   array_of(match(/main|contrib|non-free/)),
+        suite:        match(/^(?:jessie|stretch|buster)$/),
+        components:   array_of(match(/^(?:main|contrib|non-free)$/)),
       },
     }
   end
