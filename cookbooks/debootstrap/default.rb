@@ -16,6 +16,25 @@ node[:debootstrap][:mirror_url]   ||= String.new
 node[:debootstrap][:target_dir]   ||= String.new
 
 #
+# Override Variables
+#
+
+if node.key?(:target)
+  node[:target].each do |k, v|
+    case k.to_sym
+    when :distribution, :architecture, :suite, :variant, :mirror_url, :target_dir
+      if node[:target][k].is_a?(String) and !node[:target][k].empty?
+        node[:debootstrap][k] = v
+      end
+    when :components, :includes, :excludes
+      if node[:target][k].is_a?(Array) and !node[:target][k].empty?
+        node[:debootstrap][k] = v
+      end
+    end
+  end
+end
+
+#
 # Default Variables
 #
 
