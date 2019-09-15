@@ -9,7 +9,7 @@ jobs:
     - name: Required
       run: |-
         sudo apt-get -y update
-        sudo apt-get -y --no-install-recommends install cdebootstrap ubuntu-keyring
+        sudo apt-get -y --no-install-recommends install cdebootstrap ubuntu-keyring systemd-container
         make mitamae
     - name: Debootstrap
       run: make ubuntu-bionic-generic-amd64-server
