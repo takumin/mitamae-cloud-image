@@ -1,11 +1,17 @@
 ---
 #
-# Server Profile
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'bionic'
+  profile:      'server'
+  architecture: 'amd64'
+  components:   ['main', 'restricted', 'universe', 'multiverse']
+  directory:    '/tmp/ubuntu-bionic-server-amd64'
+#
+# Debootstrap Config
 #
 debootstrap:
-  distribution: 'ubuntu'
-  architecture: 'amd64'
-  suite:        'bionic'
-  variant:      'minimal'
-  components:   ['main', 'restricted', 'universe', 'multiverse']
-  includes:     ['gnupg']
+  variant:  'minimal'
+  includes: ['gnupg']
