@@ -1,18 +1,24 @@
+PROFILE_YAML    ?= profiles/ubuntu/bionic/generic/amd64/server.yml
+
 MITAMAE_REPOS   ?= github.com/itamae-kitchen/mitamae
 MITAMAE_RELEASE ?= 1.9.0
 MITAMAE_ARCH    ?= $(shell uname -m)
 MITAMAE_URL     ?= https://$(MITAMAE_REPOS)/releases/download/v$(MITAMAE_RELEASE)/mitamae-$(MITAMAE_ARCH)-linux
 
-.PHONY: all
-all: mitamae ubuntu-bionic-generic-amd64-server
+ifneq (,${TARGET_DIRECTORY})
+MITAMAE_ENV += TARGET_DIRECTORY="${TARGET_DIRECTORY}"
+endif
 
-.PHONY: ubuntu-bionic-generic-amd64-server
-ubuntu-bionic-generic-amd64-server:
-	@$(CURDIR)/.bin/mitamae local -y "$(CURDIR)/profiles/$(subst -,/,$@).yml" "$(CURDIR)/cookbooks/debootstrap/default.rb"
+ifneq (,${APT_REPO_URL_UBUNTU})
+MITAMAE_ENV += APT_REPO_URL_UBUNTU="${APT_REPO_URL_UBUNTU}"
+endif
+
+.PHONY: all
+all: bootstrap
 
 .PHONY: mitamae
-mitamae: $(CURDIR)/.bin/mitamae
-$(CURDIR)/.bin/mitamae:
+mitamae: .bin/mitamae
+.bin/mitamae:
 	@mkdir -p "$(dir $@)"
 	@if [ "$(subst MItamae v,,$(shell mitamae version))" != "$(MITAMAE_RELEASE)" ]; then \
 		rm -f "$@"; \
@@ -23,3 +29,7 @@ $(CURDIR)/.bin/mitamae:
 	@if [ ! -x "$@" ]; then \
 		chmod +x "$@"; \
 	fi
+
+.PHONY: bootstrap
+bootstrap: mitamae
+	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/bootstrap.rb
