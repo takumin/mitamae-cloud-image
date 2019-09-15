@@ -74,58 +74,49 @@ if ENV['DEBOOTSTRAP_TARGET_DIR'] then
 end
 
 #
-# Private Variables
+# Validate Variables
 #
 
-params = Hashie::Mash.new({
-  :debian => {
-    :architectures => [
-      'i386',
-      'amd64',
-      'armhf',
-      'arm64',
-    ],
-    :suites => [
-      'jessie',
-      'stretch',
-    ],
-    :variants => [
-      'default',
-      'minbase',
-      'buildd',
-      'fakechroot',
-    ],
-    :components => [
-      'main',
-      'contrib',
-      'non-free',
-    ],
-  },
-  :ubuntu => {
-    :architectures => [
-      'i386',
-      'amd64',
-      'armhf',
-      'arm64',
-    ],
-    :suites => [
-      'xenial',
-      'bionic',
-    ],
-    :variants => [
-      'default',
-      'minbase',
-      'buildd',
-      'fakechroot',
-    ],
-    :components => [
-      'main',
-      'restricted',
-      'universe',
-      'multiverse',
-    ],
-  },
-})
+node.validate! do
+  {
+    debootstrap: {
+      distribution: match(/debian|ubuntu/),
+      architecture: match(/i386|amd64|armhf|arm64/),
+      suite:        string,
+      variant:      match(/default|minbase|buildd|fakechroot/),
+      components:   array_of(string),
+      includes:     array_of(string),
+      excludes:     array_of(string),
+      mirror_url:   match(/^(?:https?|file):\/\//),
+      target_dir:   string,
+    },
+  }
+end
+
+case node[:debootstrap][:distribution]
+when 'ubuntu'
+  node.validate! do
+    {
+      debootstrap: {
+        suite:        match(/xenial|bionic/),
+        components:   array_of(match(/main|restricted|universe|multiverse/)),
+      },
+    }
+  end
+when 'debian'
+  node.validate! do
+    {
+      debootstrap: {
+        suite:        match(/jessie|stretch|buster/),
+        components:   array_of(match(/main|contrib|non-free/)),
+      },
+    }
+  end
+end
+
+#
+# Private Variables
+#
 
 dist       = node[:debootstrap][:distribution]
 arch       = node[:debootstrap][:architecture]
@@ -136,40 +127,6 @@ includes   = node[:debootstrap][:includes]
 excludes   = node[:debootstrap][:excludes]
 mirror     = node[:debootstrap][:mirror_url]
 target     = node[:debootstrap][:target_dir]
-
-#
-# Check Variables
-#
-
-unless params.key?(dist) then
-  raise ArgumentError, "node[:debootstrap][:distribution] require #{params.keys.join(' or ')}"
-end
-
-unless params[dist][:architectures].include?(arch) then
-  raise ArgumentError, "node[:debootstrap][:architectures] require #{params[dist][:architectures].join(' or ')}"
-end
-
-unless params[dist][:suites].include?(suite) then
-  raise ArgumentError, "node[:debootstrap][:suite] require #{params[dist][:suites].join(' or ')}"
-end
-
-unless params[dist][:variants].include?(variant) then
-  raise ArgumentError, "node[:debootstrap][:variant] require #{params[dist][:variants].join(' or ')}"
-end
-
-components.each do |component|
-  unless params[dist][:components].include?(component) then
-    raise ArgumentError, "node[:debootstrap][:components] require #{params[dist][:components].join(' or ')}"
-  end
-end
-
-unless mirror.match(/^https?:\/\/|ssh:\/\/|file:\/\//) then
-  raise ArgumentError, "node[:debootstrap][:mirror_url] require http:// or https:// or ssh:// or file://"
-end
-
-if target.empty? then
-  raise ArgumentError, "node[:debootstrap][:target_dir] require target directory"
-end
 
 #
 # Show Variables
