@@ -1,3 +1,6 @@
 [submodule "plugins/mitamae-plugin-resource-mount"]
 	path = plugins/mitamae-plugin-resource-mount
 	url = git@github.com:takumin/mitamae-plugin-resource-mount.git
+[submodule "plugins/mitamae-plugin-resource-apt_repository"]
+	path = plugins/mitamae-plugin-resource-apt_repository
+	url = https://github.com/takumin/mitamae-plugin-resource-apt_repository.git
