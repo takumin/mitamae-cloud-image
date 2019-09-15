@@ -11,8 +11,6 @@ jobs:
         fetch-depth: 1
     - name: Update
       run: sudo apt-get -y update
-    - name: MItamae
-      run: make mitamae
     - name: Require
       run: make require
     - name: Bootstrap
