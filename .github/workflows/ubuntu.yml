@@ -8,8 +8,8 @@ jobs:
       uses: actions/checkout@master
     - name: Required
       run: |-
-        sudo apt-get -yqq update
-        sudo apt-get -yqq install cdebootstrap debootstrap debian-keyring ubuntu-keyring
+        sudo apt-get -y update
+        sudo apt-get -y install cdebootstrap ubuntu-keyring
         make mitamae
     - name: Debootstrap
       run: make ubuntu-bionic-generic-amd64-server
