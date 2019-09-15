@@ -4,9 +4,10 @@
 
 node[:apt]                ||= Hashie::Mash.new
 node[:apt][:distribution] ||= String.new
+node[:apt][:architecture] ||= String.new
 node[:apt][:suite]        ||= String.new
 node[:apt][:components]   ||= Array.new
-node[:apt][:mirror_url]   ||= ENV['APT_REPO_URL_UBUNTU'] || String.new
+node[:apt][:mirror_url]   ||= String.new
 node[:apt][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || String.new
 
 #
@@ -20,7 +21,7 @@ if node.key?(:target)
       if node[:target][k].is_a?(String) and !node[:target][k].empty?
         node[:apt][:target_dir] = v
       end
-    when :distribution, :suite, :mirror_url
+    when :distribution, :architecture, :suite, :mirror_url
       if node[:target][k].is_a?(String) and !node[:target][k].empty?
         node[:apt][k] = v
       end
@@ -29,6 +30,24 @@ if node.key?(:target)
         node[:apt][k] = v
       end
     end
+  end
+end
+
+#
+# Default Variables
+#
+
+if node[:apt][:mirror_url].empty? then
+  case node[:apt][:distribution]
+  when 'ubuntu'
+    case node[:apt][:architecture]
+    when 'i386', 'amd64'
+      node[:apt][:mirror_url] = 'http://jp.archive.ubuntu.com/ubuntu'
+    when 'armhf', 'arm64'
+      node[:apt][:mirror_url] = 'http://jp.archive.ubuntu.com/ubuntu-ports'
+    end
+  when 'debian'
+    node[:apt][:mirror_url] = 'http://ftp.jp.debian.org/debian'
   end
 end
 

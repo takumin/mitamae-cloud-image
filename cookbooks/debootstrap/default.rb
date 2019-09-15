@@ -13,7 +13,7 @@ node[:debootstrap][:flavour]      ||= String.new
 node[:debootstrap][:components]   ||= Array.new
 node[:debootstrap][:includes]     ||= Array.new
 node[:debootstrap][:excludes]     ||= Array.new
-node[:debootstrap][:mirror_url]   ||= ENV['APT_REPO_URL_UBUNTU'] || String.new
+node[:debootstrap][:mirror_url]   ||= String.new
 node[:debootstrap][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || String.new
 
 #
@@ -178,7 +178,7 @@ if cmd == 'cdebootstrap'
   when 'ubuntu'
     cmds << '--keyring=ubuntu-archive-keyring.gpg'
   when 'debian'
-    cmds << '--keyring=debian-keyring.gpg'
+    cmds << '--keyring=debian-archive-keyring.gpg'
   end
 end
 cmds << "--arch=#{arch}"
