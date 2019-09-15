@@ -93,25 +93,25 @@ apt_repository "#{node[:apt][:target_dir]}/etc/apt/sources.list" do
   entry [
     {
       :default_uri => default_uri,
-      :mirror_uri  => "#{node[:apt][:mirror_uri]}",
+      :mirror_uri  => "#{node[:apt][:mirror_url]}",
       :suite       => "#{node[:apt][:suite]}",
       :components  => node[:apt][:components],
     },
     {
       :default_uri => default_uri,
-      :mirror_uri  => "#{node[:apt][:mirror_uri]}",
+      :mirror_uri  => "#{node[:apt][:mirror_url]}",
       :suite       => "#{node[:apt][:suite]}-updates",
       :components  => node[:apt][:components],
     },
     {
       :default_uri => default_uri,
-      :mirror_uri  => "#{node[:apt][:mirror_uri]}",
+      :mirror_uri  => "#{node[:apt][:mirror_url]}",
       :suite       => "#{node[:apt][:suite]}-backports",
       :components  => node[:apt][:components],
     },
     {
       :default_uri => default_uri,
-      :mirror_uri  => "#{node[:apt][:mirror_uri]}",
+      :mirror_uri  => "#{node[:apt][:mirror_url]}",
       :suite       => "#{node[:apt][:suite]}-security",
       :components  => node[:apt][:components],
     },
