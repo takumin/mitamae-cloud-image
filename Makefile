@@ -30,6 +30,10 @@ mitamae: .bin/mitamae
 		chmod +x "$@"; \
 	fi
 
+.PHONY: require
+require: mitamae
+	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/require.rb
+
 .PHONY: bootstrap
-bootstrap: mitamae
+bootstrap: require
 	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/bootstrap.rb
