@@ -192,6 +192,5 @@ cmds << mirror
 #
 
 execute cmds.join(' ') do
-  user 'root'
   not_if "test -x #{target}/usr/bin/apt-get"
 end
