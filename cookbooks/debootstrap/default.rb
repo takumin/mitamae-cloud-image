@@ -167,6 +167,14 @@ directory target
 #
 
 cmds = [cmd]
+if cmd == 'cdebootstrap'
+  case dist
+  when 'ubuntu'
+    cmds << '--keyring=ubuntu-archive-keyring.gpg'
+  when 'debian'
+    cmds << '--keyring=debian-keyring.gpg'
+  end
+end
 cmds << "--arch=#{arch}"
 case variant
 when 'minimal'
