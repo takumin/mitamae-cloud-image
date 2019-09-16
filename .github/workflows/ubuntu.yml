@@ -16,17 +16,20 @@ jobs:
       run: make initialize
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
-        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
+        APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com
     - name: Build image
       run: make build
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
-        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
+        APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com
     - name: Finalize
       run: make finalize
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
-        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
+        APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com
   ubuntu-bionic-generic-server-arm64:
     name: Bionic Generic Server (arm64)
     runs-on: ubuntu-latest
@@ -42,14 +45,17 @@ jobs:
       run: make initialize
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
-        APT_REPO_URL_UBUNTU: http://azure.ports.ubuntu.com/ubuntu/
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
+        APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com
     - name: Build image
       run: make build
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
-        APT_REPO_URL_UBUNTU: http://azure.ports.ubuntu.com/ubuntu/
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
+        APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com
     - name: Finalize
       run: make finalize
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
-        APT_REPO_URL_UBUNTU: http://azure.ports.ubuntu.com/ubuntu/
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
+        APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com
