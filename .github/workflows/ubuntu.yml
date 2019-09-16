@@ -11,10 +11,18 @@ jobs:
         fetch-depth: 1
     - name: Update
       run: sudo apt-get -y update
-    - name: Require
-      run: make require
-    - name: Bootstrap
-      run: make bootstrap
+    - name: Initialize
+      run: make initialize
+      env:
+        PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
+    - name: Build image
+      run: make build
+      env:
+        PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
+        APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
+    - name: Finalize
+      run: make finalize
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
         APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
