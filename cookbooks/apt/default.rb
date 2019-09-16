@@ -37,14 +37,14 @@ end
 # Environment Variables
 #
 
-case node[:debootstrap][:distribution]
+case node[:apt][:distribution]
 when 'ubuntu'
   if ENV['APT_REPO_URL_UBUNTU'].is_a?(String) and ENV['APT_REPO_URL_UBUNTU'].match(/^(?:https?|file):\/\//)
-    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
+    node[:apt][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
   end
 when 'debian'
   if ENV['APT_REPO_URL_DEBIAN'].is_a?(String) and ENV['APT_REPO_URL_DEBIAN'].match(/^(?:https?|file):\/\//)
-    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
+    node[:apt][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
   end
 end
 
