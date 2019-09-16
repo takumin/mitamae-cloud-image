@@ -1,7 +1,8 @@
-name: Ubuntu Cloud Image
+name: Ubuntu
 on: [push, pull_request]
 jobs:
-  ubuntu-bionic-generic-amd64-server:
+  ubuntu-bionic-generic-server-amd64:
+    name: Bionic Generic Server (amd64)
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -26,3 +27,29 @@ jobs:
       env:
         PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
         APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu/
+  ubuntu-bionic-generic-server-arm64:
+    name: Bionic Generic Server (arm64)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+      with:
+        submodules: true
+        fetch-depth: 1
+    - name: Update
+      run: sudo apt-get -y update
+    - name: Initialize
+      run: make initialize
+      env:
+        PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
+        APT_REPO_URL_UBUNTU: http://azure.ports.ubuntu.com/ubuntu/
+    - name: Build image
+      run: make build
+      env:
+        PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
+        APT_REPO_URL_UBUNTU: http://azure.ports.ubuntu.com/ubuntu/
+    - name: Finalize
+      run: make finalize
+      env:
+        PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
+        APT_REPO_URL_UBUNTU: http://azure.ports.ubuntu.com/ubuntu/
