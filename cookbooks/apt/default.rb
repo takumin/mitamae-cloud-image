@@ -1,68 +1,48 @@
+# frozen_string_literal: true
+
 #
 # Public Variables
 #
 
 node[:apt]                ||= Hashie::Mash.new
-node[:apt][:distribution] ||= String.new
-node[:apt][:architecture] ||= String.new
-node[:apt][:suite]        ||= String.new
-node[:apt][:components]   ||= Array.new
+node[:apt][:distribution] ||= node[:target][:distribution]
+node[:apt][:architecture] ||= node[:target][:architecture]
+node[:apt][:suite]        ||= node[:target][:suite]
+node[:apt][:components]   ||= node[:target][:components]
 node[:apt][:mirror_url]   ||= String.new
-node[:apt][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || String.new
-
-#
-# Override Variables
-#
-
-if node.key?(:target)
-  node[:target].each do |k, v|
-    case k.to_sym
-    when :directory
-      if node[:target][k].is_a?(String) and !node[:target][k].empty?
-        node[:apt][:target_dir] = v
-      end
-    when :distribution, :architecture, :suite, :mirror_url
-      if node[:target][k].is_a?(String) and !node[:target][k].empty?
-        node[:apt][k] = v
-      end
-    when :components
-      if node[:target][k].is_a?(Array) and !node[:target][k].empty?
-        node[:apt][k] = v
-      end
-    end
-  end
-end
-
-#
-# Environment Variables
-#
-
-case node[:apt][:distribution]
-when 'ubuntu'
-  if ENV['APT_REPO_URL_UBUNTU'].is_a?(String) and ENV['APT_REPO_URL_UBUNTU'].match(/^(?:https?|file):\/\//)
-    node[:apt][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
-  end
-when 'debian'
-  if ENV['APT_REPO_URL_DEBIAN'].is_a?(String) and ENV['APT_REPO_URL_DEBIAN'].match(/^(?:https?|file):\/\//)
-    node[:apt][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
-  end
-end
+node[:apt][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
 
 #
 # Default Variables
 #
 
-if node[:apt][:mirror_url].empty? then
-  case node[:apt][:distribution]
-  when 'ubuntu'
-    case node[:apt][:architecture]
-    when 'i386', 'amd64'
-      node[:apt][:mirror_url] = 'http://jp.archive.ubuntu.com/ubuntu'
-    when 'armhf', 'arm64'
-      node[:apt][:mirror_url] = 'http://jp.archive.ubuntu.com/ubuntu-ports'
+case node[:apt][:distribution]
+when 'ubuntu'
+  case node[:apt][:architecture]
+  when 'i386', 'amd64'
+    if ENV['APT_REPO_URL_UBUNTU'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU'].empty?
+      node[:apt][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
+    else
+      if node[:apt][:mirror_url].empty?
+        node[:apt][:mirror_url] = 'http://archive.ubuntu.com/ubuntu'
+      end
     end
-  when 'debian'
-    node[:apt][:mirror_url] = 'http://ftp.jp.debian.org/debian'
+  when 'armhf', 'arm64'
+    if ENV['APT_REPO_URL_UBUNTU_PORTS'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU_PORTS'].empty?
+      node[:apt][:mirror_url] = ENV['APT_REPO_URL_UBUNTU_PORTS']
+    else
+      if node[:apt][:mirror_url].empty?
+        node[:apt][:mirror_url] = 'http://ports.ubuntu.com/ubuntu'
+      end
+    end
+  end
+when 'debian'
+  if ENV['APT_REPO_URL_DEBIAN'].is_a?(String) and !ENV['APT_REPO_URL_DEBIAN'].empty?
+    node[:apt][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
+  else
+    if node[:apt][:mirror_url].empty?
+      node[:apt][:mirror_url] = 'http://deb.debian.org/debian'
+    end
   end
 end
 

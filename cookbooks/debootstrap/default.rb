@@ -6,91 +6,48 @@
 
 node[:debootstrap]                ||= Hashie::Mash.new
 node[:debootstrap][:command]      ||= String.new
-node[:debootstrap][:distribution] ||= String.new
-node[:debootstrap][:architecture] ||= String.new
-node[:debootstrap][:suite]        ||= String.new
+node[:debootstrap][:distribution] ||= node[:target][:distribution]
+node[:debootstrap][:architecture] ||= node[:target][:architecture]
+node[:debootstrap][:suite]        ||= node[:target][:suite]
 node[:debootstrap][:flavour]      ||= String.new
-node[:debootstrap][:components]   ||= Array.new
+node[:debootstrap][:components]   ||= node[:target][:components]
 node[:debootstrap][:includes]     ||= Array.new
 node[:debootstrap][:excludes]     ||= Array.new
 node[:debootstrap][:mirror_url]   ||= String.new
-node[:debootstrap][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || String.new
+node[:debootstrap][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
 
 #
-# Override Variables
-#
-
-if node.key?(:target)
-  node[:target].each do |k, v|
-    case k.to_sym
-    when :directory
-      if node[:target][k].is_a?(String) and !node[:target][k].empty?
-        node[:debootstrap][:target_dir] = v
-      end
-    when :distribution, :architecture, :suite, :flavour, :mirror_url
-      if node[:target][k].is_a?(String) and !node[:target][k].empty?
-        node[:debootstrap][k] = v
-      end
-    when :components, :includes, :excludes
-      if node[:target][k].is_a?(Array) and !node[:target][k].empty?
-        node[:debootstrap][k] = v
-      end
-    end
-  end
-end
-
-#
-# Environment Variables
+# Default Variables
 #
 
 case node[:debootstrap][:distribution]
 when 'ubuntu'
   case node[:debootstrap][:architecture]
   when 'i386', 'amd64'
-    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
+    if ENV['APT_REPO_URL_UBUNTU'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU'].empty?
+      node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
+    else
+      if node[:debootstrap][:mirror_url].empty?
+        node[:debootstrap][:mirror_url] = 'http://archive.ubuntu.com/ubuntu'
+      end
+    end
   when 'armhf', 'arm64'
-    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU_PORTS']
+    if ENV['APT_REPO_URL_UBUNTU_PORTS'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU_PORTS'].empty?
+      node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU_PORTS']
+    else
+      if node[:debootstrap][:mirror_url].empty?
+        node[:debootstrap][:mirror_url] = 'http://ports.ubuntu.com/ubuntu'
+      end
+    end
   end
 when 'debian'
-  node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
-end
-
-#
-# Default Variables
-#
-
-if node[:debootstrap][:command].empty? then
-  node[:debootstrap][:command] = 'debootstrap'
-
-  %w{cdebootstrap}.each do |cmd|
-    if run_command("#{cmd} --version", error: false).success?
-      node[:debootstrap][:command] = cmd
-      break
+  if ENV['APT_REPO_URL_DEBIAN'].is_a?(String) and !ENV['APT_REPO_URL_DEBIAN'].empty?
+    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
+  else
+    if node[:debootstrap][:mirror_url].empty?
+      node[:debootstrap][:mirror_url] = 'http://deb.debian.org/debian'
     end
   end
-end
-
-if node[:debootstrap][:mirror_url].empty? then
-  case node[:debootstrap][:distribution]
-  when 'ubuntu'
-    case node[:debootstrap][:architecture]
-    when 'i386', 'amd64'
-      node[:debootstrap][:mirror_url] = 'http://jp.archive.ubuntu.com/ubuntu'
-    when 'armhf', 'arm64'
-      node[:debootstrap][:mirror_url] = 'http://jp.archive.ubuntu.com/ubuntu-ports'
-    end
-  when 'debian'
-    node[:debootstrap][:mirror_url] = 'http://ftp.jp.debian.org/debian'
-  end
-end
-
-if node[:debootstrap][:target_dir].empty? then
-  node[:debootstrap][:target_dir] = "/tmp/#{[
-    node[:debootstrap][:distribution],
-    node[:debootstrap][:architecture],
-    node[:debootstrap][:suite],
-    node[:debootstrap][:flavour],
-  ].join('-')}"
 end
 
 #

@@ -3,26 +3,14 @@
 #
 
 node[:finalize]              ||= Hashie::Mash.new
-node[:finalize][:target_dir] ||= ENV['TARGET_DIRECTORY'] || String.new
-node[:finalize][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || String.new
-
-#
-# Default Variables
-#
-
-if node[:finalize][:target_dir].empty?
-  node[:finalize][:target_dir] = node[:target][:directory]
-end
-
-if node[:finalize][:output_dir].empty?
-  node[:finalize][:output_dir] = File.join(
-    'releases',
-    node[:target][:distribution],
-    node[:target][:suite],
-    node[:target][:profile],
-    node[:target][:architecture],
-  )
-end
+node[:finalize][:target_dir] ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
+node[:finalize][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
+  'releases',
+  node[:target][:distribution],
+  node[:target][:suite],
+  node[:target][:profile],
+  node[:target][:architecture],
+)
 
 #
 # Required Packages
