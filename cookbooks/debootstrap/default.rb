@@ -153,6 +153,8 @@ target     = node[:debootstrap][:target_dir]
 # Required Packages
 #
 
+package 'qemu-user-static'
+
 case cmd
 when 'debootstrap'
   package 'debootstrap'
@@ -218,6 +220,9 @@ if cmd == 'debootstrap'
 end
 cmds << "--include=#{includes.join(',')}" unless includes.empty?
 cmds << "--exclude=#{excludes.join(',')}" unless excludes.empty?
+if cmd == 'cdebootstrap'
+  cmds << '--foreign'
+end
 cmds << suite
 cmds << target
 cmds << mirror
@@ -228,4 +233,21 @@ cmds << mirror
 
 execute cmds.join(' ') do
   not_if "test -x #{target}/usr/bin/apt-get"
+end
+
+#
+# Copy Qemu Binary
+#
+
+case arch
+when 'amd64', 'i386'
+  # nothing...
+when 'armhf'
+  execute "cp /usr/bin/qemu-arm-static #{target}/usr/bin/qemu-arm-static" do
+    not_if "test -f #{target}/usr/bin/qemu-arm-static"
+  end
+when 'arm64'
+  execute "cp /usr/bin/qemu-aarch64-static #{target}/usr/bin/qemu-aarch64-static" do
+    not_if "test -f #{target}/usr/bin/qemu-aarch64-static"
+  end
 end
