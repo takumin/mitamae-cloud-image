@@ -18,7 +18,7 @@ MITAMAE_ENV += APT_REPO_URL_DEBIAN="${APT_REPO_URL_DEBIAN}"
 endif
 
 .PHONY: all
-all: bootstrap
+all: finalize
 
 .PHONY: mitamae
 mitamae: .bin/mitamae
@@ -38,3 +38,7 @@ require: mitamae
 .PHONY: bootstrap
 bootstrap: require
 	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/bootstrap.rb
+
+.PHONY: finalize
+finalize: bootstrap
+	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/finalize.rb
