@@ -45,13 +45,14 @@ end
 
 case node[:debootstrap][:distribution]
 when 'ubuntu'
-  if ENV['APT_REPO_URL_UBUNTU'].is_a?(String) and ENV['APT_REPO_URL_UBUNTU'].match(/^(?:https?|file):\/\//)
+  case node[:debootstrap][:architecture]
+  when 'i386', 'amd64'
     node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
+  when 'armhf', 'arm64'
+    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU_PORTS']
   end
 when 'debian'
-  if ENV['APT_REPO_URL_DEBIAN'].is_a?(String) and ENV['APT_REPO_URL_DEBIAN'].match(/^(?:https?|file):\/\//)
-    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
-  end
+  node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
 end
 
 #
