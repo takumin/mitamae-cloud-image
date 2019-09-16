@@ -13,6 +13,6 @@ target:
 # Debootstrap Config
 #
 debootstrap:
-  command:  'cdebootstrap'
+  command:  'debootstrap'
   flavour:  'minimal'
   includes: ['gnupg']

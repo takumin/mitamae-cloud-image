@@ -4,50 +4,39 @@
 # Public Variables
 #
 
-node[:debootstrap]                ||= Hashie::Mash.new
-node[:debootstrap][:command]      ||= String.new
-node[:debootstrap][:distribution] ||= node[:target][:distribution]
-node[:debootstrap][:architecture] ||= node[:target][:architecture]
-node[:debootstrap][:suite]        ||= node[:target][:suite]
-node[:debootstrap][:flavour]      ||= String.new
-node[:debootstrap][:components]   ||= node[:target][:components]
-node[:debootstrap][:includes]     ||= Array.new
-node[:debootstrap][:excludes]     ||= Array.new
-node[:debootstrap][:mirror_url]   ||= String.new
-node[:debootstrap][:target_dir]   ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
+node[:debootstrap]                          ||= Hashie::Mash.new
+node[:debootstrap][:command]                ||= 'debootstrap'
+node[:debootstrap][:distribution]           ||= node[:target][:distribution]
+node[:debootstrap][:architecture]           ||= node[:target][:architecture]
+node[:debootstrap][:suite]                  ||= node[:target][:suite]
+node[:debootstrap][:flavour]                ||= 'minimal'
+node[:debootstrap][:components]             ||= node[:target][:components]
+node[:debootstrap][:includes]               ||= Array.new
+node[:debootstrap][:excludes]               ||= Array.new
+node[:debootstrap][:ubuntu_mirror]          ||= 'http://archive.ubuntu.com/ubuntu'
+node[:debootstrap][:ubuntu_ports_mirror]    ||= 'http://ports.ubuntu.com/ubuntu'
+node[:debootstrap][:debian_mirror]          ||= 'http://deb.debian.org/debian'
+node[:debootstrap][:debian_security_mirror] ||= 'http://deb.debian.org/debian-security'
+node[:debootstrap][:target_dir]             ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
 
 #
 # Default Variables
 #
 
-case node[:debootstrap][:distribution]
-when 'ubuntu'
-  case node[:debootstrap][:architecture]
-  when 'i386', 'amd64'
-    if ENV['APT_REPO_URL_UBUNTU'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU'].empty?
-      node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU']
-    else
-      if node[:debootstrap][:mirror_url].empty?
-        node[:debootstrap][:mirror_url] = 'http://archive.ubuntu.com/ubuntu'
-      end
-    end
-  when 'armhf', 'arm64'
-    if ENV['APT_REPO_URL_UBUNTU_PORTS'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU_PORTS'].empty?
-      node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_UBUNTU_PORTS']
-    else
-      if node[:debootstrap][:mirror_url].empty?
-        node[:debootstrap][:mirror_url] = 'http://ports.ubuntu.com/ubuntu'
-      end
-    end
-  end
-when 'debian'
-  if ENV['APT_REPO_URL_DEBIAN'].is_a?(String) and !ENV['APT_REPO_URL_DEBIAN'].empty?
-    node[:debootstrap][:mirror_url] = ENV['APT_REPO_URL_DEBIAN']
-  else
-    if node[:debootstrap][:mirror_url].empty?
-      node[:debootstrap][:mirror_url] = 'http://deb.debian.org/debian'
-    end
-  end
+if ENV['APT_REPO_URL_UBUNTU'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU'].empty?
+  node[:debootstrap][:ubuntu_mirror] = ENV['APT_REPO_URL_UBUNTU']
+end
+
+if ENV['APT_REPO_URL_UBUNTU_PORTS'].is_a?(String) and !ENV['APT_REPO_URL_UBUNTU_PORTS'].empty?
+  node[:debootstrap][:ubuntu_ports_mirror] = ENV['APT_REPO_URL_UBUNTU_PORTS']
+end
+
+if ENV['APT_REPO_URL_DEBIAN'].is_a?(String) and !ENV['APT_REPO_URL_DEBIAN'].empty?
+  node[:debootstrap][:debian_mirror] = ENV['APT_REPO_URL_DEBIAN']
+end
+
+if ENV['APT_REPO_URL_DEBIAN_SECURITY'].is_a?(String) and !ENV['APT_REPO_URL_DEBIAN_SECURITY'].empty?
+  node[:debootstrap][:debian_security_mirror] = ENV['APT_REPO_URL_DEBIAN_SECURITY']
 end
 
 #
@@ -57,16 +46,19 @@ end
 node.validate! do
   {
     debootstrap: {
-      command:      match(/^(?:c?debootstrap)$/),
-      distribution: match(/^(?:debian|ubuntu)$/),
-      architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
-      suite:        string,
-      flavour:      match(/^(?:default|minimal|build)$/),
-      components:   array_of(string),
-      includes:     array_of(string),
-      excludes:     array_of(string),
-      mirror_url:   match(/^(?:https?|file):\/\//),
-      target_dir:   string,
+      command:                match(/^(?:c?debootstrap)$/),
+      distribution:           match(/^(?:debian|ubuntu)$/),
+      architecture:           match(/^(?:i386|amd64|armhf|arm64)$/),
+      suite:                  string,
+      flavour:                match(/^(?:default|minimal|build)$/),
+      components:             array_of(string),
+      includes:               array_of(string),
+      excludes:               array_of(string),
+      ubuntu_mirror:          match(/^(?:https?|file):\/\//),
+      ubuntu_ports_mirror:    match(/^(?:https?|file):\/\//),
+      debian_mirror:          match(/^(?:https?|file):\/\//),
+      debian_security_mirror: match(/^(?:https?|file):\/\//),
+      target_dir:             string,
     },
   }
 end
@@ -76,8 +68,8 @@ when 'ubuntu'
   node.validate! do
     {
       debootstrap: {
-        suite:        match(/^(?:xenial|bionic)$/),
-        components:   array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
+        suite:      match(/^(?:xenial|bionic)$/),
+        components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }
   end
@@ -85,8 +77,8 @@ when 'debian'
   node.validate! do
     {
       debootstrap: {
-        suite:        match(/^(?:jessie|stretch|buster)$/),
-        components:   array_of(match(/^(?:main|contrib|non-free)$/)),
+        suite:      match(/^(?:jessie|stretch|buster)$/),
+        components: array_of(match(/^(?:main|contrib|non-free)$/)),
       },
     }
   end
@@ -104,8 +96,19 @@ flavour    = node[:debootstrap][:flavour]
 components = node[:debootstrap][:components]
 includes   = node[:debootstrap][:includes]
 excludes   = node[:debootstrap][:excludes]
-mirror     = node[:debootstrap][:mirror_url]
 target     = node[:debootstrap][:target_dir]
+
+case dist
+when 'debian'
+  mirror = node[:debootstrap][:debian_mirror]
+when 'ubuntu'
+  case arch
+  when 'i386', 'amd64'
+    mirror = node[:debootstrap][:ubuntu_mirror]
+  when 'armhf', 'arm64'
+    mirror = node[:debootstrap][:ubuntu_ports_mirror]
+  end
+end
 
 #
 # Required Packages
