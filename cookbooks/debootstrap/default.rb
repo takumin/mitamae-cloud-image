@@ -131,22 +131,6 @@ when 'ubuntu'
 end
 
 #
-# Show Variables
-#
-
-MItamae.logger.info "Debootstrap Infomation"
-MItamae.logger.info "  Command:      #{cmd}"
-MItamae.logger.info "  Distribution: #{dist}"
-MItamae.logger.info "  Architecture: #{arch}"
-MItamae.logger.info "  Suite:        #{suite}"
-MItamae.logger.info "  Flavour:      #{flavour}"
-MItamae.logger.info "  Components:   #{components}"
-MItamae.logger.info "  Includes:     #{includes}"
-MItamae.logger.info "  Excludes:     #{excludes}"
-MItamae.logger.info "  Mirror Url:   #{mirror}"
-MItamae.logger.info "  Target Dir:   #{target}"
-
-#
 # Command Builder
 #
 
