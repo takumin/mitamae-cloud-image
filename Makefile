@@ -43,12 +43,9 @@ mitamae: .bin/mitamae
 initialize: mitamae
 	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/initialize.rb
 
-.PHONY: bootstrap
-bootstrap: initialize
-	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/bootstrap.rb
-
 .PHONY: build
-build: bootstrap
+build: initialize
+	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/build.rb
 
 .PHONY: finalize
 finalize: build
