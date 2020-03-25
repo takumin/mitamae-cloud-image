@@ -188,11 +188,11 @@ case arch
 when 'amd64', 'i386'
   # nothing...
 when 'armhf'
-  execute "cp /usr/bin/qemu-arm-static #{target}/usr/bin/qemu-arm-static" do
-    not_if "test -f #{target}/usr/bin/qemu-arm-static"
+  execute "cp /usr/bin/qemu-arm-static #{target}/usr/local/bin/qemu-arm-static" do
+    not_if "test -f #{target}/usr/local/bin/qemu-arm-static"
   end
 when 'arm64'
-  execute "cp /usr/bin/qemu-aarch64-static #{target}/usr/bin/qemu-aarch64-static" do
-    not_if "test -f #{target}/usr/bin/qemu-aarch64-static"
+  execute "cp /usr/bin/qemu-aarch64-static #{target}/usr/local/bin/qemu-aarch64-static" do
+    not_if "test -f #{target}/usr/local/bin/qemu-aarch64-static"
   end
 end
