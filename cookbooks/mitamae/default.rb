@@ -62,11 +62,11 @@ end
 #
 
 http_request '/usr/local/bin/mitamae' do
-  path   File.join(node[:mitamae][:target_dir], '/usr/local/bin/mitamae')
+  path   'usr/local/bin/mitamae'
   cwd    node[:mitamae][:target_dir]
   url    node[:mitamae][:binary_url]
   owner  'root'
   group  'root'
   mode   '0755'
-  not_if 'text -x /usr/local/bin/mitamae'
+  not_if 'test -x usr/local/bin/mitamae'
 end
