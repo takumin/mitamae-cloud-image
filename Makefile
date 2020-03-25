@@ -1,7 +1,7 @@
 PROFILE_YAML    ?= profiles/ubuntu/bionic/generic/amd64/server.yml
 
 MITAMAE_REPOS   ?= github.com/itamae-kitchen/mitamae
-MITAMAE_RELEASE ?= 1.9.0
+MITAMAE_RELEASE ?= 1.11.6
 MITAMAE_ARCH    ?= $(shell uname -m)
 MITAMAE_URL     ?= https://$(MITAMAE_REPOS)/releases/download/v$(MITAMAE_RELEASE)/mitamae-$(MITAMAE_ARCH)-linux
 
