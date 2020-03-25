@@ -18,11 +18,11 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: make initialize
+      run: rake ubuntu_bionic_generic_amd64_server:initialize
     - name: Provision
-      run: make provision
+      run: rake ubuntu_bionic_generic_amd64_server:provision
     - name: Finalize
-      run: make finalize
+      run: rake ubuntu_bionic_generic_amd64_server:finalize
   ubuntu-bionic-generic-server-arm64:
     name: Bionic Generic Server (arm64)
     runs-on: ubuntu-latest
@@ -37,8 +37,8 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: make initialize
+      run: rake ubuntu_bionic_generic_arm64_server:initialize
     - name: Provision
-      run: make provision
+      run: rake ubuntu_bionic_generic_arm64_server:provision
     - name: Finalize
-      run: make finalize
+      run: rake ubuntu_bionic_generic_arm64_server:finalize

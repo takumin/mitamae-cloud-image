@@ -13,7 +13,6 @@ node[:apt][:ubuntu_mirror]          ||= 'http://archive.ubuntu.com/ubuntu'
 node[:apt][:ubuntu_ports_mirror]    ||= 'http://ports.ubuntu.com/ubuntu'
 node[:apt][:debian_mirror]          ||= 'http://deb.debian.org/debian'
 node[:apt][:debian_security_mirror] ||= 'http://deb.debian.org/debian-security'
-node[:apt][:target_dir]             ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
 
 #
 # Default Variables
@@ -49,7 +48,6 @@ node.validate! do
       ubuntu_ports_mirror:    match(/^(?:https?|file):\/\//),
       debian_mirror:          match(/^(?:https?|file):\/\//),
       debian_security_mirror: match(/^(?:https?|file):\/\//),
-      target_dir:             string,
     },
   }
 end
@@ -154,7 +152,7 @@ end
 # Apt Repository
 #
 
-apt_repository "#{node[:apt][:target_dir]}/etc/apt/sources.list" do
+apt_repository '/etc/apt/sources.list' do
   header [
     '#',
     '# Official Repository',
@@ -165,16 +163,9 @@ apt_repository "#{node[:apt][:target_dir]}/etc/apt/sources.list" do
 end
 
 #
-# Required Packages
-#
-
-package 'systemd-container'
-
-#
 # Handler
 #
 
 execute 'apt-get update' do
   action :nothing
-  command "systemd-nspawn -D #{node[:apt][:target_dir]} apt-get update"
 end

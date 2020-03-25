@@ -13,7 +13,6 @@ node[:hosts][:contents] ||= Hashie::Mash.new({
   'ff02::1':   ['ip6-allnodes'],
   'ff02::2':   ['ip6-allrouters'],
 })
-node[:hosts][:target_dir] ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
 
 #
 # Hosts File
@@ -25,7 +24,7 @@ node[:hosts][:contents].each do |k, v|
   contents << sprintf("%-#{maxlen}s %s", k, v.join(' '))
 end
 
-file "#{node[:hosts][:target_dir]}/etc/hosts" do
+file '/etc/hosts' do
   owner   'root'
   group   'root'
   mode    '0644'
