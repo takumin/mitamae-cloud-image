@@ -43,10 +43,10 @@ mitamae: .bin/mitamae
 initialize: mitamae
 	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/initialize.rb
 
-.PHONY: build
-build: initialize
-	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/build.rb
+.PHONY: provision
+provision: initialize
+	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/provision.rb
 
 .PHONY: finalize
-finalize: build
+finalize: provision
 	@sudo $(MITAMAE_ENV) .bin/mitamae local -y $(PROFILE_YAML) phases/finalize.rb

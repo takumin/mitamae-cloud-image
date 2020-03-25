@@ -19,8 +19,8 @@ jobs:
       run: sudo apt-get -y update
     - name: Initialize
       run: make initialize
-    - name: Build image
-      run: make build
+    - name: Provision
+      run: make provision
     - name: Finalize
       run: make finalize
   ubuntu-bionic-generic-server-arm64:
@@ -38,7 +38,7 @@ jobs:
       run: sudo apt-get -y update
     - name: Initialize
       run: make initialize
-    - name: Build image
-      run: make build
+    - name: Provision
+      run: make provision
     - name: Finalize
       run: make finalize
