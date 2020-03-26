@@ -13,6 +13,13 @@ node[:finalize][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
 )
 
 #
+# Private Variables
+#
+
+target_dir = node[:finalize][:target_dir]
+output_dir = node[:finalize][:output_dir]
+
+#
 # Required Packages
 #
 
@@ -23,26 +30,34 @@ package 'pixz'
 # Output Directory
 #
 
-directory node[:finalize][:output_dir] do
+directory output_dir do
   owner 'root'
   group 'root'
   mode  '0755'
 end
 
 #
+# Package Manifest
+#
+
+execute "chroot #{target_dir} dpkg -l | sed -E '1,5d' | awk '{print $2 \"\\t\" $3}' > #{output_dir}/packages.manifest" do
+  not_if  "test -f #{output_dir}/package.manifest"
+end
+
+#
 # SquashFS Archive
 #
 
-execute "mksquashfs #{node[:finalize][:target_dir]} #{node[:finalize][:output_dir]}/rootfs.squashfs -comp xz" do
-  not_if "test -f #{node[:finalize][:output_dir]}/rootfs.squashfs"
+execute "mksquashfs #{target_dir} #{output_dir}/rootfs.squashfs -comp xz" do
+  not_if "test -f #{output_dir}/rootfs.squashfs"
 end
 
 #
 # Tarball Archive
 #
 
-execute "tar -I pixz -p --acls --xattrs --one-file-system -cf #{node[:finalize][:output_dir]}/rootfs.tar.xz -C #{node[:finalize][:target_dir]} ." do
-  not_if "test -f #{node[:finalize][:output_dir]}/rootfs.tar.xz"
+execute "tar -I pixz -p --acls --xattrs --one-file-system -cf #{output_dir}/rootfs.tar.xz -C #{target_dir} ." do
+  not_if "test -f #{output_dir}/rootfs.tar.xz"
 end
 
 #
@@ -50,8 +65,8 @@ end
 #
 
 %W{
-  #{node[:finalize][:output_dir]}/rootfs.squashfs
-  #{node[:finalize][:output_dir]}/rootfs.tar.xz
+  #{output_dir}/rootfs.squashfs
+  #{output_dir}/rootfs.tar.xz
 }.each do |archive|
   file archive do
     owner 'root'
