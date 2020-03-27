@@ -115,6 +115,7 @@ end
 #
 
 package 'qemu-user-static'
+package 'qemu-user-binfmt'
 
 case cmd
 when 'debootstrap'
