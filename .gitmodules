@@ -4,3 +4,6 @@
 [submodule "plugins/mitamae-plugin-resource-apt_repository"]
 	path = plugins/mitamae-plugin-resource-apt_repository
 	url = https://github.com/takumin/mitamae-plugin-resource-apt_repository.git
+[submodule "plugins/mitamae-plugin-resource-debconf"]
+	path = plugins/mitamae-plugin-resource-debconf
+	url = https://github.com/takumin/mitamae-plugin-resource-debconf.git
