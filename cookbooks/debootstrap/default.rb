@@ -114,8 +114,8 @@ end
 # Required Packages
 #
 
+package 'binfmt-support'
 package 'qemu-user-static'
-package 'qemu-user-binfmt'
 
 case cmd
 when 'debootstrap'
