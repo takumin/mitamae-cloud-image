@@ -59,3 +59,7 @@ end
     options v[:options]
   end
 end
+
+directory File.join(node[:rootfs_mount][:target_dir], 'dev', 'shm') do
+  mode '1777'
+end
