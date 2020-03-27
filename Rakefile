@@ -41,6 +41,7 @@ profiles.each do |profile|
     desc 'initialize'
     task :initialize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'initialize.rb')
+
       execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
     end
 
@@ -49,23 +50,24 @@ profiles.each do |profile|
       mitamae_dir  = File.join(target_dir, 'mitamae')
       recipe_path  = File.join('/mitamae', 'phases', 'provision.rb')
       exclude_list = ['--exclude=".git/"', '--exclude="releases/"']
+
       execution(['sudo', 'rsync', '-av', exclude_list.join(' '), "#{Dir.pwd}/", "#{mitamae_dir}/"].join(' '))
 
-      open("#{mitamae_dir}/mitamae.sh", 'w') do |f|
-        f.puts '#!/bin/sh'
-        f.puts ''
-        f.puts 'cd /mitamae'
-        f.puts "mitamae local -y /mitamae/profiles/#{profile} #{recipe_path}"
-      end
-      FileUtils.chmod(0755, "#{mitamae_dir}/mitamae.sh")
+      execution([
+        'sudo', '-E', 'chroot', target_dir,
+        'mitamae', 'local',
+        '--plugins=/mitamae/plugins',
+        '-y', "/mitamae/profiles/#{profile}",
+        recipe_path
+      ].join(' '))
 
-      execution(['sudo', '-E', 'chroot', target_dir, "/mitamae/mitamae.sh"].join(' '))
       execution(['sudo', 'rm', '-fr', File.join(target_dir, 'mitamae')].join(' '))
     end
 
     desc 'finalize'
     task :finalize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'finalize.rb')
+
       execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
     end
 
