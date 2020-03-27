@@ -116,7 +116,7 @@ when :ubuntu
     default_uri = 'http://archive.ubuntu.com/ubuntu'
     mirror_uri  = node[:apt][:ubuntu_mirror]
   when :armhf, :arm64
-    default_uri = 'http://ports.ubuntu.com/ubuntu'
+    default_uri = 'http://ports.ubuntu.com/ubuntu-ports'
     mirror_uri  = node[:apt][:ubuntu_ports_mirror]
   end
 
