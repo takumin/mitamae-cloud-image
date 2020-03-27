@@ -41,7 +41,7 @@ end
 #
 
 execute "chroot #{target_dir} dpkg -l | sed -E '1,5d' | awk '{print $2 \"\\t\" $3}' > #{output_dir}/packages.manifest" do
-  not_if  "test -f #{output_dir}/package.manifest"
+  not_if "test -f #{output_dir}/packages.manifest"
 end
 
 #
