@@ -15,6 +15,17 @@ node[:hosts][:contents] ||= Hashie::Mash.new({
 })
 
 #
+# Hostname File
+#
+
+file '/etc/hostname' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content 'localhost'
+end
+
+#
 # Hosts File
 #
 
