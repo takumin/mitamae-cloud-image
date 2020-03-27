@@ -10,7 +10,7 @@ node[:apt][:architecture]           ||= node[:target][:architecture]
 node[:apt][:suite]                  ||= node[:target][:suite]
 node[:apt][:components]             ||= node[:target][:components]
 node[:apt][:ubuntu_mirror]          ||= 'http://archive.ubuntu.com/ubuntu'
-node[:apt][:ubuntu_ports_mirror]    ||= 'http://ports.ubuntu.com/ubuntu'
+node[:apt][:ubuntu_ports_mirror]    ||= 'http://ports.ubuntu.com/ubuntu-ports'
 node[:apt][:debian_mirror]          ||= 'http://deb.debian.org/debian'
 node[:apt][:debian_security_mirror] ||= 'http://deb.debian.org/debian-security'
 

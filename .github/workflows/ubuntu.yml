@@ -2,7 +2,7 @@ name: Ubuntu
 on: [push, pull_request]
 env:
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
-  APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com
+  APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
 jobs:
   ubuntu-bionic-generic-server-amd64:
     name: Bionic Generic Server (amd64)
