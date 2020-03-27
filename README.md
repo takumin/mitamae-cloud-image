@@ -2,7 +2,9 @@
 generate cloud image from mitamae recipe
 
 # TODO
-- [ ] initialization
-- [x] support cdebootstrap
-- [ ] systemd-nspawn mitamae
-- [ ] finalization
+- [ ] linux kernel image
+- [ ] nvidia repository
+- [ ] desktop cookbook
+- [ ] localize cookbook
+- [ ] hwe linux kernel image
+- [ ] cleanup image
