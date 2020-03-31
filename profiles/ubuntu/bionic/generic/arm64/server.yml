@@ -5,8 +5,9 @@
 target:
   distribution: 'ubuntu'
   suite:        'bionic'
-  profile:      'server'
   architecture: 'arm64'
+  kernel:       'generic'
+  profile:      'server'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-bionic-server-arm64'
 #

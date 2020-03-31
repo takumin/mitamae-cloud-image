@@ -7,3 +7,6 @@
 [submodule "plugins/mitamae-plugin-resource-debconf"]
 	path = plugins/mitamae-plugin-resource-debconf
 	url = https://github.com/takumin/mitamae-plugin-resource-debconf.git
+[submodule "plugins/mitamae-plugin-resource-apt_keyring"]
+	path = plugins/mitamae-plugin-resource-apt_keyring
+	url = https://github.com/takumin/mitamae-plugin-resource-apt_keyring.git

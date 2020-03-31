@@ -7,8 +7,9 @@ node.validate! do
     target: {
       distribution: match(/^(?:debian|ubuntu)$/),
       suite:        string,
-      profile:      match(/^(?:minimal|server|desktop)$/),
       architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
+      kernel:       match(/^(?:generic|generic-latest|virtual|virtual-latest)$/),
+      profile:      match(/^(?:minimal|server|desktop)$/),
       components:   array_of(string),
       directory:    string,
     },

@@ -3,7 +3,7 @@ generate cloud image from mitamae recipe
 
 # TODO
 - [x] linux kernel image
-- [ ] nvidia repository
+- [x] nvidia repository
 - [ ] desktop cookbook
 - [ ] localize cookbook
 - [ ] hwe linux kernel image
