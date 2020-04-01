@@ -77,3 +77,15 @@ if ENV['DISABLE_TARBALL'] != 'true'
     mode  '0644'
   end
 end
+
+#
+# Kernel and Initramfs
+#
+
+execute "find '#{target_dir}/boot' -type f -name 'vmlinuz-*' -exec cp {} #{output_dir}/vmlinuz \\;" do
+  not_if "test -f #{output_dir}/vmlinuz"
+end
+
+execute "find '#{target_dir}/boot' -type f -name 'initrd.img-*' -exec cp {} #{output_dir}/initrd.img \\;" do
+  not_if "test -f #{output_dir}/initrd.img"
+end
