@@ -5,11 +5,11 @@
 target:
   distribution: 'ubuntu'
   suite:        'bionic'
-  architecture: 'arm64'
   kernel:       'generic'
   profile:      'server'
+  architecture: 'arm64'
   components:   ['main', 'restricted', 'universe', 'multiverse']
-  directory:    '/tmp/ubuntu-bionic-server-arm64'
+  directory:    '/tmp/ubuntu-bionic-generic-server-arm64'
 #
 # Debootstrap Config
 #
