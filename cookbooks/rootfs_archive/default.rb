@@ -47,6 +47,22 @@ execute "chroot #{target_dir} dpkg -l | sed -E '1,5d' | awk '{print $2 \"\\t\" $
 end
 
 #
+# Kernel and Initramfs
+#
+
+%w{vmlinuz initrd.img}.each do |f|
+  execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
+    not_if "test -f #{output_dir}/#{f}"
+  end
+
+  file "#{output_dir}/#{f}" do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+  end
+end
+
+#
 # SquashFS Archive
 #
 
@@ -76,16 +92,4 @@ if ENV['DISABLE_TARBALL'] != 'true'
     group 'root'
     mode  '0644'
   end
-end
-
-#
-# Kernel and Initramfs
-#
-
-execute "find '#{target_dir}/boot' -type f -name 'vmlinuz-*' -exec cp {} #{output_dir}/vmlinuz \\;" do
-  not_if "test -f #{output_dir}/vmlinuz"
-end
-
-execute "find '#{target_dir}/boot' -type f -name 'initrd.img-*' -exec cp {} #{output_dir}/initrd.img \\;" do
-  not_if "test -f #{output_dir}/initrd.img"
 end
