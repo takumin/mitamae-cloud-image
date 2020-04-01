@@ -8,7 +8,7 @@ jobs:
     name: Bionic Generic Server (amd64)
     runs-on: ubuntu-latest
     env:
-      PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
+      PROFILE_YAML: profiles/ubuntu/bionic/generic-server-amd64.yml
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -18,16 +18,16 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: rake ubuntu_bionic_generic_amd64_server:initialize
+      run: rake ubuntu_bionic_generic-server-amd64:initialize
     - name: Provision
-      run: rake ubuntu_bionic_generic_amd64_server:provision
+      run: rake ubuntu_bionic_generic-server-amd64:provision
     - name: Finalize
-      run: rake ubuntu_bionic_generic_amd64_server:finalize
+      run: rake ubuntu_bionic_generic-server-amd64:finalize
   ubuntu-bionic-generic-server-arm64:
     name: Bionic Generic Server (arm64)
     runs-on: ubuntu-latest
     env:
-      PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
+      PROFILE_YAML: profiles/ubuntu/bionic/generic-server-arm64.yml
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -37,8 +37,8 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: rake ubuntu_bionic_generic_arm64_server:initialize
+      run: rake ubuntu_bionic_generic-server-arm64:initialize
     - name: Provision
-      run: rake ubuntu_bionic_generic_arm64_server:provision
+      run: rake ubuntu_bionic_generic-server-arm64:provision
     - name: Finalize
-      run: rake ubuntu_bionic_generic_arm64_server:finalize
+      run: rake ubuntu_bionic_generic-server-arm64:finalize
