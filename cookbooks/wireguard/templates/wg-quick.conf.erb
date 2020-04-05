@@ -1,0 +1,97 @@
+[Interface]
+PrivateKey = <%= node[:wireguard][:privatekey] %>
+<%- if @val[:listenport].kind_of?(Integer) -%>
+ListenPort = <%= @val[:listenport] %>
+<%- else -%>
+ListenPort = 51820
+<%- end -%>
+<%- if @val[:fwmark] -%>
+FwMark     = <%= @val[:fwmark] %>
+<%- end -%>
+<%- case @val[:address] -%>
+<%- when String -%>
+Address    = <%= @val[:address] %>
+<%- when Array -%>
+<%-   @val[:address].each do |address| -%>
+Address    = <%= address %>
+<%-   end -%>
+<%- end -%>
+<%- case @val[:dns] -%>
+<%- when String -%>
+DNS        = <%= @val[:dns] %>
+<%- when Array -%>
+<%-   @val[:dns].each do |dns| -%>
+DNS        = <%= dns %>
+<%-   end -%>
+<%- end -%>
+<%- case @val[:mtu] -%>
+<%- when Integer -%>
+MTU        = <%= @val[:mtu] %>
+<%- when Array -%>
+<%-   @val[:mtu].each do |mtu| -%>
+<%-     if mtu.kind_of?(Integer) -%>
+MTU        = <%= mtu %>
+<%-     end -%>
+<%-   end -%>
+<%- end -%>
+<%- if @val[:table] == 'auto' or @val[:table] == 'off' -%>
+Table      = <%= @val[:table] %>
+<%- end -%>
+<%- case @val[:preup] -%>
+<%- when String -%>
+PreUp      = <%= @val[:preup] %>
+<%- when Array -%>
+<%-   @val[:preup].each do |preup| -%>
+PreUp      = <%= preup %>
+<%-   end -%>
+<%- end -%>
+<%- case @val[:postup] -%>
+<%- when String -%>
+PostUp     = <%= @val[:postup] %>
+<%- when Array -%>
+<%-   @val[:postup].each do |postup| -%>
+PostUp     = <%= postup %>
+<%-   end -%>
+<%- end -%>
+<%- case @val[:predown] -%>
+<%- when String -%>
+PreDown    = <%= @val[:predown] %>
+<%- when Array -%>
+<%-   @val[:predown].each do |predown| -%>
+PreDown    = <%= predown %>
+<%-   end -%>
+<%- end -%>
+<%- case @val[:postdown] -%>
+<%- when String -%>
+PostDown   = <%= @val[:postdown] %>
+<%- when Array -%>
+<%-   @val[:postdown].each do |postdown| -%>
+PostDown   = <%= postdown %>
+<%-   end -%>
+<%- end -%>
+<%- if @val[:saveconfig] == true -%>
+SaveConfig = true
+<%- end -%>
+<%- if @val[:pear] -%>
+<%-   @val[:pear].each do |v| -%>
+
+[Peer]
+PublicKey  = <%= v[:publickey] %>
+<%-     if v[:endpoint] -%>
+Endpoint   = <%= v[:endpoint] %>
+<%-     end -%>
+<%-     if v[:allowedips] -%>
+<%-       case v[:allowedips] -%>
+<%-       when String -%>
+AllowedIPs = <%= v[:allowedips] %>
+<%-       when Array -%>
+AllowedIPs = <%= v[:allowedips].join(', ') %>
+<%-       end -%>
+<%-     else -%>
+AllowedIPs = 0.0.0.0/0, ::/0
+<%-     end -%>
+<%-     if v[:keepalive].kind_of?(Integer) -%>
+PersistentKeepalive = <%= v[:keepalive] %>
+<%-     end -%>
+<%-   end -%>
+<%- end -%>
