@@ -48,6 +48,13 @@ when 'ubuntu-18.04'
   package 'gir1.2-clutter-gst-3.0'
   package 'gir1.2-gtkclutter-1.0'
 
+  # Workaround: Manage all network interfaces with Network Manager
+  file '/etc/NetworkManager/conf.d/10-globally-managed-devices.conf' do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+  end
+
   # Remove Example Desktop Entry
   file '/etc/skel/examples.desktop' do
     action :delete
