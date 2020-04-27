@@ -51,7 +51,7 @@ end
 # Kernel and Initramfs
 #
 
-%w{vmlinuz initrd.img}.each do |f|
+%w{vmlinuz initrd.img config}.each do |f|
   execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
     not_if "test -f #{output_dir}/#{f}"
   end
