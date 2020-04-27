@@ -53,8 +53,7 @@ end
 # Check Platform
 #
 
-result = run_command(['dpkg-query', '-f', "'${Status}'", '-W', 'ubuntu-desktop'], error: false)
-unless result.success?
+unless node[:target][:role].match(/desktop/)
   return
 end
 
