@@ -49,7 +49,6 @@ end
 # Required Packages
 #
 
-puts "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
 when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-generic$/
   # nothing...
