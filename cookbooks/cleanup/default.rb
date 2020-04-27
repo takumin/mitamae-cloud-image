@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 # Workaround
-if File.exist?('/vmlinuz.old')
-  execute 'rm -f /vmlinuz.old'
+execute 'rm -f /vmlinuz.old' do
+  only_if 'test -f /vmlinuz.old'
 end
-if File.exist?('/initrd.img.old')
-  execute 'rm -f /initrd.img.old'
+execute 'rm -f /initrd.img.old' do
+  only_if 'test -f /initrd.img.old'
 end
 
 execute 'apt-get -y autoremove --purge'
