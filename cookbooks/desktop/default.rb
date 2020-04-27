@@ -44,4 +44,12 @@ when 'ubuntu-18.04'
   execute 'glib-compile-schemas /usr/share/glib-2.0/schemas' do
     action :nothing
   end
+
+  # Home Directory Locale
+  file '/etc/xdg/user-dirs.conf' do
+    action :edit
+    block do |content|
+      content.gsub!(/^filename_encoding=UTF-8$/, 'filename_encoding=en_US.UTF-8')
+    end
+  end
 end
