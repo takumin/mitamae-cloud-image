@@ -52,24 +52,6 @@ end
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
 when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-generic$/
   # nothing...
-when /^ubuntu-12\.04-generic-hwe-server-nvidia$/
-  package 'xserver-xorg-lts-trusty'
-  package 'libgl1-mesa-glx-lts-trusty'
-when /^ubuntu-12\.04-generic-hwe-desktop-nvidia$/
-  package 'xserver-xorg-lts-trusty'
-when /^ubuntu-14\.04-generic-hwe-server-nvidia$/
-  package 'xserver-xorg-lts-xenial'
-  package 'xserver-xorg-core-lts-xenial'
-  package 'xserver-xorg-input-all-lts-xenial'
-  package 'libegl1-mesa-lts-xenial'
-  package 'libgbm1-lts-xenial'
-  package 'libgl1-mesa-dri-lts-xenial'
-  package 'libgl1-mesa-glx-lts-xenial'
-  package 'libgles1-mesa-lts-xenial'
-  package 'libgles2-mesa-lts-xenial'
-  package 'libwayland-egl1-mesa-lts-xenial'
-when /^ubuntu-14\.04-generic-hwe-desktop-nvidia$/
-  package 'xserver-xorg-lts-xenial'
 when /^ubuntu-16\.04-generic-hwe-server-nvidia$/
   package 'xserver-xorg-core-hwe-16.04'
   package 'xserver-xorg-input-all-hwe-16.04'
