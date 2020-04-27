@@ -21,3 +21,11 @@ when :ubuntu
 else
   MItamae.logger.info "Ignore minimal package installation for this platform: #{node[:platform]}"
 end
+
+file '/etc/default/keyboard' do
+  action :edit
+  not_if 'grep -E \'^BACKSPACE=".*ctrl:nocaps.*"$\' /etc/default/keyboard'
+  block do |content|
+    content.gsub!(/^BACKSPACE=".*"$/, 'BACKSPACE="ctrl:nocaps"')
+  end
+end
