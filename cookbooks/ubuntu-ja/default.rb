@@ -106,7 +106,6 @@ end
 file '/etc/xdg/autostart/xdg-user-dirs.desktop' do
   action :edit
   block do |content|
-    content.gsub!(/^TryExec=xdg-user-dirs-update$/, 'TryExec=env LC_ALL=C xdg-user-dirs-update')
     content.gsub!(/^Exec=xdg-user-dirs-update$/, 'Exec=env LC_ALL=C xdg-user-dirs-update')
   end
 end
