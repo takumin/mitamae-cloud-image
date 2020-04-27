@@ -1,5 +1,18 @@
 # frozen_string_literal: true
 
+# Get Kernel Version
+GET_KERNEL_VERSION = "dpkg -l | awk '{print $2}' | grep -E '^linux-image-[0-9\.-_]' | sort | tail -n 1 | sed -E 's/^linux-image-//'"
+
+# Cleanup Initramfs
+execute 'update-initramfs -d -k all' do
+  not_if "test -f \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\""
+end
+
+# Create Initramfs
+execute "update-initramfs -c -k \"$(#{GET_KERNEL_VERSION})\"" do
+  not_if "test -f \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\""
+end
+
 # Workaround
 execute 'rm -f /vmlinuz.old' do
   only_if 'test -f /vmlinuz.old'
