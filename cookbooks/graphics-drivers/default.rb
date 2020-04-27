@@ -1,6 +1,18 @@
 # frozen_string_literal: true
 
 #
+# Check Platform
+#
+
+unless node[:platform].match(/^ubuntu$/)
+  return
+end
+
+unless node[:target][:role].match(/nvidia/)
+  return
+end
+
+#
 # Constant Variables
 #
 

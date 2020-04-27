@@ -69,7 +69,7 @@ end
 # Check Platform
 #
 
-unless node[:target][:profile].match(/nvidia/)
+unless node[:target][:role].match(/nvidia/)
   return
 end
 

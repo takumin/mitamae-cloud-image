@@ -6,7 +6,7 @@ target:
   distribution: 'ubuntu'
   suite:        'bionic'
   kernel:       'generic'
-  profile:      'desktop'
+  role:         'desktop'
   architecture: 'amd64'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-bionic-generic-desktop-amd64'

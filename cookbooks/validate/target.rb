@@ -8,8 +8,7 @@ node.validate! do
       distribution: match(/^(?:debian|ubuntu)$/),
       suite:        string,
       architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
-      kernel:       match(/^(?:generic|generic-latest|virtual|virtual-latest)$/),
-      profile:      match(/^(?:minimal|server|desktop)$/),
+      role:         match(/^(?:minimal|server|desktop|server-nvidia|desktop-nvidia)$/),
       components:   array_of(string),
       directory:    string,
     },
@@ -21,6 +20,7 @@ when :ubuntu
   node.validate! do
     {
       target: {
+        kernel:     match(/^(?:generic|generic-hwe|virtual|virtual-hwe)$/),
         suite:      match(/^(?:xenial|bionic)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
@@ -30,6 +30,7 @@ when :debian
   node.validate! do
     {
       target: {
+        kernel:     match(/^(?:generic|cloud)$/),
         suite:      match(/^(?:jessie|stretch|buster)$/),
         components: array_of(match(/^(?:main|contrib|non-free)$/)),
       },

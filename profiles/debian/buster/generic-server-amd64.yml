@@ -6,7 +6,7 @@ target:
   distribution: 'debian'
   suite:        'buster'
   kernel:       'generic'
-  profile:      'server'
+  role:         'server'
   architecture: 'amd64'
   components:   ['main', 'contrib', 'non-free']
   directory:    '/tmp/debian-buster-generic-server-amd64'

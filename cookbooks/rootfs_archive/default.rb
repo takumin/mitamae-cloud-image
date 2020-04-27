@@ -10,7 +10,7 @@ node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
   'releases',
   node[:target][:distribution],
   node[:target][:suite],
-  node[:target][:profile],
+  node[:target][:role],
   node[:target][:architecture],
 )
 

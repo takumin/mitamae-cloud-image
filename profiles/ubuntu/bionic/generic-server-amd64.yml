@@ -6,7 +6,7 @@ target:
   distribution: 'ubuntu'
   suite:        'bionic'
   kernel:       'generic'
-  profile:      'server'
+  role:         'server'
   architecture: 'amd64'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-bionic-generic-server-amd64'

@@ -4,7 +4,7 @@
 # Check Platform
 #
 
-unless node[:target][:profile].match(/desktop/)
+unless node[:target][:role].match(/desktop/)
   return
 end
 
