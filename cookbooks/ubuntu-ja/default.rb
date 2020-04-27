@@ -97,9 +97,17 @@ end
 # Home Directory Locale
 #
 
-file '/etc/xdg/user-dirs.conf' do
+file '/etc/xdg/autostart/xdg-user-dirs.desktop' do
   action :edit
   block do |content|
-    content.gsub!(/^filename_encoding=UTF-8$/, 'filename_encoding=en_US.UTF-8')
+    content.gsub!(/^TryExec=xdg-user-dirs-update$/, 'TryExec=env LC_ALL=C xdg-user-dirs-update')
+    content.gsub!(/^Exec=xdg-user-dirs-update$/, 'Exec=env LC_ALL=C xdg-user-dirs-update')
+  end
+end
+
+file '/etc/xdg/autostart/user-dirs-update-gtk.desktop' do
+  action :edit
+  block do |content|
+    content.gsub!(/^Exec=xdg-user-dirs-gtk-update$/, 'Exec=env LC_ALL=C xdg-user-dirs-gtk-update')
   end
 end
