@@ -53,7 +53,8 @@ end
 # Check Platform
 #
 
-unless run_command(['dpkg-query', '-f', "'${Status}'", '-W', 'ubuntu-desktop'], error: false).success?
+result = run_command(['dpkg-query', '-f', "'${Status}'", '-W', 'ubuntu-desktop'], error: false)
+unless result.success?
   return
 end
 
