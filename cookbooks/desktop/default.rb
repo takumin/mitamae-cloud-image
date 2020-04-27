@@ -55,6 +55,19 @@ when 'ubuntu-18.04'
     mode  '0644'
   end
 
+  # Workaround: Explicitly enable Network Manager
+  file '/etc/netplan/01-network-manager-all.yaml' do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      '# Workaround: Explicitly enable Network Manager',
+      'network:',
+      '  version: 2',
+      '  renderer: NetworkManager',
+    ].join("\n")
+  end
+
   # Remove Example Desktop Entry
   file '/etc/skel/examples.desktop' do
     action :delete
