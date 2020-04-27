@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-%w{/vmlinuz.old initrd.img.old}.each do |old|
-  file old do
-    action :delete
-  end
+# Workaround
+if File.exist?('/vmlinuz.old')
+  execute 'rm -f /vmlinuz.old'
+end
+if File.exist?('/initrd.img.old')
+  execute 'rm -f /initrd.img.old'
 end
 
 execute 'apt-get -y autoremove --purge'
