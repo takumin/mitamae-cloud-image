@@ -35,17 +35,21 @@ link '/var/lib/dbus/machine-id' do
   force true
 end
 
-directory '/var/lib/apt/lists' do
-  action :delete
+execute 'rm -fr /var/lib/apt/lists' do
+  only_if 'test "$(find /var/lib/apt/lists -type f | wc -l)" != "1"'
+  notifies :create, 'directory[/var/lib/apt/lists]'
+  notifies :create, 'file[/var/lib/apt/lists/lock]'
 end
 
 directory '/var/lib/apt/lists' do
+  action :nothing
   owner 'root'
   group 'root'
   mode  '0755'
 end
 
 file '/var/lib/apt/lists/lock' do
+  action :nothing
   owner 'root'
   group 'root'
   mode  '0640'
