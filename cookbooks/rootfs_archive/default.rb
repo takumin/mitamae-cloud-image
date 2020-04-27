@@ -11,8 +11,8 @@ node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
   node[:target][:distribution],
   node[:target][:suite],
   node[:target][:kernel],
-  node[:target][:role],
   node[:target][:architecture],
+  node[:target][:role],
 )
 
 #

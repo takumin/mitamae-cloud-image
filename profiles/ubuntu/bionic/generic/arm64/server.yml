@@ -1,0 +1,19 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'bionic'
+  kernel:       'generic'
+  architecture: 'arm64'
+  role:         'server'
+  components:   ['main', 'restricted', 'universe', 'multiverse']
+  directory:    '/tmp/ubuntu-bionic-generic-arm64-server'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'cdebootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']

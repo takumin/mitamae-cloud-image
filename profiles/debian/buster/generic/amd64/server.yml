@@ -6,10 +6,10 @@ target:
   distribution: 'debian'
   suite:        'buster'
   kernel:       'generic'
-  role:         'server'
   architecture: 'amd64'
+  role:         'server'
   components:   ['main', 'contrib', 'non-free']
-  directory:    '/tmp/debian-buster-generic-server-amd64'
+  directory:    '/tmp/debian-buster-generic-amd64-server'
 #
 # Debootstrap Config
 #

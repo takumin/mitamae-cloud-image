@@ -6,11 +6,11 @@ env:
   DISABLE_SQUASHFS: true
   DISABLE_TARBALL: true
 jobs:
-  ubuntu-bionic-generic-server-amd64:
+  ubuntu-bionic-generic-amd64-server:
     name: Bionic Generic Server (amd64)
     runs-on: ubuntu-latest
     env:
-      PROFILE_YAML: profiles/ubuntu/bionic/generic-server-amd64.yml
+      PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -20,18 +20,18 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: rake ubuntu_bionic_generic-server-amd64:initialize
+      run: rake ubuntu_bionic_generic_amd64_server:initialize
     - name: Provision
-      run: rake ubuntu_bionic_generic-server-amd64:provision
+      run: rake ubuntu_bionic_generic_amd64_server:provision
     - name: Finalize
-      run: rake ubuntu_bionic_generic-server-amd64:finalize
+      run: rake ubuntu_bionic_generic_amd64_server:finalize
     - name: Packages
-      run: cat releases/ubuntu/bionic/generic/server/amd64/packages.manifest
-  ubuntu-bionic-generic-server-arm64:
+      run: cat releases/ubuntu/bionic/generic/amd64/server/packages.manifest
+  ubuntu-bionic-generic-arm64-server:
     name: Bionic Generic Server (arm64)
     runs-on: ubuntu-latest
     env:
-      PROFILE_YAML: profiles/ubuntu/bionic/generic-server-arm64.yml
+      PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -41,10 +41,10 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: rake ubuntu_bionic_generic-server-arm64:initialize
+      run: rake ubuntu_bionic_generic_arm64_server:initialize
     - name: Provision
-      run: rake ubuntu_bionic_generic-server-arm64:provision
+      run: rake ubuntu_bionic_generic_arm64_server:provision
     - name: Finalize
-      run: rake ubuntu_bionic_generic-server-arm64:finalize
+      run: rake ubuntu_bionic_generic_arm64_server:finalize
     - name: Packages
-      run: cat releases/ubuntu/bionic/generic/server/arm64/packages.manifest
+      run: cat releases/ubuntu/bionic/generic/arm64/server/packages.manifest

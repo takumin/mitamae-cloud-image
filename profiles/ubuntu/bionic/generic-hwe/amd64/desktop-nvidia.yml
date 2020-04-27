@@ -1,0 +1,19 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'bionic'
+  kernel:       'generic-hwe'
+  architecture: 'amd64'
+  role:         'desktop-nvidia'
+  components:   ['main', 'restricted', 'universe', 'multiverse']
+  directory:    '/tmp/ubuntu-bionic-generic-hwe-amd64-desktop-nvidia'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'cdebootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']
