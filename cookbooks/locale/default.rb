@@ -85,6 +85,6 @@ end
 
 node[:locale][:defaults].each do |k, v|
   execute "update-locale #{k}=#{v}" do
-    not_if "grep -E '^#{k}=#{v}$'"
+    not_if "grep -E '^#{k}=#{v}$' /etc/default/locale"
   end
 end
