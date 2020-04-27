@@ -52,4 +52,9 @@ when 'ubuntu-18.04'
       content.gsub!(/^filename_encoding=UTF-8$/, 'filename_encoding=en_US.UTF-8')
     end
   end
+
+  # Remove Example Desktop Entry
+  file '/etc/skel/examples.desktop' do
+    action :delete
+  end
 end
