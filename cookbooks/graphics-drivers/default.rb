@@ -46,6 +46,26 @@ node.validate! do
 end
 
 #
+# Required Packages
+#
+
+case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
+when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-generic$/
+  # nothing...
+when /^ubuntu-12\.04-generic-hwe$/
+  package = 'xserver-xorg-lts-trusty'
+when /^ubuntu-14\.04-generic-hwe$/
+  package = 'xserver-xorg-lts-xenial'
+when /^ubuntu-16\.04-generic-hwe$/
+  package = 'xserver-xorg-hwe-16.04'
+when /^ubuntu-18\.04-generic-hwe$/
+  package = 'xserver-xorg-hwe-18.04'
+else
+  MItamae.logger.error "Unknown platform: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
+  exit 1
+end
+
+#
 # Apt Repository
 #
 
