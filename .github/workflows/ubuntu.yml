@@ -3,6 +3,8 @@ on: [push, pull_request]
 env:
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
   APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
+  DISABLE_SQUASHFS: true
+  DISABLE_TARBALL: true
 jobs:
   ubuntu-bionic-generic-server-amd64:
     name: Bionic Generic Server (amd64)
