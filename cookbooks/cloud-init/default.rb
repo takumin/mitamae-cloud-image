@@ -74,6 +74,7 @@ when 'ubuntu-16.04', 'ubuntu-18.04'
     not_if 'grep -E "renderers:" /etc/cloud/cloud.cfg'
     block do |content|
       if content.match(/^system_info:$/)
+        content << "   # Workaround: https://github.com/canonical/cloud-init/pull/267\n"
         content << "   network:\n"
         content << "     renderers: ['netplan', 'eni']\n"
       end
