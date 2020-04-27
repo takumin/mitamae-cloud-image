@@ -62,3 +62,21 @@ end
 #
 
 package 'cloud-init'
+
+#
+# Workaround: Cloud-Init Bug
+# See also: https://github.com/canonical/cloud-init/pull/267
+#
+case "#{node[:platform]}-#{node[:platform_version]}"
+when 'ubuntu-16.04', 'ubuntu-18.04'
+  file '/etc/cloud/cloud.cfg' do
+    action :edit
+    not_if 'grep -E "renderers:" /etc/cloud/cloud.cfg'
+    block do |content|
+      if content.match(/^system_info:$/)
+        content << "   network:\n"
+        content << "     renderers: ['netplan', 'eni']\n"
+      end
+    end
+  end
+end
