@@ -21,6 +21,7 @@ execute 'rm -f /initrd.img.old' do
   only_if 'test -f /initrd.img.old'
 end
 
+execute 'apt-get -y dist-upgrade'
 execute 'apt-get -y autoremove --purge'
 execute 'apt-get -y clean'
 
