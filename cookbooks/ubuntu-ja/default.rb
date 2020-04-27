@@ -50,6 +50,12 @@ execute 'apt-get update' do
 end
 
 #
+# CLI Japanese Packages
+#
+
+package 'language-pack-ja'
+
+#
 # Check Platform
 #
 
@@ -58,7 +64,7 @@ unless node[:target][:role].match(/desktop/)
 end
 
 #
-# Install Packages
+# GUI Japanese Packages
 #
 
 package 'ubuntu-defaults-ja'
