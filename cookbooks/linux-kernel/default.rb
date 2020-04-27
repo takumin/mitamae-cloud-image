@@ -7,13 +7,13 @@
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
 when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-generic$/
   package = 'linux-image-generic'
-when /^ubuntu-12\.04-generic-latest$/
+when /^ubuntu-12\.04-generic-hwe$/
   package = 'linux-generic-lts-trusty'
-when /^ubuntu-14\.04-generic-latest$/
+when /^ubuntu-14\.04-generic-hwe$/
   package = 'linux-generic-lts-xenial'
-when /^ubuntu-16\.04-generic-latest$/
+when /^ubuntu-16\.04-generic-hwe$/
   package = 'linux-image-generic-hwe-16.04'
-when /^ubuntu-18\.04-generic-latest$/
+when /^ubuntu-18\.04-generic-hwe$/
   package = 'linux-image-generic-hwe-18.04'
 else
   MItamae.logger.error "Unknown platform: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
