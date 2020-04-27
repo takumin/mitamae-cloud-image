@@ -25,6 +25,8 @@ jobs:
       run: rake ubuntu_bionic_generic-server-amd64:provision
     - name: Finalize
       run: rake ubuntu_bionic_generic-server-amd64:finalize
+    - name: Packages
+      run: cat releases/ubuntu/bionic/generic/server/amd64/packages.manifest
   ubuntu-bionic-generic-server-arm64:
     name: Bionic Generic Server (arm64)
     runs-on: ubuntu-latest
@@ -44,3 +46,5 @@ jobs:
       run: rake ubuntu_bionic_generic-server-arm64:provision
     - name: Finalize
       run: rake ubuntu_bionic_generic-server-arm64:finalize
+    - name: Packages
+      run: cat releases/ubuntu/bionic/generic/server/arm64/packages.manifest
