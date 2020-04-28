@@ -4,9 +4,12 @@
 # Public Variables
 #
 
-node[:rootfs_archive]              ||= Hashie::Mash.new
-node[:rootfs_archive][:target_dir] ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
-node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
+node[:rootfs_archive]                     ||= Hashie::Mash.new
+node[:rootfs_archive][:format]            ||= Hashie::Mash.new
+node[:rootfs_archive][:format][:tarball]  ||= 'lz4'
+node[:rootfs_archive][:format][:squashfs] ||= 'lz4'
+node[:rootfs_archive][:target_dir]        ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
+node[:rootfs_archive][:output_dir]        ||= ENV['OUTPUT_DIRECTORY'] || File.join(
   'releases',
   node[:target][:distribution],
   node[:target][:suite],
@@ -14,6 +17,23 @@ node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
   node[:target][:architecture],
   node[:target][:role],
 )
+
+#
+# Validate Variables
+#
+
+node.validate! do
+  {
+    rootfs_archive: {
+      format: {
+        tarball:  match(/^(?:gzip|lz4|xz)$/),
+        squashfs: match(/^(?:gzip|lz4|xz)$/),
+      },
+      target_dir: match(/^(?:[0-9a-zA-Z-_\/\.]+)$/),
+      output_dir: match(/^(?:[0-9a-zA-Z-_\/\.]+)$/),
+    },
+  }
+end
 
 #
 # Private Variables
@@ -27,7 +47,20 @@ output_dir = node[:rootfs_archive][:output_dir]
 #
 
 package 'squashfs-tools'
-package 'pixz'
+package 'tar'
+
+[:tarball, :squashfs].each do |sym|
+  case node[:rootfs_archive][:format][sym]
+  when 'gzip'
+    package 'pigz'
+  when 'lz4'
+    package 'liblz4-tool'
+  when 'xz'
+    package 'pixz'
+  else
+    raise
+  end
+end
 
 #
 # Output Directory
@@ -68,7 +101,7 @@ end
 #
 
 if ENV['DISABLE_SQUASHFS'] != 'true'
-  execute "mksquashfs #{target_dir} #{output_dir}/rootfs.squashfs -comp xz" do
+  execute "mksquashfs #{target_dir} #{output_dir}/rootfs.squashfs -comp #{node[:rootfs_archive][:format][:squashfs]}" do
     not_if "test -f #{output_dir}/rootfs.squashfs"
   end
 
@@ -84,11 +117,25 @@ end
 #
 
 if ENV['DISABLE_TARBALL'] != 'true'
-  execute "tar -I pixz -p --acls --xattrs --one-file-system -cf #{output_dir}/rootfs.tar.xz -C #{target_dir} ." do
+  case node[:rootfs_archive][:format][:tarball]
+  when 'gzip'
+    cmd = 'pigz'
+    ext = 'gz'
+  when 'lz4'
+    cmd = 'lz4'
+    ext = 'lz4'
+  when 'xz'
+    cmd = 'pixz'
+    ext = 'xz'
+  else
+    raise
+  end
+
+  execute "tar -I #{cmd} -p --acls --xattrs --one-file-system -cf #{output_dir}/rootfs.tar.#{ext} -C #{target_dir} ." do
     not_if "test -f #{output_dir}/rootfs.tar.xz"
   end
 
-  file "#{output_dir}/rootfs.tar.xz" do
+  file "#{output_dir}/rootfs.tar.#{ext}" do
     owner 'root'
     group 'root'
     mode  '0644'
