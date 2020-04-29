@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 #
+# Disable automatic terminal login when in desktop role
+#
+
+if node[:target][:role].match(/desktop/)
+  return
+end
+
+#
 # Public Variables
 #
 
@@ -17,14 +25,6 @@ node.validate! do
       terminal: match(/^(?:tty[0-9])$/),
     },
   }
-end
-
-#
-# Override Terminal Variable
-#
-
-if node[:target][:role].match(/desktop/)
-  node[:autologin][:terminal] = 'tty2'
 end
 
 #
