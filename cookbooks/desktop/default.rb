@@ -55,28 +55,11 @@ when 'ubuntu-18.04'
     mode  '0644'
   end
 
-  # Workaround 1:
-  # Explicitly enable Network Manager for netplan
-  # -> Disable because systemd-networkd will be enabled
-  # file '/etc/netplan/01-network-manager-all.yaml' do
-  #   owner 'root'
-  #   group 'root'
-  #   mode  '0644'
-  #   content [
-  #     '# Workaround: Explicitly enable Network Manager',
-  #     'network:',
-  #     '  version: 2',
-  #     '  renderer: NetworkManager',
-  #   ].join("\n")
-  # end
-
-  # Workaround 2:
-  # Explicitly enable Network Manager for cloud-init
-  file '/etc/cloud/cloud.cfg.d/99_network_manager.cfg' do
-    only_if 'test -d /etc/cloud/cloud.cfg.d'
-    owner   'root'
-    group   'root'
-    mode    '0644'
+  # Workaround: Explicitly enable Network Manager for netplan
+  file '/etc/netplan/01-network-manager-all.yaml' do
+    owner 'root'
+    group 'root'
+    mode  '0644'
     content [
       '# Workaround: Explicitly enable Network Manager',
       'network:',
