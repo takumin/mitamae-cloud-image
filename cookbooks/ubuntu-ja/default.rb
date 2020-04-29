@@ -80,6 +80,10 @@ package 'fcitx-mozc'
 # Default Input Method for Fcitx
 #
 
+execute 'im-config -n fcitx' do
+  not_if 'grep -qs "^run_im fcitx$" /etc/X11/xinit/xinputrc'
+end
+
 file '/usr/share/glib-2.0/schemas/99_input-method.gschema.override' do
   owner 'root'
   group 'root'
@@ -115,12 +119,4 @@ file '/etc/xdg/autostart/user-dirs-update-gtk.desktop' do
   block do |content|
     content.gsub!(/^Exec=xdg-user-dirs-gtk-update$/, 'Exec=env LC_ALL=C xdg-user-dirs-gtk-update')
   end
-end
-
-#
-# Default Input Method
-#
-
-execute 'im-config -n fcitx' do
-  not_if 'grep -qs "^run_im fcitx$" /etc/X11/xinit/xinputrc'
 end
