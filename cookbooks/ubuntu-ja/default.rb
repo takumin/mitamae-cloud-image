@@ -82,6 +82,11 @@ package 'fcitx-mozc'
 
 execute 'im-config -n fcitx' do
   not_if 'grep -qs "^run_im fcitx$" /etc/X11/xinit/xinputrc'
+  notifies :run, 'execute[cp /etc/X11/xinit/xinputrc /etc/skel/.xinputrc]'
+end
+
+execute 'cp /etc/X11/xinit/xinputrc /etc/skel/.xinputrc' do
+  action :nothing
 end
 
 file '/usr/share/glib-2.0/schemas/99_input-method.gschema.override' do
