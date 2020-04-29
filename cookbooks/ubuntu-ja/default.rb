@@ -116,3 +116,11 @@ file '/etc/xdg/autostart/user-dirs-update-gtk.desktop' do
     content.gsub!(/^Exec=xdg-user-dirs-gtk-update$/, 'Exec=env LC_ALL=C xdg-user-dirs-gtk-update')
   end
 end
+
+#
+# Default Input Method
+#
+
+execute 'im-config -n fcitx' do
+  not_if 'grep -qs "^run_im fcitx$" /etc/X11/xinit/xinputrc'
+end
