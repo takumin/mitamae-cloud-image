@@ -18,4 +18,5 @@ remote_file '/etc/initramfs-tools/scripts/init-bottom/reset-network-interfaces' 
   owner 'root'
   group 'root'
   mode  '0755'
+  only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
 end
