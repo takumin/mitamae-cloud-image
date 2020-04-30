@@ -12,24 +12,8 @@ end
 # Required Packages
 #
 
-case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
-when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-generic$/
-  # nothing...
-when /^ubuntu-16\.04-generic-hwe-server-nvidia$/
-  package 'xserver-xorg-core-hwe-16.04'
-  package 'xserver-xorg-input-all-hwe-16.04'
-  package 'xserver-xorg-legacy-hwe-16.04'
-when /^ubuntu-16\.04-generic-hwe-desktop-nvidia$/
-  package 'xserver-xorg-hwe-16.04'
-when /^ubuntu-18\.04-generic-hwe-server-nvidia$/
-  package 'xserver-xorg-core-hwe-18.04'
-  package 'xserver-xorg-input-all-hwe-18.04'
-  package 'xserver-xorg-legacy-hwe-18.04'
-when /^ubuntu-18\.04-generic-hwe-desktop-nvidia$/
-  package 'xserver-xorg-hwe-18.04'
-else
-  MItamae.logger.error "Unknown platform: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-  exit 1
+if node[:target][:kernel].match(/hwe/)
+  package "xserver-xorg-hwe-#{node[:platform_version]}"
 end
 
 #
