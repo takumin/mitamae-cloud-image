@@ -90,11 +90,10 @@ file '/lib/systemd/system/cloud-init.service' do
   action :edit
   only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
   block do |content|
-    AFTER_NM = 'After=NetworkManager-wait-online.service'
-    AFTER_SN = 'After=systemd-networkd-wait-online.service'
+    DEPENDENCY = 'After=NetworkManager-wait-online.service'
 
-    unless content.match(/^#{Regexp.escape(AFTER_NM)}$/)
-      content.gsub!(/^#{Regexp.escape(AFTER_SN)}$/, "#{AFTER_SN}\n#{AFTER_NM}")
+    unless content.match(/^#{Regexp.escape(DEPENDENCY)}$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\n#{DEPENDENCY}")
     end
 
     content.gsub!(/^Before=sysinit\.target\n/, '')
@@ -105,11 +104,10 @@ file '/lib/systemd/system/cloud-final.service' do
   action :edit
   only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
   block do |content|
-    BEFORE_DM = 'Before=display-manager.service'
-    AFTER_MU  = 'After=multi-user.target'
+    DEPENDENCY = 'Before=display-manager.service'
 
-    unless content.match(/^#{Regexp.escape(BEFORE_DM)}$/)
-      content.gsub!(/^#{Regexp.escape(AFTER_MU)}$/, "#{AFTER_MU}\n#{BEFORE_DM}")
+    unless content.match(/^#{Regexp.escape(DEPENDENCY)}$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\n#{DEPENDENCY}")
     end
   end
 end
