@@ -83,6 +83,22 @@ when 'ubuntu-16.04', 'ubuntu-18.04'
 end
 
 #
+# Workaround: Fixed dependency to wait for Terminal
+#
+
+file '/lib/systemd/system/cloud-final.service' do
+  action :edit
+  not_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
+  block do |content|
+    DEPENDENCY = 'Before=getty@tty1.service'
+
+    unless content.match(/^#{Regexp.escape(DEPENDENCY)}$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\n#{DEPENDENCY}")
+    end
+  end
+end
+
+#
 # Workaround: Fixed dependency to wait for Network Manager
 #
 
