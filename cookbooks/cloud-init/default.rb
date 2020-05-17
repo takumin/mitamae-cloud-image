@@ -64,22 +64,6 @@ end
 package 'cloud-init'
 
 #
-# Override Directory
-#
-
-%w{
-  /etc/systemd/system/cloud-init.service.d
-  /etc/systemd/system/cloud-config.service.d
-  /etc/systemd/system/cloud-final.service.d
-}.each do |d|
-  directory d do
-    owner 'root'
-    group 'root'
-    mode  '0755'
-  end
-end
-
-#
 # Workaround: https://github.com/canonical/cloud-init/pull/267
 #
 
@@ -99,77 +83,56 @@ when 'ubuntu-16.04', 'ubuntu-18.04'
 end
 
 #
-# Workaround: Fixed dependency to wait for Network Manager
+# Copy the file for overwriting
 #
 
-file '/etc/systemd/system/cloud-init.service.d/after_network_manager.conf' do
-  owner   'root'
-  group   'root'
-  mode    '0644'
-  content [
-    '[Unit]',
-    'After=NetworkManager-wait-online.service',
-  ].join("\n")
-  only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
+%w{
+  cloud-init.service
+  cloud-init.target
+  cloud-final.service
+}.each do |f|
+  execute "cp /lib/systemd/system/#{f} /etc/systemd/system/#{f}" do
+    not_if "test -f /etc/systemd/system/#{f}"
+  end
 end
 
-file '/lib/systemd/system/cloud-init.service' do
+#
+# Wait network online
+#
+
+file '/etc/systemd/system/cloud-init.service' do
   action :edit
   block do |content|
-    content.gsub!(/^Before=sysinit\.target\n/, '')
+    content.gsub!(/^Before=sysinit\.target$/, 'After=sysinit.target')
+
+    unless content.match(/^After=systemd-resolved\.service$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\nAfter=systemd-resolved.service")
+    end
+
+    unless content.match(/^After=NetworkManager-wait-online\.service$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\nAfter=NetworkManager-wait-online.service")
+    end
   end
-  only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
 end
 
-#
-# Workaround: Fixed dependency to wait for systemd-resolved
-#
-
-file '/etc/systemd/system/cloud-init.service.d/after_systemd_resolved.conf' do
-  owner   'root'
-  group   'root'
-  mode    '0644'
-  content [
-    '[Unit]',
-    'After=systemd-resolved.service',
-  ].join("\n")
-  only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
-end
-
-#
-# Workaround: Fixed dependency to wait for Terminal
-#
-
-file '/etc/systemd/system/cloud-final.service.d/before_getty_terminal.conf' do
-  not_if  'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
-  owner   'root'
-  group   'root'
-  mode    '0644'
-  content [
-    '[Unit]',
-    'Before=getty@tty1.service',
-  ].join("\n")
-end
-
-#
-# Workaround: Fixed dependency to wait for Display Manager
-#
-
-file '/etc/systemd/system/cloud-final.service.d/before_display_manager.conf' do
-  only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
-  owner   'root'
-  group   'root'
-  mode    '0644'
-  content [
-    '[Unit]',
-    'Before=display-manager.service',
-  ].join("\n")
-end
-
-file '/lib/systemd/system/cloud-final.service' do
+file '/etc/systemd/system/cloud-init.target' do
   action :edit
   block do |content|
-    content.gsub!(/^After=multi-user\.target\n/, '')
+    content.gsub!(/^After=multi-user\.target$/, 'Before=multi-user.target')
   end
-  only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
+end
+
+file '/etc/systemd/system/cloud-final.service' do
+  action :edit
+  block do |content|
+    content.gsub!(/^After=multi-user\.target$/, 'Before=multi-user.target')
+
+    unless content.match(/^Before=getty@tty1\.service$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=getty@tty1.service")
+    end
+
+    unless content.match(/^Before=display-manager\.service$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=display-manager.service")
+    end
+  end
 end
