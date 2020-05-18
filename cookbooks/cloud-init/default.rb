@@ -104,6 +104,7 @@ file '/etc/systemd/system/cloud-init.service' do
   action :edit
   block do |content|
     content.gsub!(/^Before=sysinit\.target$/, 'After=sysinit.target')
+    content.gsub!(/^Before=systemd-user-sessions\.service\n/, '')
 
     unless content.match(/^After=systemd-resolved\.service$/)
       content.gsub!(/^\[Unit\]$/, "[Unit]\nAfter=systemd-resolved.service")
@@ -126,6 +127,10 @@ file '/etc/systemd/system/cloud-final.service' do
   action :edit
   block do |content|
     content.gsub!(/^After=multi-user\.target$/, 'Before=multi-user.target')
+
+    unless content.match(/^Before=systemd-user-sessions\.service$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=systemd-user-sessions.service")
+    end
 
     unless content.match(/^Before=getty@tty1\.service$/)
       content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=getty@tty1.service")
