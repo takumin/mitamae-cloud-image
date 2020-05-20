@@ -13,29 +13,19 @@ execute "update-initramfs -c -k \"$(#{GET_KERNEL_VERSION})\"" do
   not_if "test -f \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\""
 end
 
-# Workaround
-execute 'rm -f /vmlinuz.old' do
-  only_if 'test -f /vmlinuz.old'
-end
-execute 'rm -f /initrd.img.old' do
-  only_if 'test -f /initrd.img.old'
+# Cleanup Bootstrap Helper
+package 'cdebootstrap-helper-rc.d' do
+  action :remove
 end
 
+# Upgrade Packages
 execute 'apt-get -y dist-upgrade'
+
+# Cleanup Packages
 execute 'apt-get -y autoremove --purge'
 execute 'apt-get -y clean'
 
-file '/etc/machine-id' do
-  owner   'root'
-  group   'root'
-  mode    '0644'
-end
-
-link '/var/lib/dbus/machine-id' do
-  to '/etc/machine-id'
-  force true
-end
-
+# Cleanup Apt Cache
 execute 'rm -fr /var/lib/apt/lists' do
   only_if 'test "$(find /var/lib/apt/lists -type f | wc -l)" != "1"'
   notifies :create, 'directory[/var/lib/apt/lists]'
@@ -54,4 +44,25 @@ file '/var/lib/apt/lists/lock' do
   owner 'root'
   group 'root'
   mode  '0640'
+end
+
+# Workaround
+execute 'rm -f /vmlinuz.old' do
+  only_if 'test -f /vmlinuz.old'
+end
+
+execute 'rm -f /initrd.img.old' do
+  only_if 'test -f /initrd.img.old'
+end
+
+# Workaround
+file '/etc/machine-id' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+end
+
+link '/var/lib/dbus/machine-id' do
+  to '/etc/machine-id'
+  force true
 end
