@@ -57,7 +57,7 @@ when :ubuntu
   node.validate! do
     {
       apt: {
-        suite:      match(/^(?:xenial|bionic)$/),
+        suite:      match(/^(?:xenial|bionic|focal)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }

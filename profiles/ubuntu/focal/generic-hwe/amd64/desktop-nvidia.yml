@@ -1,0 +1,19 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'focal'
+  kernel:       'generic-hwe'
+  architecture: 'amd64'
+  role:         'desktop-nvidia'
+  components:   ['main', 'restricted', 'universe', 'multiverse']
+  directory:    '/tmp/ubuntu-focal-generic-hwe-amd64-desktop-nvidia'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'cdebootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']

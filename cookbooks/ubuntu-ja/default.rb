@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 #
+# Check Architecture
+#
+
+unless node[:target][:architecture].match(/amd64|i386/)
+  return
+end
+
+#
 # Apt Keyrings
 #
 

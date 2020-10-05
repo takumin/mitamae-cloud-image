@@ -68,7 +68,7 @@ when 'ubuntu'
   node.validate! do
     {
       debootstrap: {
-        suite:      match(/^(?:xenial|bionic)$/),
+        suite:      match(/^(?:xenial|bionic|focal)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }
@@ -166,15 +166,13 @@ if cmd == 'debootstrap'
 end
 cmds << "--include=#{includes.join(',')}" unless includes.empty?
 cmds << "--exclude=#{excludes.join(',')}" unless excludes.empty?
-if cmd == 'cdebootstrap'
-  cmds << '--foreign'
-end
+cmds << '--foreign'
 cmds << suite
 cmds << target
 cmds << mirror
 
 #
-# Run Debootstrap
+# Run Debootstrap First Stage
 #
 
 execute cmds.join(' ') do
@@ -195,5 +193,15 @@ when 'armhf'
 when 'arm64'
   execute "cp /usr/bin/qemu-aarch64-static #{target}/usr/bin/qemu-aarch64-static" do
     not_if "test -f #{target}/usr/bin/qemu-aarch64-static"
+  end
+end
+
+#
+# Run Debootstrap Second Stage
+#
+
+if cmd == 'debootstrap'
+  execute "chroot #{target} debootstrap/debootstrap --second-stage --verbose" do
+    only_if "test -x #{target}/debootstrap/debootstrap"
   end
 end

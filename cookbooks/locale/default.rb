@@ -55,6 +55,7 @@ end
 #
 
 package 'locales'
+package 'locales-all'
 
 #
 # Availables Locale

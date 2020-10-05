@@ -1,0 +1,19 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'focal'
+  kernel:       'generic'
+  architecture: 'arm64'
+  role:         'desktop'
+  components:   ['main', 'restricted', 'universe', 'multiverse']
+  directory:    '/tmp/ubuntu-focal-generic-arm64-desktop'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'debootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']

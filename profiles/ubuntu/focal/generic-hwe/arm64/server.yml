@@ -1,0 +1,19 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'focal'
+  kernel:       'generic-hwe'
+  architecture: 'arm64'
+  role:         'server'
+  components:   ['main', 'restricted', 'universe', 'multiverse']
+  directory:    '/tmp/ubuntu-focal-generic-hwe-arm64-server'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'debootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']
