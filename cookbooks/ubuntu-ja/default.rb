@@ -1,10 +1,18 @@
 # frozen_string_literal: true
 
 #
+# Check Distribution
+#
+
+unless node[:target][:distribution].match(/^ubuntu$/)
+  return
+end
+
+#
 # Check Architecture
 #
 
-unless node[:target][:architecture].match(/amd64|i386/)
+unless node[:target][:architecture].match(/^(?:amd64|i386)$/)
   return
 end
 

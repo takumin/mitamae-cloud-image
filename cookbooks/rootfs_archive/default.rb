@@ -84,15 +84,30 @@ end
 # Kernel and Initramfs
 #
 
-%w{vmlinuz initrd.img config}.each do |f|
-  execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
-    not_if "test -f #{output_dir}/#{f}"
-  end
+case "#{node[:target][:distribution]}-#{node[:target][:kernel]}"
+when "debian-raspberrypi"
+  execute [
+    "find '#{target_dir}/boot' -type f -name 'kernel*img' -exec basename {} \\;",
+    "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/{} && cp #{target_dir}/boot/{} #{output_dir}/{} || true'",
+  ].join(' | ')
 
-  file "#{output_dir}/#{f}" do
-    owner 'root'
-    group 'root'
-    mode  '0644'
+  INITRD_NAME = 'echo {} | sed -E "s@-[0-9]+\.[0-9]+\.[0-9]+@@; s@\+\$@@;"'
+
+  execute [
+    "find '#{target_dir}/boot' -type f -name 'initrd.img-*' -exec basename {} \\;",
+    "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/$(#{INITRD_NAME}) && cp #{target_dir}/boot/{} #{output_dir}/$(#{INITRD_NAME}) || true'",
+  ].join(' | ')
+else
+  %w{vmlinuz initrd.img config}.each do |f|
+    execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
+      not_if "test -f #{output_dir}/#{f}"
+    end
+
+    file "#{output_dir}/#{f}" do
+      owner 'root'
+      group 'root'
+      mode  '0644'
+    end
   end
 end
 

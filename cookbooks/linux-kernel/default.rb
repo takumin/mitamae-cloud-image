@@ -4,19 +4,26 @@
 # Package Select
 #
 
-case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-raspi$/
-  package = 'linux-image-raspi'
-when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-generic$/
-  package = 'linux-image-generic'
-when /^ubuntu-16\.04-generic-hwe$/
-  package = 'linux-image-generic-hwe-16.04'
-when /^ubuntu-18\.04-generic-hwe$/
-  package = 'linux-image-generic-hwe-18.04'
-when /^ubuntu-20\.04-generic-hwe$/
-  package = 'linux-image-generic-hwe-20.04'
+case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:architecture]}-#{node[:target][:kernel]}"
+when /^debian-(?:[0-9]+)\.?(?:[0-9]+)?-amd64-generic$/
+  packages = %w{linux-image-amd64}
+when /^debian-(?:[0-9]+)\.?(?:[0-9]+)?-arm64-generic$/
+  packages = %w{linux-image-arm64}
+when /^debian-(?:[0-9]+)\.?(?:[0-9]+)?-arm64-raspberrypi$/
+  packages = %w{raspberrypi-bootloader raspberrypi-kernel}
+
+when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-arm64-raspi$/
+  packages = %w{linux-image-raspi}
+when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-amd64-generic$/
+  packages = %w{linux-image-generic}
+when /^ubuntu-16\.04-amd64-generic-hwe$/
+  packages = %w{linux-image-generic-hwe-16.04}
+when /^ubuntu-18\.04-amd64-generic-hwe$/
+  packages = %w{linux-image-generic-hwe-18.04}
+when /^ubuntu-20\.04-amd64-generic-hwe$/
+  packages = %w{linux-image-generic-hwe-20.04}
 else
-  MItamae.logger.error "Unknown platform: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
+  MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:architecture]}-#{node[:target][:kernel]}"
   exit 1
 end
 
@@ -29,6 +36,8 @@ when 'ubuntu'
   options = '--no-install-recommends'
 end
 
-package package do
-  options options
+packages.each do |pkg|
+  package pkg do
+    options options
+  end
 end

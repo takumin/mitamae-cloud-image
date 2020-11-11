@@ -159,13 +159,10 @@ apt_repository '/etc/apt/sources.list' do
     '#',
   ]
   entry entry
-  notifies :run, 'execute[apt-get update]'
 end
 
 #
-# Handler
+# Update Repository
 #
 
-execute 'apt-get update' do
-  action :nothing
-end
+execute 'apt-get update'
