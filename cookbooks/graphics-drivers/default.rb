@@ -19,7 +19,7 @@ end
 NVIDIA_DRIVER_VERSION_AVAILABLE = [
   '390', # Old LTS
   '450', # Latest Long Lived Branch
-  '455', # Latest Short Lived Branch
+  # '455', # Latest Short Lived Branch (Unknown Server Package...)
 ]
 
 #
@@ -90,4 +90,11 @@ end
 # Install Package
 #
 
-package "nvidia-driver-#{node[:graphics_drivers][:nvidia_version]}"
+case node[:target][:role]
+when /server/
+  package "nvidia-driver-#{node[:graphics_drivers][:nvidia_version]}-server"
+when /desktop/
+  package "nvidia-driver-#{node[:graphics_drivers][:nvidia_version]}"
+else
+  raise
+end
