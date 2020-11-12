@@ -83,18 +83,6 @@ when 'ubuntu-16.04', 'ubuntu-18.04'
 end
 
 #
-# Workaround: Removed netplan yaml file created in initramfs stage
-# See also: https://askubuntu.com/questions/1228433/what-is-creating-run-netplan-eth0-yaml
-#
-
-remote_file '/etc/initramfs-tools/scripts/init-bottom/reset-network-interfaces' do
-  owner 'root'
-  group 'root'
-  mode  '0755'
-  only_if 'test "$(dpkg-query -f \'${Status}\' -W ubuntu-desktop)" = "install ok installed"'
-end
-
-#
 # Copy the file for overwriting
 #
 
