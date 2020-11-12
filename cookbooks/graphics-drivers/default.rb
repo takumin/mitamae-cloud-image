@@ -18,12 +18,8 @@ end
 
 NVIDIA_DRIVER_VERSION_AVAILABLE = [
   '390', # Old LTS
-  '410',
-  '415',
-  '418',
-  '430', # LTS
-  '435',
-  '440', # Latest
+  '450', # Latest Long Lived Branch
+  '455', # Latest Short Lived Branch
 ]
 
 #
