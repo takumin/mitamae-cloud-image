@@ -49,15 +49,17 @@ end
 # Required Packages
 #
 
-if node[:target][:kernel].match(/hwe/)
-  if node[:target][:role].match(/server/)
-    package "xserver-xorg-core-hwe-#{node[:platform_version]}"
-    package "xserver-xorg-input-all-hwe-#{node[:platform_version]}"
-    package "xserver-xorg-legacy-hwe-#{node[:platform_version]}"
-  end
+if node[:platform_version].match(/(?:16\.04|18\.04)/)
+  if node[:target][:kernel].match(/hwe/)
+    if node[:target][:role].match(/server/)
+      package "xserver-xorg-core-hwe-#{node[:platform_version]}"
+      package "xserver-xorg-input-all-hwe-#{node[:platform_version]}"
+      package "xserver-xorg-legacy-hwe-#{node[:platform_version]}"
+    end
 
-  if node[:target][:role].match(/desktop/)
-    package "xserver-xorg-hwe-#{node[:platform_version]}"
+    if node[:target][:role].match(/desktop/)
+      package "xserver-xorg-hwe-#{node[:platform_version]}"
+    end
   end
 end
 
