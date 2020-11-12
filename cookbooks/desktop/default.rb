@@ -12,7 +12,8 @@ end
 # Required Packages
 #
 
-if node[:target][:kernel].match(/hwe/)
+case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
+when /^ubuntu-(?:16\.04|18\.04)-generic-hwe$/
   package "xserver-xorg-hwe-#{node[:platform_version]}"
 end
 
