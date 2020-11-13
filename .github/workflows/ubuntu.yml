@@ -1,16 +1,33 @@
-name: Ubuntu
-on: [push, pull_request]
+name: Build
+on: [push]
 env:
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
   APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
-  DISABLE_SQUASHFS: true
-  DISABLE_TARBALL: true
 jobs:
-  ubuntu-bionic-generic-amd64-server:
-    name: Bionic Generic Server (amd64)
-    runs-on: ubuntu-latest
+  build:
+    name: ${{ matrix.distro }} ${{ matrix.release }} ${{ matrix.kernel }} ${{ matrix.profile }} (${{ matrix.arch }})
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        distro:  ubuntu
+        release: [focal]
+        kernel:  [generic-hwe]
+        profile: [server]
+        arch:    [amd64]
+        # distro:  [ubuntu, debian]
+        # include:
+        # - distro: ubuntu
+        #   release: [bionic, focal]
+        #   kernel:  [generic, generic-hwe]
+        #   profile: [server, server-nvidia, desktop, desktop-nvidia]
+        #   arch:    [amd64, arm64]
+        # - distro: debian
+        #   release: [buster]
+        #   kernel:  [generic]
+        #   profile: [server, desktop]
+        #   arch:    [amd64, arm64]
     env:
-      PROFILE_YAML: profiles/ubuntu/bionic/generic/amd64/server.yml
+      PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
     steps:
     - name: Checkout
       uses: actions/checkout@master
@@ -20,73 +37,10 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: rake ubuntu_bionic_generic_amd64_server:initialize
+      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:initialize
     - name: Provision
-      run: rake ubuntu_bionic_generic_amd64_server:provision
+      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:provision
     - name: Finalize
-      run: rake ubuntu_bionic_generic_amd64_server:finalize
+      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:finalize
     - name: Packages
-      run: cat releases/ubuntu/bionic/generic/amd64/server/packages.manifest
-  ubuntu-bionic-generic-arm64-server:
-    name: Bionic Generic Server (arm64)
-    runs-on: ubuntu-latest
-    env:
-      PROFILE_YAML: profiles/ubuntu/bionic/generic/arm64/server.yml
-    steps:
-    - name: Checkout
-      uses: actions/checkout@master
-      with:
-        submodules: true
-        fetch-depth: 1
-    - name: Update
-      run: sudo apt-get -y update
-    - name: Initialize
-      run: rake ubuntu_bionic_generic_arm64_server:initialize
-    - name: Provision
-      run: rake ubuntu_bionic_generic_arm64_server:provision
-    - name: Finalize
-      run: rake ubuntu_bionic_generic_arm64_server:finalize
-    - name: Packages
-      run: cat releases/ubuntu/bionic/generic/arm64/server/packages.manifest
-  ubuntu-focal-generic-amd64-server:
-    name: Focal Generic Server (amd64)
-    runs-on: ubuntu-latest
-    env:
-      PROFILE_YAML: profiles/ubuntu/focal/generic/amd64/server.yml
-    steps:
-    - name: Checkout
-      uses: actions/checkout@master
-      with:
-        submodules: true
-        fetch-depth: 1
-    - name: Update
-      run: sudo apt-get -y update
-    - name: Initialize
-      run: rake ubuntu_focal_generic_amd64_server:initialize
-    - name: Provision
-      run: rake ubuntu_focal_generic_amd64_server:provision
-    - name: Finalize
-      run: rake ubuntu_focal_generic_amd64_server:finalize
-    - name: Packages
-      run: cat releases/ubuntu/focal/generic/amd64/server/packages.manifest
-  ubuntu-focal-generic-arm64-server:
-    name: Focal Generic Server (arm64)
-    runs-on: ubuntu-latest
-    env:
-      PROFILE_YAML: profiles/ubuntu/focal/generic/arm64/server.yml
-    steps:
-    - name: Checkout
-      uses: actions/checkout@master
-      with:
-        submodules: true
-        fetch-depth: 1
-    - name: Update
-      run: sudo apt-get -y update
-    - name: Initialize
-      run: rake ubuntu_focal_generic_arm64_server:initialize
-    - name: Provision
-      run: rake ubuntu_focal_generic_arm64_server:provision
-    - name: Finalize
-      run: rake ubuntu_focal_generic_arm64_server:finalize
-    - name: Packages
-      run: cat releases/ubuntu/focal/generic/arm64/server/packages.manifest
+      run: cat releases/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}/packages.manifest
