@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        distro:  ubuntu
+        distro:  [ubuntu]
         release: [focal]
         kernel:  [generic-hwe]
         profile: [server]
