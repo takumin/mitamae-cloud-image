@@ -10,10 +10,15 @@ jobs:
     strategy:
       matrix:
         distro:  [ubuntu]
+        arch:    [amd64, arm64]
         release: [bionic, focal]
         kernel:  [generic, generic-hwe]
         profile: [server, server-nvidia, desktop, desktop-nvidia]
-        arch:    [amd64, arm64]
+        exclude:
+        - arch: arm64
+          profile: server-nvidia
+        - arch: arm64
+          profile: desktop-nvidia
     env:
       PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
     steps:
