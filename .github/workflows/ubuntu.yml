@@ -1,31 +1,19 @@
-name: Build
+name: Ubuntu
 on: [push]
 env:
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
   APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
 jobs:
-  build:
-    name: ${{ matrix.distro }} ${{ matrix.release }} ${{ matrix.kernel }} ${{ matrix.profile }} (${{ matrix.arch }})
+  ubuntu:
+    name: ${{ matrix.release }} ${{ matrix.kernel }} ${{ matrix.profile }} (${{ matrix.arch }})
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         distro:  [ubuntu]
-        release: [focal]
-        kernel:  [generic-hwe]
-        profile: [server]
-        arch:    [amd64]
-        # distro:  [ubuntu, debian]
-        # include:
-        # - distro: ubuntu
-        #   release: [bionic, focal]
-        #   kernel:  [generic, generic-hwe]
-        #   profile: [server, server-nvidia, desktop, desktop-nvidia]
-        #   arch:    [amd64, arm64]
-        # - distro: debian
-        #   release: [buster]
-        #   kernel:  [generic]
-        #   profile: [server, desktop]
-        #   arch:    [amd64, arm64]
+        release: [bionic, focal]
+        kernel:  [generic, generic-hwe]
+        profile: [server, server-nvidia, desktop, desktop-nvidia]
+        arch:    [amd64, arm64]
     env:
       PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
     steps:
