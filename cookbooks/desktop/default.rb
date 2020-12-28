@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Check Platform
+# Check Role
 #
 
 unless node[:target][:role].match(/desktop/)
@@ -13,8 +13,12 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-when /^ubuntu-(?:16\.04|18\.04)-generic-hwe$/
-  package "xserver-xorg-hwe-#{node[:platform_version]}"
+when 'ubuntu-16.04-generic-hwe'
+  package 'xserver-xorg-hwe-16.04'
+when 'ubuntu-18.04-generic-hwe'
+  package 'xserver-xorg-hwe-18.04'
+when 'ubuntu-20.04-generic-hwe'
+  # 2020/12/28: X.org HWE package does not exist
 end
 
 #
@@ -26,9 +30,8 @@ when 'ubuntu'
   package 'ubuntu-desktop'
 end
 
-case "#{node[:platform]}-#{node[:platform_version]}"
-when 'ubuntu-18.04'
-  # Workaround: Fix System Log Error Message
+# Workaround: Fix System Log Error Message
+if "#{node[:platform]}-#{node[:platform_version]}" == 'ubuntu-18.04'
   package 'gir1.2-clutter-1.0'
   package 'gir1.2-clutter-gst-3.0'
   package 'gir1.2-gtkclutter-1.0'
