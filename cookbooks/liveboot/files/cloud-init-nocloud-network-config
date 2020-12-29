@@ -1,0 +1,46 @@
+#!/bin/sh
+
+[ "$1" = 'prereqs' ] && { exit 0; }
+
+cloud_init_nocloud_network_config() {(
+	for cmdline in $(cat /proc/cmdline); do
+		case $cmdline in
+			ds=*)
+				datastore="${cmdline#ds=}"
+				;;
+		esac
+	done
+
+	if [ -z "$datastore" ]; then
+		return
+	fi
+
+	if [ "${datastore%%;*}" != "nocloud-net" ]; then
+		return
+	fi
+
+	OLDIFS="$IFS"; IFS=";";
+	for cmdline in $datastore; do
+		case $cmdline in
+			s=*)
+				seedfrom="${cmdline#s=}"
+				;;
+			seedfrom=*)
+				seedfrom="${cmdline#seedfrom=}"
+				;;
+		esac
+	done
+	IFS="$OLDIFS"
+
+	if [ -z "$seedfrom" ]; then
+		return
+	fi
+
+	if [ -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
+		wget -q -O "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg" "${seedfrom}network-config"
+	fi
+)}
+
+. /scripts/functions
+
+cloud_init_nocloud_network_config

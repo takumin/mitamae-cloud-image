@@ -4,16 +4,17 @@
 
 # Workaround: Removed netplan yaml file created in initramfs stage
 # See also: https://askubuntu.com/questions/1228433/what-is-creating-run-netplan-eth0-yaml
-reset_network_interfaces() {
-	local intf
+reset_network_interfaces() {(
 	for intf in /sys/class/net/*; do
+		if [ "${intf##*/}" = "lo" ]; then
+			continue
+		fi
 		if [ -f "/run/netplan/${intf##*/}.yaml" ]; then
 			rm -f "/run/netplan/${intf##*/}.yaml"
 		fi
 		ip addr flush dev "${intf##*/}"
-		ip link set "${intf##*/}" down
 	done
-}
+)}
 
 . /scripts/functions
 

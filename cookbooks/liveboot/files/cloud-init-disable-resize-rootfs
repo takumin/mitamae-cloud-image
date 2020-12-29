@@ -1,0 +1,13 @@
+#!/bin/sh
+
+[ "$1" = 'prereqs' ] && { exit 0; }
+
+cloud_init_disable_resize_rootfs() {(
+	if [ -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
+		echo 'resize_rootfs: false' > "${rootmnt}/etc/cloud/cloud.cfg.d/99_disable_resize_rootfs.cfg"
+	fi
+)}
+
+. /scripts/functions
+
+cloud_init_disable_resize_rootfs
