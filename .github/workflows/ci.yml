@@ -24,6 +24,8 @@ jobs:
           profile: desktop-nvidia
     env:
       PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
+      TARGET_NAME: ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}
+      RELEASE_DIR: ${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}
     steps:
     #
     # Build Image
@@ -36,13 +38,13 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
-      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:initialize
+      run: rake ${TARGET_NAME}:initialize
     - name: Provision
-      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:provision
+      run: rake ${TARGET_NAME}:provision
     - name: Finalize
-      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:finalize
+      run: rake ${TARGET_NAME}:finalize
     - name: Packages
-      run: cat releases/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}/packages.manifest
+      run: cat releases/${RELEASE_DIR}/packages.manifest
     #
     # Publish Wasabi
     #
@@ -70,7 +72,10 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
     - name: Publish
-      env:
-        PREFIX=${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}
-      run: |
-        aws s3 sync --exact-timestamps --delete releases/${PREFIX} s3://mitamae-cloud-image/${PREFIX}
+      run: >-
+        aws s3 sync
+        --exact-timestamps
+        --delete
+        --endpoint-url=https://s3.${AWS_DEFAULT_REGION}.wasabisys.com
+        releases/${RELEASE_DIR}
+        s3://mitamae-cloud-image/${RELEASE_DIR}
