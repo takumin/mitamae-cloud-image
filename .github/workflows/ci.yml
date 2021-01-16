@@ -1,0 +1,76 @@
+name: CI
+on:
+  push:
+    branches:
+    - master
+env:
+  APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
+  APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
+jobs:
+  build-and-publish:
+    name: ${{ matrix.distro }} ${{ matrix.release }} ${{ matrix.kernel }} ${{ matrix.profile }} (${{ matrix.arch }})
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        distro:  [ubuntu]
+        arch:    [amd64, arm64]
+        release: [bionic, focal]
+        kernel:  [generic, generic-hwe]
+        profile: [server, server-nvidia, desktop, desktop-nvidia]
+        exclude:
+        - arch: arm64
+          profile: server-nvidia
+        - arch: arm64
+          profile: desktop-nvidia
+    env:
+      PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
+    steps:
+    #
+    # Build Image
+    #
+    - name: Checkout
+      uses: actions/checkout@master
+      with:
+        submodules: true
+        fetch-depth: 1
+    - name: Update
+      run: sudo apt-get -y update
+    - name: Initialize
+      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:initialize
+    - name: Provision
+      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:provision
+    - name: Finalize
+      run: rake ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}:finalize
+    - name: Packages
+      run: cat releases/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}/packages.manifest
+    #
+    # Publish Wasabi
+    #
+    - name: AssumeRole
+      run: |
+        RESULT="$(
+          aws sts assume-role --role-arn "${AWS_ROLE_ARN}" \
+                              --role-session-name "${GITHUB_RUN_ID}" \
+                              --endpoint-url "https://sts.${AWS_DEFAULT_REGION}.wasabisys.com"
+        )"
+        AWS_ACCESS_KEY_ID="$(echo "${RESULT}" | jq -r '.Credentials.AccessKeyId')"
+        AWS_SECRET_ACCESS_KEY="$(echo "${RESULT}" | jq -r '.Credentials.SecretAccessKey')"
+        AWS_SESSION_TOKEN="$(echo "${RESULT}" | jq -r '.Credentials.SessionToken')"
+        echo "::add-mask::$AWS_DEFAULT_REGION"
+        echo "::add-mask::$AWS_ACCESS_KEY_ID"
+        echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+        echo "::add-mask::$AWS_SESSION_TOKEN"
+        echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" >> $GITHUB_ENV
+        echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
+        echo "AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}" >> $GITHUB_ENV
+      env:
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+    - name: Publish
+      env:
+        PREFIX=${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}
+      run: |
+        aws s3 sync --exact-timestamps --delete releases/${PREFIX} s3://mitamae-cloud-image/${PREFIX}
