@@ -161,8 +161,8 @@ end
 # Checksum Archive
 #
 
-if ENV['DISABLE_SHA256SUM'] != 'true'
-  execute "find . -type f -not -name 'SHA256SUM' -print0 | sed -E 's@./@@g' | sort -zn | xargs -0 sha256sum > SHA256SUMS" do
+if ENV['DISABLE_SHA256SUMS'] != 'true'
+  execute "find . -type f -not -name 'SHA256SUMS' -print0 | sed -E 's@./@@g' | sort -zn | xargs -0 sha256sum > SHA256SUMS" do
     cwd    output_dir
     not_if "test -f SHA256SUMS"
   end
