@@ -47,6 +47,8 @@ jobs:
       run: rake ${TARGET_NAME}:finalize
     - name: Packages
       run: cat releases/${RELEASE_DIR}/packages.manifest
+    - name: Checksums
+      run: cat releases/${RELEASE_DIR}/SHA256SUMS
     #
     # Publish Wasabi
     #

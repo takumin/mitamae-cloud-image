@@ -162,12 +162,12 @@ end
 #
 
 if ENV['DISABLE_SHA256SUM'] != 'true'
-  execute "find . -type f -not -name 'SHA256SUM' -print0 | sed -E 's@./@@g' | sort -zn | xargs -0 sha256sum > SHA256SUM" do
+  execute "find . -type f -not -name 'SHA256SUM' -print0 | sed -E 's@./@@g' | sort -zn | xargs -0 sha256sum > SHA256SUMS" do
     cwd    output_dir
-    not_if "test -f SHA256SUM"
+    not_if "test -f SHA256SUMS"
   end
 
-  file "#{output_dir}/SHA256SUM" do
+  file "#{output_dir}/SHA256SUMS" do
     owner 'root'
     group 'root'
     mode  '0644'
