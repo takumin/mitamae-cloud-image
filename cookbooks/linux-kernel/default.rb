@@ -14,16 +14,16 @@ when /^debian-(?:[0-9]+)\.?(?:[0-9]+)?-arm64-raspberrypi$/
 
 when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-arm64-raspi$/
   packages = %w{linux-image-raspi}
-when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-amd64-generic$/
+when /^ubuntu-(?:[0-9]+)\.(?:[0-9]+)-(?:amd64|arm64)-generic$/
   packages = %w{linux-image-generic}
-when /^ubuntu-16\.04-amd64-generic-hwe$/
+when /^ubuntu-16\.04-(?:amd64|arm64)-generic-hwe$/
   packages = %w{linux-image-generic-hwe-16.04}
-when /^ubuntu-18\.04-amd64-generic-hwe$/
+when /^ubuntu-18\.04-(?:amd64|arm64)-generic-hwe$/
   packages = %w{linux-image-generic-hwe-18.04}
-when /^ubuntu-20\.04-amd64-generic-hwe$/
+when /^ubuntu-20\.04-(?:amd64|arm64)-generic-hwe$/
   packages = %w{linux-image-generic-hwe-20.04}
 else
-  MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:architecture]}-#{node[:target][:kernel]}"
+  MItamae.logger.error "linux-kernel:  #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:architecture]}-#{node[:target][:kernel]}"
   exit 1
 end
 
