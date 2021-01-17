@@ -156,3 +156,20 @@ if ENV['DISABLE_TARBALL'] != 'true'
     mode  '0644'
   end
 end
+
+#
+# Checksum Archive
+#
+
+if ENV['DISABLE_SHA256SUM'] != 'true'
+  execute "find . -type f -not -name 'SHA256SUM' -print0 | sed -E 's@./@@g' | sort -zn | xargs -0 sha256sum > SHA256SUM" do
+    cwd    output_dir
+    not_if "test -f SHA256SUM"
+  end
+
+  file "#{output_dir}/SHA256SUM" do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+  end
+end
