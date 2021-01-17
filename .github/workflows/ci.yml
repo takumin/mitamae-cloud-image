@@ -72,10 +72,15 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
     - name: Publish
-      run: >-
-        aws s3 sync
-        --exact-timestamps
-        --delete
-        --endpoint-url=https://s3.${AWS_DEFAULT_REGION}.wasabisys.com
-        releases/${RELEASE_DIR}
-        s3://mitamae-cloud-image/${RELEASE_DIR}
+      uses: nick-invision/retry@v2
+      with:
+        timeout_minutes: 3
+        max_attempts: 3
+        command: >-
+          aws s3 sync
+          --no-progress
+          --exact-timestamps
+          --delete
+          --endpoint-url=https://s3.${AWS_DEFAULT_REGION}.wasabisys.com
+          releases/${RELEASE_DIR}
+          s3://mitamae-cloud-image/${RELEASE_DIR}
