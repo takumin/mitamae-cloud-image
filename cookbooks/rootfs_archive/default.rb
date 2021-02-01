@@ -8,15 +8,38 @@ node[:rootfs_archive]                     ||= Hashie::Mash.new
 node[:rootfs_archive][:format]            ||= Hashie::Mash.new
 node[:rootfs_archive][:format][:tarball]  ||= 'lz4'
 node[:rootfs_archive][:format][:squashfs] ||= 'lz4'
-node[:rootfs_archive][:target_dir]        ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
-node[:rootfs_archive][:output_dir]        ||= ENV['OUTPUT_DIRECTORY'] || File.join(
-  'releases',
-  node[:target][:distribution],
-  node[:target][:suite],
-  node[:target][:kernel],
-  node[:target][:architecture],
-  node[:target][:role],
-)
+
+#
+# Public Variables - Target Directory
+#
+
+node[:rootfs_archive][:target_dir] ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
+
+#
+# Public Variables - Output Directory
+#
+
+case node[:target][:distribution]
+when 'debian', 'ubuntu'
+  node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
+    'releases',
+    node[:target][:distribution],
+    node[:target][:suite],
+    node[:target][:kernel],
+    node[:target][:architecture],
+    node[:target][:role],
+  )
+when 'arch'
+  node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
+    'releases',
+    node[:target][:distribution],
+    node[:target][:kernel],
+    node[:target][:architecture],
+    node[:target][:role],
+  )
+else
+  raise
+end
 
 #
 # Validate Variables
@@ -76,30 +99,54 @@ end
 # Package Manifest
 #
 
-execute "chroot #{target_dir} dpkg -l | sed -E '1,5d' | awk '{print $2 \"\\t\" $3}' > #{output_dir}/packages.manifest" do
-  not_if "test -f #{output_dir}/packages.manifest"
+case node[:target][:distribution]
+when 'debian', 'ubuntu'
+  execute "chroot #{target_dir} dpkg -l | sed -E '1,5d' | awk '{print $2 \"\\t\" $3}' > #{output_dir}/packages.manifest" do
+    not_if "test -f #{output_dir}/packages.manifest"
+  end
+when 'arch'
+  execute "chroot #{target_dir} pacman -Q > #{output_dir}/packages.manifest" do
+    not_if "test -f #{output_dir}/packages.manifest"
+  end
+else
+  raise
 end
 
 #
 # Kernel and Initramfs
 #
 
-case "#{node[:target][:distribution]}-#{node[:target][:kernel]}"
-when "debian-raspberrypi"
-  execute [
-    "find '#{target_dir}/boot' -type f -name 'kernel*img' -exec basename {} \\;",
-    "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/{} && cp #{target_dir}/boot/{} #{output_dir}/{} || true'",
-  ].join(' | ')
+case node[:target][:distribution]
+when 'debian', 'ubuntu'
+  case "#{node[:target][:distribution]}-#{node[:target][:kernel]}"
+  when "debian-raspberrypi"
+    execute [
+      "find '#{target_dir}/boot' -type f -name 'kernel*img' -exec basename {} \\;",
+      "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/{} && cp #{target_dir}/boot/{} #{output_dir}/{} || true'",
+    ].join(' | ')
 
-  INITRD_NAME = 'echo {} | sed -E "s@-[0-9]+\.[0-9]+\.[0-9]+@@; s@\+\$@@;"'
+    INITRD_NAME = 'echo {} | sed -E "s@-[0-9]+\.[0-9]+\.[0-9]+@@; s@\+\$@@;"'
 
-  execute [
-    "find '#{target_dir}/boot' -type f -name 'initrd.img-*' -exec basename {} \\;",
-    "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/$(#{INITRD_NAME}) && cp #{target_dir}/boot/{} #{output_dir}/$(#{INITRD_NAME}) || true'",
-  ].join(' | ')
-else
-  %w{vmlinuz initrd.img config}.each do |f|
-    execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
+    execute [
+      "find '#{target_dir}/boot' -type f -name 'initrd.img-*' -exec basename {} \\;",
+      "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/$(#{INITRD_NAME}) && cp #{target_dir}/boot/{} #{output_dir}/$(#{INITRD_NAME}) || true'",
+    ].join(' | ')
+  else
+    %w{vmlinuz initrd.img config}.each do |f|
+      execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
+        not_if "test -f #{output_dir}/#{f}"
+      end
+
+      file "#{output_dir}/#{f}" do
+        owner 'root'
+        group 'root'
+        mode  '0644'
+      end
+    end
+  end
+when 'arch'
+  %W{vmlinuz-#{node[:target][:kernel]} initramfs-#{node[:target][:kernel]}.img}.each do |f|
+    execute "find '#{target_dir}/boot' -type f -name '#{f}' -exec cp {} #{output_dir}/#{f} \\;" do
       not_if "test -f #{output_dir}/#{f}"
     end
 
@@ -109,6 +156,8 @@ else
       mode  '0644'
     end
   end
+else
+  raise
 end
 
 #

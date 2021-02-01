@@ -4,4 +4,11 @@
 # Package Install
 #
 
-package 'initramfs-tools'
+case node[:platform]
+when 'debian', 'ubuntu'
+  package 'initramfs-tools'
+when 'arch'
+  package 'mkinitcpio'
+else
+  raise
+end

@@ -32,21 +32,21 @@ target_dir       = node[:resolv_conf][:target_dir]
 resolv_conf_path = File.join(target_dir, 'etc', 'resolv.conf')
 
 #
-# Create Link File
+# Remove Symbolic Link
 #
 
-if File.symlink?(resolv_conf_path)
-  resolv_symlink_path = File.expand_path(File.join(File.dirname(resolv_conf_path), File.readlink(resolv_conf_path)))
+file resolv_conf_path do
+  action :delete
+  only_if "test \"'#{resolv_conf_path}'\" != \"$(stat -c '%N' #{resolv_conf_path})\""
+end
 
-  if resolv_symlink_path.match(/^#{Regexp.escape(File.join(target_dir, 'run'))}/)
-    directory File.dirname(resolv_symlink_path) do
-      owner 'root'
-      group 'root'
-      mode  '0755'
-    end
+#
+# Copy Host Machine File
+#
 
-    execute "cp -L /etc/resolv.conf #{resolv_symlink_path}" do
-      not_if "test -r #{resolv_symlink_path}"
-    end
-  end
+file resolv_conf_path do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content File.read('/etc/resolv.conf')
 end

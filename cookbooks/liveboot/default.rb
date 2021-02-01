@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
 #
+# Check Distribution
+#
+
+unless node[:target][:distribution].match(/^(debian|ubuntu)$/)
+  return
+end
+
+#
 # Package Install
 #
 
-case node[:platform]
-when 'debian', 'ubuntu'
-  package 'live-boot'
-else
-  MItamae.logger.error "Unknown Platform: #{node[:platform]}"
-  exit 1
-end
+package 'live-boot'
 
 #
 # Cloud-Init NoCloud Datasource Network Config

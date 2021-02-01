@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 #
+# Check Distribution
+#
+
+unless node[:target][:distribution].match(/^(debian|ubuntu)$/)
+  return
+end
+
+#
 # Public Variables
 #
 
@@ -17,7 +25,7 @@ node[:debootstrap][:ubuntu_mirror]          ||= 'http://archive.ubuntu.com/ubunt
 node[:debootstrap][:ubuntu_ports_mirror]    ||= 'http://ports.ubuntu.com/ubuntu-ports'
 node[:debootstrap][:debian_mirror]          ||= 'http://deb.debian.org/debian'
 node[:debootstrap][:debian_security_mirror] ||= 'http://deb.debian.org/debian-security'
-node[:debootstrap][:target_dir]             ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
+node[:debootstrap][:target_dir]             ||= node[:target][:directory]
 
 #
 # Default Variables
@@ -37,6 +45,10 @@ end
 
 if ENV['APT_REPO_URL_DEBIAN_SECURITY'].is_a?(String) and !ENV['APT_REPO_URL_DEBIAN_SECURITY'].empty?
   node[:debootstrap][:debian_security_mirror] = ENV['APT_REPO_URL_DEBIAN_SECURITY']
+end
+
+if ENV['TARGET_DIRECTORY'].is_a?(String) and !ENV['TARGET_DIRECTORY'].empty?
+  node[:debootstrap][:target_dir] = ENV['TARGET_DIRECTORY']
 end
 
 #

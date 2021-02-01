@@ -18,6 +18,8 @@ when :debian
   execute 'aptitude -F %p search \'~pimportant\' | xargs apt-get install -yqq'
 when :ubuntu
   package 'ubuntu-minimal'
+when :arch
+  package 'base'
 else
   MItamae.logger.info "Ignore minimal package installation for this platform: #{node[:platform]}"
 end

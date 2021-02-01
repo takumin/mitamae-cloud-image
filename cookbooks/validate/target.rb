@@ -5,17 +5,15 @@
 node.validate! do
   {
     target: {
-      distribution: match(/^(?:debian|ubuntu)$/),
-      suite:        string,
+      distribution: match(/^(?:debian|ubuntu|arch)$/),
       architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
       role:         match(/^(?:minimal|server|desktop|server-nvidia|desktop-nvidia)$/),
-      components:   array_of(string),
       directory:    string,
     },
   }
 end
 
-case node[:debootstrap][:target]
+case node[:target][:distribution]
 when :ubuntu
   node.validate! do
     {

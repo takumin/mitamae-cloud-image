@@ -54,8 +54,15 @@ end
 # Required Packages
 #
 
-package 'locales'
-package 'locales-all'
+case node[:platform]
+when 'debian', 'ubuntu'
+  package 'locales'
+  package 'locales-all'
+when 'arch'
+  # nothing...
+else
+  raise
+end
 
 #
 # Availables Locale
@@ -66,7 +73,7 @@ node[:locale][:availables].each do |locale|
     action :edit
     not_if "grep -E '^#{locale}$' /etc/locale.gen"
     block do |content|
-      content.gsub!(/^#?\s+?#{locale}$/, "#{locale}")
+      content.gsub!(/^#?\s?#{locale}\s+?$/, "#{locale}")
     end
     notifies :run, 'execute[locale-gen]'
   end
@@ -84,8 +91,10 @@ end
 # Select Locale
 #
 
-node[:locale][:defaults].each do |k, v|
-  execute "update-locale #{k}=#{v}" do
-    not_if "grep -E '^#{k}=#{v}$' /etc/default/locale"
+if node[:platform].match(/^(?:debian|ubuntu)$/)
+  node[:locale][:defaults].each do |k, v|
+    execute "update-locale #{k}=#{v}" do
+      not_if "grep -E '^#{k}=#{v}$' /etc/default/locale"
+    end
   end
 end

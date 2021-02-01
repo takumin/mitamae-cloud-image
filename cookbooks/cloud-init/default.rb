@@ -51,10 +51,13 @@ end
 # Package Config
 #
 
-debconf 'cloud-init' do
-  question 'cloud-init/datasources'
-  vtype    'multiselect'
-  value    node[:cloud_init][:datasources].join(', ')
+case node[:platform]
+when 'debian', 'ubuntu'
+  debconf 'cloud-init' do
+    question 'cloud-init/datasources'
+    vtype    'multiselect'
+    value    node[:cloud_init][:datasources].join(', ')
+  end
 end
 
 #
@@ -62,6 +65,20 @@ end
 #
 
 package 'cloud-init'
+
+#
+# Package Config
+#
+
+case node[:platform]
+when 'arch'
+  file '/etc/cloud/cloud.cfg.d/99_datasources.cfg' do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content "datasource_list: [ #{node[:cloud_init][:datasources].join(', ')} ]\n"
+  end
+end
 
 #
 # Copy the file for overwriting
