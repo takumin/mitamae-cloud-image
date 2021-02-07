@@ -75,7 +75,12 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+    - name: Get Packages Manifest
+      run: aws s3 s3://mitamae-cloud-image/${RELEASE_DIR}/packages.manifest /tmp/packages.manifest
+    - name: Check Difference
+      run: diff -q releases/${RELEASE_DIR}/packages.manifest /tmp/packages.manifest
     - name: Publish
+      if: failure()
       uses: nick-invision/retry@v2
       with:
         timeout_minutes: 3
