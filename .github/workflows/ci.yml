@@ -50,9 +50,20 @@ jobs:
     - name: Checksums
       run: cat releases/${RELEASE_DIR}/SHA256SUMS
     #
+    # Check Difference
+    #
+    - name: Download Packages Manifest
+      run: wget -qO /tmp/packages.manifest https://mitamae-cloud-image.s3.${AWS_DEFAULT_REGION}.wasabisys.com/${RELEASE_DIR}/packages.manifest
+      env:
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    - name: Check Difference
+      id: check_difference
+      run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest
+    #
     # Publish Wasabi
     #
     - name: AssumeRole
+      if: failure() && steps.check_difference.outcome == 'failure'
       run: |
         RESULT="$(
           aws sts assume-role --role-arn "${AWS_ROLE_ARN}" \
@@ -75,11 +86,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-    - name: Get Packages Manifest
-      run: aws s3 cp s3://mitamae-cloud-image/${RELEASE_DIR}/packages.manifest /tmp/packages.manifest
-    - name: Check Difference
-      id: check_difference
-      run: diff -u releases/${RELEASE_DIR}/packages.manifest /tmp/packages.manifest
     - name: Publish
       if: failure() && steps.check_difference.outcome == 'failure'
       uses: nick-invision/retry@v2
