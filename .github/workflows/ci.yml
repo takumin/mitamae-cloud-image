@@ -48,9 +48,15 @@ jobs:
     - name: Finalize
       id: finalize
       run: rake ${TARGET_NAME}:finalize
+
+    #
+    # Build Artifacts
+    #
     - name: Packages
+      if: success()
       run: cat releases/${RELEASE_DIR}/packages.manifest
     - name: Checksums
+      if: success()
       run: cat releases/${RELEASE_DIR}/SHA256SUMS
 
     #
