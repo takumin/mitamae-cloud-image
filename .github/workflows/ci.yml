@@ -3,8 +3,8 @@ on:
   push:
     branches:
     - master
-  # schedule:
-  # - cron: '12 12 * * *'
+  schedule:
+  - cron: '12 12 * * *'
 env:
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
   APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
@@ -49,53 +49,55 @@ jobs:
       run: cat releases/${RELEASE_DIR}/packages.manifest
     - name: Checksums
       run: cat releases/${RELEASE_DIR}/SHA256SUMS
+
     #
     # Check Difference
     #
-    - name: Download Packages Manifest
-      run: wget -qO /tmp/packages.manifest https://mitamae-cloud-image.s3.${AWS_DEFAULT_REGION}.wasabisys.com/${RELEASE_DIR}/packages.manifest
-      env:
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    - name: Check Difference
-      run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
+    # - name: Download Packages Manifest
+    #   run: wget -qO /tmp/packages.manifest https://mitamae-cloud-image.s3.${AWS_DEFAULT_REGION}.wasabisys.com/${RELEASE_DIR}/packages.manifest
+    #   env:
+    #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    # - name: Check Difference
+    #   run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
+
     #
     # Publish Wasabi
     #
-    - name: AssumeRole
-      if: env.PUBLISH == 'true'
-      run: |
-        RESULT="$(
-          aws sts assume-role --role-arn "${AWS_ROLE_ARN}" \
-                              --role-session-name "${GITHUB_RUN_ID}" \
-                              --endpoint-url "https://sts.${AWS_DEFAULT_REGION}.wasabisys.com"
-        )"
-        AWS_ACCESS_KEY_ID="$(echo "${RESULT}" | jq -r '.Credentials.AccessKeyId')"
-        AWS_SECRET_ACCESS_KEY="$(echo "${RESULT}" | jq -r '.Credentials.SecretAccessKey')"
-        AWS_SESSION_TOKEN="$(echo "${RESULT}" | jq -r '.Credentials.SessionToken')"
-        echo "::add-mask::$AWS_DEFAULT_REGION"
-        echo "::add-mask::$AWS_ACCESS_KEY_ID"
-        echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
-        echo "::add-mask::$AWS_SESSION_TOKEN"
-        echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" >> $GITHUB_ENV
-        echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
-        echo "AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}" >> $GITHUB_ENV
-      env:
-        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-    - name: Publish
-      if: env.PUBLISH == 'true'
-      uses: nick-invision/retry@v2
-      with:
-        timeout_minutes: 3
-        max_attempts: 3
-        command: >-
-          aws s3 sync
-          --no-progress
-          --exact-timestamps
-          --delete
-          --endpoint-url=https://s3.${AWS_DEFAULT_REGION}.wasabisys.com
-          releases/${RELEASE_DIR}
-          s3://mitamae-cloud-image/${RELEASE_DIR}
+    # - name: AssumeRole
+    #   if: env.PUBLISH == 'true'
+    #   run: |
+    #     RESULT="$(
+    #       aws sts assume-role --role-arn "${AWS_ROLE_ARN}" \
+    #                           --role-session-name "${GITHUB_RUN_ID}" \
+    #                           --endpoint-url "https://sts.${AWS_DEFAULT_REGION}.wasabisys.com"
+    #     )"
+    #     AWS_ACCESS_KEY_ID="$(echo "${RESULT}" | jq -r '.Credentials.AccessKeyId')"
+    #     AWS_SECRET_ACCESS_KEY="$(echo "${RESULT}" | jq -r '.Credentials.SecretAccessKey')"
+    #     AWS_SESSION_TOKEN="$(echo "${RESULT}" | jq -r '.Credentials.SessionToken')"
+    #     echo "::add-mask::$AWS_DEFAULT_REGION"
+    #     echo "::add-mask::$AWS_ACCESS_KEY_ID"
+    #     echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+    #     echo "::add-mask::$AWS_SESSION_TOKEN"
+    #     echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" >> $GITHUB_ENV
+    #     echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_ENV
+    #     echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
+    #     echo "AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}" >> $GITHUB_ENV
+    #   env:
+    #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+    # - name: Publish
+    #   if: env.PUBLISH == 'true'
+    #   uses: nick-invision/retry@v2
+    #   with:
+    #     timeout_minutes: 3
+    #     max_attempts: 3
+    #     command: >-
+    #       aws s3 sync
+    #       --no-progress
+    #       --exact-timestamps
+    #       --delete
+    #       --endpoint-url=https://s3.${AWS_DEFAULT_REGION}.wasabisys.com
+    #       releases/${RELEASE_DIR}
+    #       s3://mitamae-cloud-image/${RELEASE_DIR}
