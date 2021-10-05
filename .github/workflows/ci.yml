@@ -64,13 +64,13 @@ jobs:
     #
     - name: Check Mount Point Initialize
       if: failure() && steps.initialize.outcome == 'failure'
-      run: fuser -muv /tmp/${TARGET_NAME//_/-}
+      run: lsof /tmp/${TARGET_NAME//_/-}
     - name: Check Mount Point Provision
       if: failure() && steps.provision.outcome == 'failure'
-      run: fuser -muv /tmp/${TARGET_NAME//_/-}
+      run: lsof /tmp/${TARGET_NAME//_/-}
     - name: Check Mount Point Finalize
       if: failure() && steps.finalize.outcome == 'failure'
-      run: fuser -muv /tmp/${TARGET_NAME//_/-}
+      run: lsof /tmp/${TARGET_NAME//_/-}
 
     #
     # Check Difference
