@@ -1,0 +1,19 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'debian'
+  suite:        'bullseye'
+  kernel:       'generic'
+  architecture: 'amd64'
+  role:         'server'
+  components:   ['main', 'contrib', 'non-free']
+  directory:    '/tmp/debian-bullseye-generic-amd64-server'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'debootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']
