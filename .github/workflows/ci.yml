@@ -40,15 +40,31 @@ jobs:
     - name: Update
       run: sudo apt-get -y update
     - name: Initialize
+      id: initialize
       run: rake ${TARGET_NAME}:initialize
     - name: Provision
+      id: provision
       run: rake ${TARGET_NAME}:provision
     - name: Finalize
+      id: finalize
       run: rake ${TARGET_NAME}:finalize
     - name: Packages
       run: cat releases/${RELEASE_DIR}/packages.manifest
     - name: Checksums
       run: cat releases/${RELEASE_DIR}/SHA256SUMS
+
+    #
+    # Check Mount Point
+    #
+    - name: Check Mount Point Initialize
+      if: failure() && steps.initialize.outcome == 'failure'
+      run: findmnt /tmp/${TARGET_NAME//_/-}
+    - name: Check Mount Point Provision
+      if: failure() && steps.provision.outcome == 'failure'
+      run: findmnt /tmp/${TARGET_NAME//_/-}
+    - name: Check Mount Point Finalize
+      if: failure() && steps.finalize.outcome == 'failure'
+      run: findmnt /tmp/${TARGET_NAME//_/-}
 
     #
     # Check Difference
