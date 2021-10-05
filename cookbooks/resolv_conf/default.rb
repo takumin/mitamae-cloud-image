@@ -32,6 +32,20 @@ target_dir       = node[:resolv_conf][:target_dir]
 resolv_conf_path = File.join(target_dir, 'etc', 'resolv.conf')
 
 #
+# Get Absolute File Path
+#
+
+if File.symlink?(resolv_conf_path)
+  resolv_conf_path = File.expand_path(File.join(target_dir, 'etc', File.readlink(resolv_conf_path)))
+
+  directory File.dirname(resolv_conf_path) do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
+end
+
+#
 # Remove Symbolic Link
 #
 
