@@ -48,7 +48,7 @@ node[:rootfs_umount][:umounts].reverse.each do |v|
     action :absent
 
     if v == node[:rootfs_umount][:target_dir] && ENV['CI'] == 'true'
-      force true
+      lazy true
     end
   end
 end
