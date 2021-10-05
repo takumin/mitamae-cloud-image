@@ -6,8 +6,8 @@
 
 node[:rootfs_archive]                     ||= Hashie::Mash.new
 node[:rootfs_archive][:format]            ||= Hashie::Mash.new
-node[:rootfs_archive][:format][:tarball]  ||= 'lz4'
-node[:rootfs_archive][:format][:squashfs] ||= 'lz4'
+node[:rootfs_archive][:format][:tarball]  ||= 'gzip'
+node[:rootfs_archive][:format][:squashfs] ||= 'gzip'
 
 #
 # Public Variables - Target Directory
@@ -49,8 +49,8 @@ node.validate! do
   {
     rootfs_archive: {
       format: {
-        tarball:  match(/^(?:gzip|lz4|xz)$/),
-        squashfs: match(/^(?:gzip|lz4|xz)$/),
+        tarball:  match(/^(?:gzip|lz4|xz|zstd)$/),
+        squashfs: match(/^(?:gzip|lz4|xz|zstd)$/),
       },
       target_dir: match(/^(?:[0-9a-zA-Z-_\/\.]+)$/),
       output_dir: match(/^(?:[0-9a-zA-Z-_\/\.]+)$/),
@@ -80,6 +80,8 @@ package 'tar'
     package 'liblz4-tool'
   when 'xz'
     package 'pixz'
+  when 'zstd'
+    package 'zstd'
   else
     raise
   end
@@ -191,6 +193,9 @@ if ENV['DISABLE_TARBALL'] != 'true'
   when 'xz'
     cmd = 'pixz'
     ext = 'xz'
+  when 'zstd'
+    cmd = 'zstd'
+    ext = 'zstd'
   else
     raise
   end
