@@ -64,10 +64,10 @@ jobs:
     #
     - name: Check Mount Point
       if: failure()
-      run: findmnt -aR /tmp/${TARGET_NAME//_/-}
+      run: findmnt -aR /
     - name: Check Open Process
       if: failure()
-      run: lsof /tmp/${TARGET_NAME//_/-}
+      run: lsof /
 
     #
     # Check Difference
