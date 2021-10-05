@@ -42,7 +42,9 @@ profiles.each do |profile|
     task :initialize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'initialize.rb')
 
-      execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
+      unless execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
+        abort('failed command')
+      end
     end
 
     desc 'provision'
@@ -51,24 +53,32 @@ profiles.each do |profile|
       recipe_path  = File.join('/mitamae', 'phases', 'provision.rb')
       exclude_list = ['--exclude=".git/"', '--exclude="releases/"']
 
-      execution(['sudo', 'rsync', '-av', exclude_list.join(' '), "#{Dir.pwd}/", "#{mitamae_dir}/"].join(' '))
+      unless execution(['sudo', 'rsync', '-av', exclude_list.join(' '), "#{Dir.pwd}/", "#{mitamae_dir}/"].join(' '))
+        abort('failed command')
+      end
 
-      execution([
+      unless execution([
         'sudo', '-E', 'chroot', target_dir,
         'mitamae', 'local',
         '--plugins=/mitamae/plugins',
         '-y', "/mitamae/profiles/#{profile}",
         recipe_path
       ].join(' '))
+        abort('failed command')
+      end
 
-      execution(['sudo', 'rm', '-fr', File.join(target_dir, 'mitamae')].join(' '))
+      unless execution(['sudo', 'rm', '-fr', File.join(target_dir, 'mitamae')].join(' '))
+        abort('failed command')
+      end
     end
 
     desc 'finalize'
     task :finalize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'finalize.rb')
 
-      execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
+      unless execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
+        abort('failed command')
+      end
     end
 
     task :all => [:initialize, :provision, :finalize]
@@ -79,7 +89,8 @@ profiles.each do |profile|
 end
 
 def execution(cmd)
-  puts cmd
+  retval = false
+
   # https://ikm.hatenablog.jp/entry/2014/11/12/003925
   Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
     stdin.close_write
@@ -96,5 +107,9 @@ def execution(cmd)
       end
     rescue EOFError
     end
+
+    retval = wait_thr.value.success?
   end
+
+  return retval
 end
