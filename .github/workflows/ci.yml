@@ -62,14 +62,11 @@ jobs:
     #
     # Check Mount Point
     #
-    - name: Check Mount Point Initialize
-      if: failure() && steps.initialize.outcome == 'failure'
-      run: lsof /tmp/${TARGET_NAME//_/-}
-    - name: Check Mount Point Provision
-      if: failure() && steps.provision.outcome == 'failure'
-      run: lsof /tmp/${TARGET_NAME//_/-}
-    - name: Check Mount Point Finalize
-      if: failure() && steps.finalize.outcome == 'failure'
+    - name: Check Mount Point
+      if: failure()
+      run: findmnt -R /tmp/${TARGET_NAME//_/-}
+    - name: Check Open Process
+      if: failure()
       run: lsof /tmp/${TARGET_NAME//_/-}
 
     #
