@@ -24,6 +24,8 @@ jobs:
           profile: server-nvidia
         - arch: arm64
           profile: desktop-nvidia
+        - arch: arm64
+          release: bionic
     env:
       PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
       TARGET_NAME: ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}
