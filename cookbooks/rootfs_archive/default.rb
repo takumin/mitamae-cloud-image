@@ -6,8 +6,8 @@
 
 node[:rootfs_archive]                     ||= Hashie::Mash.new
 node[:rootfs_archive][:format]            ||= Hashie::Mash.new
-node[:rootfs_archive][:format][:tarball]  ||= 'gzip'
-node[:rootfs_archive][:format][:squashfs] ||= 'gzip'
+node[:rootfs_archive][:format][:tarball]  ||= 'zstd'
+node[:rootfs_archive][:format][:squashfs] ||= 'zstd'
 
 #
 # Public Variables - Target Directory
