@@ -22,7 +22,7 @@ when 'debian'
 when 'ubuntu'
   case "#{node[:platform_version]}-#{node[:target][:architecture]}-#{node[:target][:kernel]}"
   when /^(?:[0-9]+)\.(?:[0-9]+)-arm64-raspi$/
-    packages = %w{linux-image-raspi}
+    packages = %w{linux-image-raspi linux-firmware-raspi2}
   when /^(?:[0-9]+)\.(?:[0-9]+)-(?:amd64|arm64)-generic$/
     packages = %w{linux-image-generic}
   when /^16\.04-(?:amd64|arm64)-generic-hwe$/
