@@ -5,7 +5,7 @@
 #
 
 node[:initramfs]            ||= Hashie::Mash.new
-node[:initramfs][:compress] ||= 'zstd'
+node[:initramfs][:compress] ||= 'lz4'
 
 #
 # Package Install

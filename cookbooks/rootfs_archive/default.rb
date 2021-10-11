@@ -6,8 +6,8 @@
 
 node[:rootfs_archive]                     ||= Hashie::Mash.new
 node[:rootfs_archive][:format]            ||= Hashie::Mash.new
-node[:rootfs_archive][:format][:tarball]  ||= 'zstd'
-node[:rootfs_archive][:format][:squashfs] ||= 'zstd'
+node[:rootfs_archive][:format][:tarball]  ||= 'lz4'
+node[:rootfs_archive][:format][:squashfs] ||= 'lz4'
 
 #
 # Public Variables - Target Directory
@@ -226,4 +226,95 @@ if ENV['DISABLE_SHA256SUMS'] != 'true'
     group 'root'
     mode  '0644'
   end
+end
+
+#
+# Raspberry Pi Common Firmware
+#
+
+case node[:target][:kernel]
+when 'raspberrypi', 'raspi'
+  %w{
+    bootcode.bin
+    fixup.dat
+    fixup_cd.dat
+    fixup_db.dat
+    fixup_x.dat
+    fixup4.dat
+    fixup4cd.dat
+    fixup4db.dat
+    fixup4x.dat
+    start.elf
+    start_cd.elf
+    start_db.elf
+    start_x.elf
+    start4.elf
+    start4cd.elf
+    start4db.elf
+    start4x.elf
+  }.each do |bin|
+    http_request "#{output_dir}/#{bin}" do
+      url   "https://github.com/raspberrypi/firmware/raw/master/boot/#{bin}"
+      owner 'root'
+      group 'root'
+      mode  '0644'
+    end
+  end
+
+  file "#{output_dir}/config.txt" do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content [
+      'arm_64bit=1',
+      'kernel=vmlinuz',
+      'initramfs initrd.img followkernel',
+      'disable_overscan=1',
+      'force_turbo=1',
+      'dtoverlay=miniuart-bt',
+      'dtoverlay=vc4-kms-v3d-pi4',
+      'max_framebuffers=2',
+    ].join("\n")
+  end
+
+  file "#{output_dir}/cmdline.txt" do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content [
+      'console=serial0,115200',
+      'console=tty1',
+      'boot=live',
+      'ip=dhcp',
+      'fetch=http://boot.internal/rpi/rootfs.squashfs',
+      'ds=nocloud-net;s=http://boot.internal/seed/rpi4/default/',
+      'overlayroot=tmpfs',
+      'ipv6.disable=1', # Workaround: https://github.com/systemd/systemd/issues/8686
+    ].join(' ')
+  end
+end
+
+#
+# Raspberry Pi Ubuntu Firmware
+#
+
+case "#{node[:target][:distribution]}-#{node[:target][:kernel]}"
+when "ubuntu-raspi"
+  execute [
+    "find '#{target_dir}/usr/lib/firmware' -mindepth 1 -maxdepth 1 -name '*-raspi'",
+    "xargs -I {} find {}/device-tree/broadcom -type f",
+    "xargs -I {} sh -c 'cp {} #{output_dir}/$(basename {})'",
+  ].join(' | ')
+
+  directory "#{output_dir}/overlays" do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
+
+  execute [
+    "find '#{target_dir}/usr/lib/firmware' -mindepth 1 -maxdepth 1 -name '*-raspi'",
+    "xargs -I {} find {}/device-tree/overlays -type f",
+    "xargs -I {} sh -c 'cp {} #{output_dir}/overlays/$(basename {})'",
+  ].join(' | ')
 end
