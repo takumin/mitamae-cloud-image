@@ -72,9 +72,9 @@ when 'ubuntu-16.04-server-nvidia'
     options '--no-install-recommends'
   end
 when /^ubuntu-(?:18\.04|20\.04)-desktop-nvidia$/
-  package 'nvidia-driver-450'
+  package 'nvidia-driver-470'
 when /^ubuntu-(?:18\.04|20\.04)-server-nvidia$/
-  package 'nvidia-headless-450-server'
+  package 'nvidia-headless-470-server'
 else
   MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
   exit 1
