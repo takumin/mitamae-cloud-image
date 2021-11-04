@@ -201,7 +201,7 @@ if ENV['DISABLE_TARBALL'] != 'true'
   end
 
   execute "tar -I #{cmd} -p --acls --xattrs --one-file-system -cf #{output_dir}/rootfs.tar.#{ext} -C #{target_dir} ." do
-    not_if "test -f #{output_dir}/rootfs.tar.xz"
+    not_if "test -f #{output_dir}/rootfs.tar.#{ext}"
   end
 
   file "#{output_dir}/rootfs.tar.#{ext}" do
@@ -269,10 +269,10 @@ when 'raspberrypi', 'raspi'
       'arm_64bit=1',
       'kernel=vmlinuz',
       'initramfs initrd.img followkernel',
-      'disable_overscan=1',
       'force_turbo=1',
       'dtoverlay=miniuart-bt',
       'dtoverlay=vc4-kms-v3d-pi4',
+      'disable_overscan=1',
       'max_framebuffers=2',
     ].join("\n")
   end
@@ -282,13 +282,13 @@ when 'raspberrypi', 'raspi'
     group   'root'
     mode    '0644'
     content [
-      'console=serial0,115200',
-      'console=tty1',
+      'console=ttyAMA0,115200',
       'boot=live',
       'ip=dhcp',
       'fetch=http://boot.internal/rpi/rootfs.squashfs',
-      'ds=nocloud-net;s=http://boot.internal/seed/rpi4/default/',
       'overlayroot=tmpfs',
+      'ds=nocloud-net',
+      'seednet=http://boot.internal/seed/#HOSTNAME#/default/',
       'ipv6.disable=1', # Workaround: https://github.com/systemd/systemd/issues/8686
     ].join(' ')
   end

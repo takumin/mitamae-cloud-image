@@ -4,14 +4,17 @@
 
 cloud_init_nocloud_network_config() {(
 	for cmdline in $(cat /proc/cmdline); do
-		case $cmdline in
+		case ${cmdline} in
 			ds=*)
 				datastore="${cmdline#ds=}"
+				;;
+			seednet=*)
+				seednet="${cmdline#seednet=}"
 				;;
 		esac
 	done
 
-	if [ -z "$datastore" ]; then
+	if [ -z "${datastore}" ]; then
 		return
 	fi
 
@@ -19,9 +22,10 @@ cloud_init_nocloud_network_config() {(
 		return
 	fi
 
-	OLDIFS="$IFS"; IFS=";";
-	for cmdline in $datastore; do
-		case $cmdline in
+	OLDIFS="$IFS"
+	IFS=";"
+	for cmdline in ${datastore}; do
+		case ${cmdline} in
 			s=*)
 				seedfrom="${cmdline#s=}"
 				;;
@@ -32,12 +36,21 @@ cloud_init_nocloud_network_config() {(
 	done
 	IFS="$OLDIFS"
 
-	if [ -z "$seedfrom" ]; then
-		return
-	fi
-
 	if [ -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
-		wget -q -O "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg" "${seedfrom}network-config"
+		if [ -z "${seedfrom}" ] && [ -n "${seednet}" ]; then
+			# If the seedfrom parameter is not set and the seednet parameter is set, reset the seedfrom parameter.
+			seedfrom="$(echo "${seednet}" | sed -E "s/#HOSTNAME#/$(hostname)/; s/#DOMAINNAME#/$(hostname -d)/; s/#FQDN#/$(hostname -f)/;")"
+
+			# Cloud-Init expects seedfrom to be set in the kernel command line parameters, so it corresponds in the configuration file.
+			echo 'datasource:' > "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
+			echo '  NoCloud:' >> "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
+			echo "    seedfrom: ${seedfrom}" >> "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
+		fi
+
+		if [ -n "${seedfrom}" ]; then
+			# Cloud-Init's NoCloudNet data source does not get the network configuration file, so get it manually.
+			wget -q -O "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg" "${seedfrom}network-config"
+		fi
 	fi
 )}
 
