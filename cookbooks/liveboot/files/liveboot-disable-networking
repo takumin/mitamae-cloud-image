@@ -1,0 +1,6 @@
+#!/bin/sh
+
+[ "$1" = 'prereqs' ] && { exit 0; }
+
+NONETWORKING="true"
+export NONETWORKING

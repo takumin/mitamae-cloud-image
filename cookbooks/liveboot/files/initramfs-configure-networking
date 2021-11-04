@@ -1,0 +1,9 @@
+#!/bin/sh
+
+[ "$1" = 'prereqs' ] && { exit 0; }
+
+. /scripts/functions
+
+if [ "${BOOT:-}" = "live" ]; then
+	configure_networking
+fi

@@ -15,6 +15,26 @@ end
 package 'live-boot'
 
 #
+# Live Boot Disable Networking
+#
+
+remote_file '/etc/initramfs-tools/scripts/init-top/liveboot-disable-networking' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+#
+# Initramfs Configure Networking
+#
+
+remote_file '/etc/initramfs-tools/scripts/init-top/initramfs-configure-networking' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+#
 # Cloud-Init NoCloud Datasource Network Config
 #
 

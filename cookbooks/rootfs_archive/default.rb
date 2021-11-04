@@ -289,7 +289,6 @@ when 'raspberrypi', 'raspi'
       'overlayroot=tmpfs',
       'ds=nocloud-net',
       'seednet=http://boot.internal/seed/#HOSTNAME#/default/',
-      'ipv6.disable=1', # Workaround: https://github.com/systemd/systemd/issues/8686
     ].join(' ')
   end
 end

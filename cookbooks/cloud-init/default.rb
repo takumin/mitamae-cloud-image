@@ -130,8 +130,8 @@ file '/etc/systemd/system/cloud-final.service' do
       content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=systemd-user-sessions.service")
     end
 
-    unless content.match(/^Before=getty@tty1\.service$/)
-      content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=getty@tty1.service")
+    unless content.match(/^Before=#{node[:autologin][:service]}@#{node[:autologin][:port]}.service$/)
+      content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=#{node[:autologin][:service]}@#{node[:autologin][:port]}.service")
     end
 
     unless content.match(/^Before=display-manager\.service$/)

@@ -113,6 +113,10 @@ service "#{node[:autologin][:service]}@#{node[:autologin][:port]}.service" do
   action :enable
 end
 
+#
+# Remove Unused Terminal
+#
+
 if node[:autologin][:port] != 'tty1'
   service 'getty@tty1' do
     action :disable
