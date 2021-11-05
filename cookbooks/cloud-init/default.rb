@@ -36,6 +36,14 @@ node[:cloud_init]               ||= Hashie::Mash.new
 node[:cloud_init][:datasources] ||= ['NoCloud', 'None']
 
 #
+# Public Variables - Other Recipe
+#
+
+node[:autologin]           ||= Hashie::Mash.new
+node[:autologin][:service] ||= 'getty'
+node[:autologin][:port]    ||= 'tty1'
+
+#
 # Validate Variables
 #
 
