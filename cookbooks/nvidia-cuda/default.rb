@@ -20,7 +20,7 @@ end
 # Check Architecture
 #
 
-if node[:kernel][:machine] != 'x86_64'
+unless node[:kernel][:machine].match?(/^x86_64$/)
   return
 end
 
@@ -103,6 +103,7 @@ nvidia_cuda_mirror = node[:nvidia_cuda][:mirror][node[:platform]][platform_coden
 
 apt_keyring 'cudatools <cudatools@nvidia.com>' do
   finger 'AE09FE4BBD223A84B2CCFCE3F60F4B3D7FA2AF80'
+  uri File.join(nvidia_cuda_origin, '7fa2af80.pub')
 end
 
 #
