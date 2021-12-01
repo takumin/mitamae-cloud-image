@@ -44,6 +44,10 @@ if ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_BIONIC'].is_a?(String) and !ENV['APT_REP
   node[:nvidia_cuda][:mirror][:ubuntu][:bionic] = ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_BIONIC']
 end
 
+if ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL'].is_a?(String) and !ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL'].empty?
+  node[:nvidia_cuda][:mirror][:ubuntu][:focal] = ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL']
+end
+
 #
 # Validate Variables
 #
@@ -53,14 +57,16 @@ node.validate! do
     nvidia_cuda: {
       origin: {
         ubuntu: {
-          xenial:  match(/^(?:https?|file):\/\//),
-          bionic:  match(/^(?:https?|file):\/\//),
+          xenial: match(/^(?:https?|file):\/\//),
+          bionic: match(/^(?:https?|file):\/\//),
+          focal:  match(/^(?:https?|file):\/\//),
         },
       },
       mirror: {
         ubuntu: {
-          xenial:  match(/^(?:https?|file):\/\//),
-          bionic:  match(/^(?:https?|file):\/\//),
+          xenial: match(/^(?:https?|file):\/\//),
+          bionic: match(/^(?:https?|file):\/\//),
+          focal:  match(/^(?:https?|file):\/\//),
         },
       },
     },
@@ -141,14 +147,14 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-when /^ubuntu-(?:12|14|16|18)\.04-(?:generic|virtual)$/
-  package 'xserver-xorg-core'
-when /^ubuntu-16\.04-(?:generic|virtual)-latest$/
-  package 'xserver-xorg-core-hwe-16.04'
-when /^ubuntu-18\.04-(?:generic|virtual)-latest$/
-  package 'xserver-xorg-core-hwe-18.04'
+when 'ubuntu-16.04-generic-hwe'
+  package 'xserver-xorg-hwe-16.04'
+when 'ubuntu-18.04-generic-hwe'
+  package 'xserver-xorg-hwe-18.04'
 when 'ubuntu-20.04-generic-hwe'
   # 2020/12/28: X.org HWE package does not exist
+else
+  package 'xserver-xorg-core'
 end
 
 package 'cuda-drivers'
