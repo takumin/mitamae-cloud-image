@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 #
+# Check Role
+#
+
+unless node[:target][:role].match?(/-nvidia-cuda$/)
+  return
+end
+
+#
 # Check Distribution
 #
 
@@ -9,10 +17,10 @@ unless node[:target][:distribution].match?(/^ubuntu$/)
 end
 
 #
-# Check Role
+# Check Architecture
 #
 
-unless node[:target][:role].match?(/-nvidia-cuda$/)
+if node[:kernel][:machine] != 'x86_64'
   return
 end
 
@@ -74,37 +82,20 @@ node.validate! do
 end
 
 #
-# Check Platform
-#
-
-unless node[:target][:role].match(/nvidia/)
-  return
-end
-
-if node[:kernel][:machine] != 'x86_64'
-  return
-end
-
-case node.platform
-when 'ubuntu'
-  case node.platform_version
-  when '16.04'
-    node[:platform_codename] = :xenial
-  when '18.04'
-    node[:platform_codename] = :bionic
-  else
-    return
-  end
-else
-  return
-end
-
-#
 # Private Variables
 #
 
-nvidia_cuda_origin = node[:nvidia_cuda][:origin][node[:platform]][node[:platform_codename]]
-nvidia_cuda_mirror = node[:nvidia_cuda][:mirror][node[:platform]][node[:platform_codename]]
+case node[:platform_version]
+when '16.04'
+  platform_codename = :xenial
+when '18.04'
+  platform_codename = :bionic
+when '20.04'
+  platform_codename = :focal
+end
+
+nvidia_cuda_origin = node[:nvidia_cuda][:origin][node[:platform]][platform_codename]
+nvidia_cuda_mirror = node[:nvidia_cuda][:mirror][node[:platform]][platform_codename]
 
 #
 # Apt Keyring
