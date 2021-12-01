@@ -1,18 +1,36 @@
 # frozen_string_literal: true
 
 #
+# Check Distribution
+#
+
+unless node[:target][:distribution].match?(/^ubuntu$/)
+  return
+end
+
+#
+# Check Role
+#
+
+unless node[:target][:role].match?(/-nvidia-cuda$/)
+  return
+end
+
+#
 # Public Variables
 #
 
-node[:nvidia_cuda]                             ||= Hashie::Mash.new
-node[:nvidia_cuda][:origin]                    ||= Hashie::Mash.new
-node[:nvidia_cuda][:origin][:ubuntu]           ||= Hashie::Mash.new
-node[:nvidia_cuda][:origin][:ubuntu][:xenial]  ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604'
-node[:nvidia_cuda][:origin][:ubuntu][:bionic]  ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804'
-node[:nvidia_cuda][:mirror]                    ||= Hashie::Mash.new
-node[:nvidia_cuda][:mirror][:ubuntu]           ||= Hashie::Mash.new
-node[:nvidia_cuda][:mirror][:ubuntu][:xenial]  ||= node[:nvidia_cuda][:origin][:ubuntu][:xenial]
-node[:nvidia_cuda][:mirror][:ubuntu][:bionic]  ||= node[:nvidia_cuda][:origin][:ubuntu][:bionic]
+node[:nvidia_cuda]                            ||= Hashie::Mash.new
+node[:nvidia_cuda][:origin]                   ||= Hashie::Mash.new
+node[:nvidia_cuda][:origin][:ubuntu]          ||= Hashie::Mash.new
+node[:nvidia_cuda][:origin][:ubuntu][:xenial] ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64'
+node[:nvidia_cuda][:origin][:ubuntu][:bionic] ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64'
+node[:nvidia_cuda][:origin][:ubuntu][:focal]  ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64'
+node[:nvidia_cuda][:mirror]                   ||= Hashie::Mash.new
+node[:nvidia_cuda][:mirror][:ubuntu]          ||= Hashie::Mash.new
+node[:nvidia_cuda][:mirror][:ubuntu][:xenial] ||= node[:nvidia_cuda][:origin][:ubuntu][:xenial]
+node[:nvidia_cuda][:mirror][:ubuntu][:bionic] ||= node[:nvidia_cuda][:origin][:ubuntu][:bionic]
+node[:nvidia_cuda][:mirror][:ubuntu][:focal]  ||= node[:nvidia_cuda][:origin][:ubuntu][:focal]
 
 #
 # Override Variables
@@ -129,6 +147,8 @@ when /^ubuntu-16\.04-(?:generic|virtual)-latest$/
   package 'xserver-xorg-core-hwe-16.04'
 when /^ubuntu-18\.04-(?:generic|virtual)-latest$/
   package 'xserver-xorg-core-hwe-18.04'
+when 'ubuntu-20.04-generic-hwe'
+  # 2020/12/28: X.org HWE package does not exist
 end
 
 package 'cuda-drivers'
