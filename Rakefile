@@ -79,6 +79,10 @@ profiles.each do |profile|
       unless execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
         abort('failed command')
       end
+
+      unless execution(['sudo', 'chown', '-R', '"$(id -u):$(id -g)"', Dir.pwd].join(' '))
+        abort('failed command')
+      end
     end
 
     task :all => [:initialize, :provision, :finalize]
