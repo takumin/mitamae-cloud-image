@@ -7,7 +7,7 @@ target:
   suite:        'bionic'
   kernel:       'generic-hwe'
   architecture: 'amd64'
-  role:         'desktop'
+  roles:        ['desktop']
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-bionic-generic-hwe-amd64-desktop'
 #

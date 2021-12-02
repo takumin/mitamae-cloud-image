@@ -17,7 +17,7 @@ node.validate! do
     target: {
       distribution: match(/^(?:debian|ubuntu|arch)$/),
       architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
-      role:         match(/^(?:#{AVAILABLE_ROLES.join('|')})$/),
+      roles:        array_of(match(/^(?:#{AVAILABLE_ROLES.join('|')})$/)),
       directory:    string,
     },
   }

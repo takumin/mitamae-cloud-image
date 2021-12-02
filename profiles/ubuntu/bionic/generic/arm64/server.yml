@@ -7,7 +7,7 @@ target:
   suite:        'bionic'
   kernel:       'generic'
   architecture: 'arm64'
-  role:         'server'
+  roles:        ['server']
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-bionic-generic-arm64-server'
 #

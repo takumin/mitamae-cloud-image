@@ -7,7 +7,7 @@ target:
   suite:        'buster'
   kernel:       'generic'
   architecture: 'arm64'
-  role:         'server'
+  roles:        ['server']
   components:   ['main', 'contrib', 'non-free']
   directory:    '/tmp/debian-buster-generic-arm64-server'
 #
