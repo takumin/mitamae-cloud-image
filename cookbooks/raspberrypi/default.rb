@@ -4,7 +4,7 @@
 # Check Distribution
 #
 
-unless node[:target][:distribution].match(/^debian$/)
+unless node[:target][:distribution].match(/^(?:debian|ubuntu)$/)
   return
 end
 
@@ -17,53 +17,59 @@ unless node[:target][:kernel].match(/^(?:raspberrypi|raspi)$/)
 end
 
 #
-# Apt Keyrings
+# Raspberry Pi Official Repository
 #
 
-apt_keyring 'Raspberry Pi Archive Signing Key' do
-  finger 'CF8A1AF502A2AA2D763BAE7E82B129927FA3303E'
-  uri 'https://archive.raspberrypi.org/debian/raspberrypi.gpg.key'
-end
+if node[:target][:distribution].match(/^debian$/)
+  #
+  # Apt Keyrings
+  #
 
-#
-# Apt Repository
-#
+  apt_keyring 'Raspberry Pi Archive Signing Key' do
+    finger 'CF8A1AF502A2AA2D763BAE7E82B129927FA3303E'
+    uri 'https://archive.raspberrypi.org/debian/raspberrypi.gpg.key'
+  end
 
-apt_repository 'Raspberry Pi Repository' do
-  path '/etc/apt/sources.list.d/raspi.list'
-  entry [
-    {
-      :default_uri => 'http://archive.raspberrypi.org/debian',
-      :mirror_uri  => "#{ENV['APT_REPO_URL_RASPBERRYPI']}",
-      :suite       => '###platform_codename###',
-      :components  => [
-        'main',
-      ],
-    },
-  ]
-  notifies :run, 'execute[apt-get update]', :immediately
-end
+  #
+  # Apt Repository
+  #
 
-#
-# Event Handler
-#
+  apt_repository 'Raspberry Pi Repository' do
+    path '/etc/apt/sources.list.d/raspi.list'
+    entry [
+      {
+        :default_uri => 'http://archive.raspberrypi.org/debian',
+        :mirror_uri  => "#{ENV['APT_REPO_URL_RASPBERRYPI']}",
+        :suite       => '###platform_codename###',
+        :components  => [
+          'main',
+        ],
+      },
+    ]
+    notifies :run, 'execute[apt-get update]', :immediately
+  end
 
-execute 'apt-get update' do
-  action :nothing
-end
+  #
+  # Event Handler
+  #
 
-#
-# Repository Keyring
-#
+  execute 'apt-get update' do
+    action :nothing
+  end
 
-package 'raspberrypi-archive-keyring'
+  #
+  # Repository Keyring
+  #
 
-#
-# Remove Old Keyring
-#
+  package 'raspberrypi-archive-keyring'
 
-file '/etc/apt/trusted.gpg' do
-  action :delete
+  #
+  # Remove Old Keyring
+  #
+
+  file '/etc/apt/trusted.gpg' do
+    action :delete
+  end
 end
 
 #
