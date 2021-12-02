@@ -42,7 +42,7 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-when /^ubuntu-.*-generic$/
+when /^ubuntu-(?:16|18|20)\.04-generic-(?:desktop|server)$/
   # nothing...
 when 'ubuntu-16.04-generic-hwe'
   if node[:target][:roles].any?{|v| v.match?(/desktop/)}
@@ -57,10 +57,11 @@ when 'ubuntu-18.04-generic-hwe'
   else
     package 'linux-headers-generic-hwe-18.04'
   end
-when 'ubuntu-20.04-generic-hwe'
+when /^ubuntu-20\.04-generic-hwe$/
   package 'linux-headers-generic-hwe-20.04'
 else
-  raise "failed graphics-drivers: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
+  MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
+  exit 1
 end
 
 #
@@ -76,12 +77,13 @@ when 'ubuntu-16.04'
       options '--no-install-recommends'
     end
   end
-when 'ubuntu-18.04', 'ubuntu-20.04'
+when /^ubuntu-(?:18\.04|20\.04)$/
   if node[:target][:roles].any?{|v| v.match?(/desktop/)}
     package 'nvidia-driver-470'
   else
     package 'nvidia-headless-470-server'
   end
 else
-  raise "failed graphics-drivers: #{node[:platform]}-#{node[:platform_version]}"
+  MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}"
+  exit 1
 end
