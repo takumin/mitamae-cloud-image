@@ -27,6 +27,7 @@ when 'debian', 'ubuntu'
     node[:target][:suite],
     node[:target][:kernel],
     node[:target][:architecture],
+    node[:target][:role],
   )
 when 'arch'
   node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
@@ -34,6 +35,7 @@ when 'arch'
     node[:target][:distribution],
     node[:target][:kernel],
     node[:target][:architecture],
+    node[:target][:role],
   )
 else
   raise

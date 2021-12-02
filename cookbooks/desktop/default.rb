@@ -4,7 +4,7 @@
 # Check Role
 #
 
-unless node[:target][:roles].any?{|v| v.match?(/desktop/)}
+unless node[:target][:role].match(/desktop/)
   return
 end
 

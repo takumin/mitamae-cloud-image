@@ -7,7 +7,7 @@ target:
   suite:        'focal'
   kernel:       'generic-hwe'
   architecture: 'arm64'
-  roles:        ['server']
+  role:         'server'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-focal-generic-hwe-arm64-server'
 #

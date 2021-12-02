@@ -7,7 +7,7 @@ target:
   suite:        'bullseye'
   kernel:       'raspberrypi'
   architecture: 'arm64'
-  roles:        ['server']
+  role:         'server'
   components:   ['main', 'contrib', 'non-free']
   directory:    '/tmp/debian-bullseye-raspberrypi-arm64-server'
 #

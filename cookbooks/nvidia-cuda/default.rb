@@ -4,7 +4,7 @@
 # Check Role
 #
 
-unless node[:target][:roles].any?{|v| v.match?(/nvidia-cuda$/)}
+unless node[:target][:role].match?(/-nvidia-cuda$/)
   return
 end
 

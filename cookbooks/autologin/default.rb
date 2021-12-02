@@ -4,7 +4,7 @@
 # Disable automatic terminal login when in desktop role
 #
 
-if node[:target][:roles].any?{|v| v.match?(/desktop/)}
+if node[:target][:role].match(/desktop/)
   return
 end
 

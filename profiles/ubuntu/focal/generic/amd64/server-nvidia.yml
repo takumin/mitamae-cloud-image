@@ -7,7 +7,7 @@ target:
   suite:        'focal'
   kernel:       'generic'
   architecture: 'amd64'
-  roles:        ['server-nvidia']
+  role:         'server-nvidia'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-focal-generic-amd64-server-nvidia'
 #

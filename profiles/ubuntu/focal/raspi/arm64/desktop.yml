@@ -7,7 +7,7 @@ target:
   suite:        'focal'
   kernel:       'raspi'
   architecture: 'arm64'
-  roles:        ['desktop']
+  role:         'desktop'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-focal-raspi-arm64-desktop'
 #

@@ -75,7 +75,7 @@ package 'language-pack-ja'
 # Check Platform
 #
 
-unless node[:target][:roles].any?{|v| v.match?(/desktop/)}
+unless node[:target][:role].match(/desktop/)
   return
 end
 

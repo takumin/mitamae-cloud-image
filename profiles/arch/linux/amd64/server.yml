@@ -6,5 +6,5 @@ target:
   distribution: 'arch'
   kernel:       'linux'
   architecture: 'amd64'
-  roles:        ['server']
+  role:         'server'
   directory:    '/tmp/arch-linux-amd64-server'
