@@ -54,6 +54,9 @@ jobs:
     #
     # Build Artifacts
     #
+    - name: Sizes
+      if: success()
+      run: ls -lah releases/${RELEASE_DIR}/
     - name: Packages
       if: success()
       run: cat releases/${RELEASE_DIR}/packages.manifest
