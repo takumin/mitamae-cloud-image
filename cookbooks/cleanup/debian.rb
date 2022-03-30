@@ -1,26 +1,23 @@
 # frozen_string_literal: true
 
 #
-# Copy Initramfs File
+# Get Kernel Version Command
 #
 
-case "#{node[:platform]}-#{node[:target][:kernel]}"
-when "debian-raspberrypi"
-  # Create Initramfs
-  execute 'find /lib/modules -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | xargs -n1 -I {} sh -c "test ! -f /boot/initrd.img-{} && update-initramfs -c -k {} || true"'
-else
-  # Get Kernel Version
-  GET_KERNEL_VERSION = "dpkg -l | awk '{print $2}' | grep -E '^linux-image-[0-9\.-_]' | sort | tail -n 1 | sed -E 's/^linux-image-//'"
+GET_KERNEL_VERSION = "dpkg -l | awk '{print $2}' | grep -E '^linux-image-[0-9\.-_]' | sort | tail -n 1 | sed -E 's/^linux-image-//'"
 
-  # Cleanup Initramfs
-  execute 'update-initramfs -d -k all' do
-    not_if "test -f \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\""
-  end
+#
+# Cleanup Initramfs
+#
 
-  # Create Initramfs
-  execute "update-initramfs -c -k \"$(#{GET_KERNEL_VERSION})\"" do
-    not_if "test -f \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\""
-  end
+execute 'find /boot -type f -name "initrd.img-*" | xargs rm -f'
+
+#
+# Create Initramfs
+#
+
+execute "update-initramfs -c -k \"$(#{GET_KERNEL_VERSION})\"" do
+  not_if "test -f \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\""
 end
 
 #
