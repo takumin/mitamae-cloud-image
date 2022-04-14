@@ -29,15 +29,12 @@ end
 # Workaround: Arch Linux: Kill GPG Agent
 #
 
-execute "chroot #{node[:rootfs_umount][:target_dir]} pkill gpg-agent" do
-  only_if "test \"$(chroot #{node[:rootfs_umount][:target_dir]} sh -c 'ps --no-headers -C gpg-agent | wc -l')\" = 1"
-end
+execute [
+  "for pid in $(lsof +D #{node[:rootfs_umount][:target_dir]} 2>/dev/null | tail -n+2 | tr -s ' ' | cut -d ' ' -f 2 | sort -nu); do",
+  "kill -KILL $pid;",
+  "done",
+].join(' ')
 
-#
-# Workaround: Arch Linux: Wait GPG Agent
-#
-
-execute 'sleep 1'
 
 #
 # Workaround: Arch Linux: https://bugs.archlinux.org/task/46169
@@ -52,9 +49,5 @@ node[:rootfs_umount][:umounts].unshift(node[:rootfs_umount][:target_dir])
 node[:rootfs_umount][:umounts].reverse.each do |v|
   mount v do
     action :absent
-
-    if v == node[:rootfs_umount][:target_dir] && ENV['CI'] == 'true'
-      lazy true
-    end
   end
 end

@@ -307,9 +307,11 @@ end
 # Workaround: Arch Linux: Kill GPG Agent
 #
 
-execute "chroot #{directory[:extract][:path]} pkill gpg-agent" do
-  not_if "test \"$(chroot #{directory[:extract][:path]} sh -c 'ps --no-headers -C gpg-agent | wc -l')\" != 1"
-end
+execute [
+  "for pid in $(lsof +D #{directory[:extract][:path]} 2>/dev/null | tail -n+2 | tr -s ' ' | cut -d ' ' -f 2 | sort -nu); do",
+  "kill -KILL $pid;",
+  "done",
+].join(' ')
 
 #
 # Unmount Pacstrap System
