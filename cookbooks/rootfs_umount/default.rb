@@ -26,18 +26,24 @@ node.validate! do
 end
 
 #
-# Workaround: Arch Linux: https://bugs.archlinux.org/task/46169
-#
-
-node[:rootfs_umount][:umounts].unshift(node[:rootfs_umount][:target_dir])
-
-#
 # Workaround: Arch Linux: Kill GPG Agent
 #
 
 execute "chroot #{node[:rootfs_umount][:target_dir]} pkill gpg-agent" do
   only_if "test \"$(chroot #{node[:rootfs_umount][:target_dir]} sh -c 'ps --no-headers -C gpg-agent | wc -l')\" = 1"
 end
+
+#
+# Workaround: Arch Linux: Wait GPG Agent
+#
+
+execute 'sleep 1'
+
+#
+# Workaround: Arch Linux: https://bugs.archlinux.org/task/46169
+#
+
+node[:rootfs_umount][:umounts].unshift(node[:rootfs_umount][:target_dir])
 
 #
 # Unmount Target Directory
