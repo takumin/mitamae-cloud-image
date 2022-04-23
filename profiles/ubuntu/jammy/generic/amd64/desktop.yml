@@ -1,0 +1,19 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'jammy'
+  kernel:       'generic'
+  architecture: 'amd64'
+  role:         'desktop'
+  components:   ['main', 'restricted', 'universe', 'multiverse']
+  directory:    '/tmp/ubuntu-jammy-generic-amd64-desktop'
+#
+# Debootstrap Config
+#
+debootstrap:
+  command:  'cdebootstrap'
+  flavour:  'minimal'
+  includes: ['gnupg']

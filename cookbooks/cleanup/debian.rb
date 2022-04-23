@@ -76,3 +76,11 @@ end
 execute 'rm -f /initrd.img.old' do
   only_if 'test -f /initrd.img.old'
 end
+
+execute 'rm -f /boot/vmlinuz.old' do
+  only_if 'test -f /boot/vmlinuz.old'
+end
+
+execute 'rm -f /boot/initrd.img.old' do
+  only_if 'test -f /boot/initrd.img.old'
+end

@@ -80,7 +80,7 @@ when 'ubuntu'
   node.validate! do
     {
       debootstrap: {
-        suite:      match(/^(?:xenial|bionic|focal)$/),
+        suite:      match(/^(?:xenial|bionic|focal|jammy)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }
