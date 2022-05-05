@@ -4,8 +4,24 @@
 # Public Variables
 #
 
-node[:initramfs]            ||= Hashie::Mash.new
-node[:initramfs][:compress] ||= 'lz4'
+node[:initramfs] ||= Hashie::Mash.new
+
+#
+# Public Variables - Compression Format
+#
+
+case node[:target][:distribution]
+when 'debian', 'ubuntu'
+  unless %w{stretch buster bionic focal}.include?(node[:target][:suite])
+    node[:initramfs][:compress] ||= 'zstd'
+  else
+    node[:initramfs][:compress] ||= 'gzip'
+  end
+when 'arch'
+  node[:initramfs][:compress] ||= 'zstd'
+else
+  raise
+end
 
 #
 # Package Install
