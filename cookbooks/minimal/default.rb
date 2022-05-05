@@ -31,6 +31,7 @@ when :debian, :ubuntu
   packages << 'tzdata'
 
   # networking
+  packages << 'ethtool'
   packages << 'iproute2'
   packages << 'iputils-ping'
   packages << 'netbase'
@@ -41,8 +42,11 @@ when :debian, :ubuntu
 
   # utils
   packages << 'bash-completion'
+  packages << 'htop'
   packages << 'less'
   packages << 'lsb-release'
+  packages << 'lsof'
+  packages << 'patch'
   packages << 'sudo'
   packages << 'vim-tiny'
 end
