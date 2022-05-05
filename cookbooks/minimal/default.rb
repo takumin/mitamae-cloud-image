@@ -14,15 +14,16 @@ end
 
 case node[:platform].to_sym
 when :debian, :ubuntu
-  packages = %w{
-    init
-    dbus
-    dbus-user-session
-    policykit-1
-    systemd
-    libnss-systemd
-    libpam-systemd
-  }
+  packages = []
+
+  # init/systemd
+  packages << 'init'
+  packages << 'dbus'
+  packages << 'dbus-user-session'
+  packages << 'policykit-1'
+  packages << 'systemd'
+  packages << 'libnss-systemd'
+  packages << 'libpam-systemd'
 end
 
 #
