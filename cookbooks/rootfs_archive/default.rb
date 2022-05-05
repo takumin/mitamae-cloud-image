@@ -4,10 +4,28 @@
 # Public Variables
 #
 
-node[:rootfs_archive]                     ||= Hashie::Mash.new
-node[:rootfs_archive][:format]            ||= Hashie::Mash.new
-node[:rootfs_archive][:format][:tarball]  ||= 'lz4'
-node[:rootfs_archive][:format][:squashfs] ||= 'lz4'
+node[:rootfs_archive]          ||= Hashie::Mash.new
+node[:rootfs_archive][:format] ||= Hashie::Mash.new
+
+#
+# Public Variables - Format Archive
+#
+
+case node[:target][:distribution]
+when 'debian', 'ubuntu'
+  unless %w{stretch buster bionic focal}.include?(node[:target][:suite])
+    node[:rootfs_archive][:format][:tarball]  ||= 'zstd'
+    node[:rootfs_archive][:format][:squashfs] ||= 'zstd'
+  else
+    node[:rootfs_archive][:format][:tarball]  ||= 'gzip'
+    node[:rootfs_archive][:format][:squashfs] ||= 'gzip'
+  end
+when 'arch'
+  node[:rootfs_archive][:format][:tarball]  ||= 'zstd'
+  node[:rootfs_archive][:format][:squashfs] ||= 'zstd'
+else
+  raise
+end
 
 #
 # Public Variables - Target Directory
