@@ -15,4 +15,3 @@ target:
 #
 debootstrap:
   command:  'cdebootstrap'
-  flavour:  'minimal'

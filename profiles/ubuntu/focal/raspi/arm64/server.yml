@@ -15,7 +15,6 @@ target:
 #
 debootstrap:
   command:  'debootstrap'
-  flavour:  'minimal'
 #
 # Raspberry Pi Serial Consile
 #
