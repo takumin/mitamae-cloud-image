@@ -10,8 +10,3 @@ target:
   role:         'server'
   components:   ['main', 'contrib', 'non-free']
   directory:    '/tmp/debian-buster-generic-arm64-server'
-#
-# Debootstrap Config
-#
-debootstrap:
-  command:  'debootstrap'

@@ -11,11 +11,6 @@ target:
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-focal-raspi-arm64-server'
 #
-# Debootstrap Config
-#
-debootstrap:
-  command:  'debootstrap'
-#
 # Raspberry Pi Serial Consile
 #
 autologin:

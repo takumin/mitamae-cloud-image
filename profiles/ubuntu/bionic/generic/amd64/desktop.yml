@@ -10,8 +10,3 @@ target:
   role:         'desktop'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-bionic-generic-amd64-desktop'
-#
-# Debootstrap Config
-#
-debootstrap:
-  command:  'cdebootstrap'

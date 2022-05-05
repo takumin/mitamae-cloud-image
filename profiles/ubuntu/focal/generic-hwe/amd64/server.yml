@@ -10,8 +10,3 @@ target:
   role:         'server'
   components:   ['main', 'restricted', 'universe', 'multiverse']
   directory:    '/tmp/ubuntu-focal-generic-hwe-amd64-server'
-#
-# Debootstrap Config
-#
-debootstrap:
-  command:  'cdebootstrap'
