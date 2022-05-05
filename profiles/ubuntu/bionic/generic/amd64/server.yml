@@ -16,4 +16,3 @@ target:
 debootstrap:
   command:  'cdebootstrap'
   flavour:  'minimal'
-  includes: ['gnupg']

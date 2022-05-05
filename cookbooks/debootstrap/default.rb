@@ -52,6 +52,12 @@ if ENV['TARGET_DIRECTORY'].is_a?(String) and !ENV['TARGET_DIRECTORY'].empty?
 end
 
 #
+# Required GNUPG Package
+#
+
+node[:debootstrap][:includes] << 'gnupg'
+
+#
 # Validate Variables
 #
 
