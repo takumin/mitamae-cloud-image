@@ -69,18 +69,13 @@ end
 # Workaround: Remove Unused Kernel/Initramfs Files
 #
 
-execute 'rm -f /vmlinuz.old' do
-  only_if 'test -f /vmlinuz.old'
-end
-
-execute 'rm -f /initrd.img.old' do
-  only_if 'test -f /initrd.img.old'
-end
-
-execute 'rm -f /boot/vmlinuz.old' do
-  only_if 'test -f /boot/vmlinuz.old'
-end
-
-execute 'rm -f /boot/initrd.img.old' do
-  only_if 'test -f /boot/initrd.img.old'
+%w{
+  /vmlinuz.old
+  /initrd.img.old
+  /boot/vmlinuz.old
+  /boot/initrd.img.old
+}.each do |f|
+  file f do
+    action :delete
+  end
 end
