@@ -4,7 +4,7 @@
 # Get Kernel Version Command
 #
 
-GET_KERNEL_VERSION = "dpkg -l | awk '{print $2}' | grep -E '^linux-image-[0-9\.-_]' | sort | tail -n 1 | sed -E 's/^linux-image-//'"
+GET_KERNEL_VERSION = 'basename "$(find /lib/modules -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)"'
 
 #
 # Cleanup Initramfs
