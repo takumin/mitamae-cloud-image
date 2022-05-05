@@ -1,0 +1,21 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'focal'
+  kernel:       'raspi'
+  architecture: 'arm64'
+  role:         'minimal'
+#
+# Raspberry Pi Serial Consile
+#
+autologin:
+  service: 'serial-getty'
+  getty:   '/sbin/agetty'
+  port:    'ttyAMA0'
+  user:    'root'
+  term:    'linux'
+  baud:    [115200,38400,9600]
+  opts:    ['--keep-baud', '--flow-control']

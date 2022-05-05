@@ -1,0 +1,10 @@
+---
+#
+# Target Config
+#
+target:
+  distribution: 'ubuntu'
+  suite:        'bionic'
+  kernel:       'generic'
+  architecture: 'arm64'
+  role:         'minimal'

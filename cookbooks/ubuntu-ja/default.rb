@@ -17,6 +17,14 @@ unless node[:target][:architecture].match(/^(?:amd64|i386)$/)
 end
 
 #
+# Check Role
+#
+
+if node[:target][:role].match(/minimal/)
+  return
+end
+
+#
 # Apt Keyrings
 #
 

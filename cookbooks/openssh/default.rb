@@ -6,7 +6,15 @@
 
 case node[:platform]
 when 'debian', 'ubuntu'
-  package 'openssh-server'
+  if node[:target][:role].match(/minimal/)
+    opts = '--no-install-recommends'
+  else
+    opts = ''
+  end
+
+  package 'openssh-server' do
+    options opts
+  end
 when 'arch'
   package 'openssh'
 else
