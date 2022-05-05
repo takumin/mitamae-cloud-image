@@ -7,4 +7,3 @@ target:
   kernel:       'linux-lts'
   architecture: 'amd64'
   role:         'server'
-  directory:    '/tmp/arch-linux-lts-amd64-server'

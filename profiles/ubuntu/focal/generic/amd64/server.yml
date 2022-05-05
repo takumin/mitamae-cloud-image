@@ -9,4 +9,3 @@ target:
   architecture: 'amd64'
   role:         'server'
   components:   ['main', 'restricted', 'universe', 'multiverse']
-  directory:    '/tmp/ubuntu-focal-generic-amd64-server'

@@ -34,7 +34,13 @@ profiles.each do |profile|
   elsif profile_yaml['target']['directory']
     target_dir = profile_yaml['target']['directory']
   else
-    raise
+    target_name = []
+    target_name << profile_yaml['target']['distribution']
+    target_name << profile_yaml['target']['suite'] if profile_yaml['target']['distribution'].match(/^(?:debian|ubuntu)$/)
+    target_name << profile_yaml['target']['kernel']
+    target_name << profile_yaml['target']['architecture']
+    target_name << profile_yaml['target']['role']
+    target_dir = "/tmp/#{target_name.join('-')}"
   end
 
   namespace profile_name do

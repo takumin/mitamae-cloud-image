@@ -9,4 +9,3 @@ target:
   architecture: 'arm64'
   role:         'server'
   components:   ['main', 'contrib', 'non-free']
-  directory:    '/tmp/debian-buster-generic-arm64-server'

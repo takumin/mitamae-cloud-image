@@ -9,4 +9,3 @@ target:
   architecture: 'amd64'
   role:         'desktop-nvidia'
   components:   ['main', 'restricted', 'universe', 'multiverse']
-  directory:    '/tmp/ubuntu-bionic-generic-amd64-desktop-nvidia'

@@ -9,4 +9,3 @@ target:
   architecture: 'arm64'
   role:         'server'
   components:   ['main', 'restricted', 'universe', 'multiverse']
-  directory:    '/tmp/ubuntu-focal-generic-hwe-arm64-server'
