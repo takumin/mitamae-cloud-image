@@ -9,12 +9,20 @@ target_name << node.target.kernel
 target_name << node.target.architecture
 target_name << node.target.role
 
+case node.target.distribution
+when 'debian'
+  components = ['main', 'contrib', 'non-free']
+when 'ubuntu'
+  components = ['main', 'restricted', 'universe', 'multiverse']
+end
+
 #
 # Public Variables
 #
 
 node.reverse_merge!({
   target: {
-    directory: "/tmp/#{target_name.join('-')}",
+    components: components,
+    directory:  "/tmp/#{target_name.join('-')}",
   },
 })

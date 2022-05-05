@@ -8,4 +8,3 @@ target:
   kernel:       'raspi'
   architecture: 'arm64'
   role:         'desktop'
-  components:   ['main', 'restricted', 'universe', 'multiverse']

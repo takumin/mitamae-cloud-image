@@ -8,4 +8,3 @@ target:
   kernel:       'generic'
   architecture: 'amd64'
   role:         'server-nvidia'
-  components:   ['main', 'restricted', 'universe', 'multiverse']

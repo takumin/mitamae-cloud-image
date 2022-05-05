@@ -8,7 +8,6 @@ target:
   kernel:       'raspi'
   architecture: 'arm64'
   role:         'server'
-  components:   ['main', 'restricted', 'universe', 'multiverse']
 #
 # Raspberry Pi Serial Consile
 #
