@@ -24,6 +24,12 @@ when :debian, :ubuntu
   packages << 'systemd'
   packages << 'libnss-systemd'
   packages << 'libpam-systemd'
+
+  # networking
+  packages << 'iproute2'
+  packages << 'iputils-ping'
+  packages << 'netbase'
+  packages << 'netcat-openbsd'
 end
 
 #
