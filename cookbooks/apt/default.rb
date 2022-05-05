@@ -74,7 +74,7 @@ when :debian
   node.validate! do
     {
       apt: {
-        suite:      match(/^(?:jessie|stretch|buster)$/),
+        suite:      match(/^(?:stretch|buster)$/),
         components: array_of(match(/^(?:main|contrib|non-free)$/)),
       },
     }

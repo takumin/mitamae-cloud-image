@@ -39,7 +39,7 @@ when :debian
     {
       target: {
         kernel:     match(/^(?:generic|cloud)$/),
-        suite:      match(/^(?:jessie|stretch|buster|bullseye)$/),
+        suite:      match(/^(?:stretch|buster|bullseye)$/),
         components: array_of(match(/^(?:main|contrib|non-free)$/)),
       },
     }
