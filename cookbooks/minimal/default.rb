@@ -41,3 +41,11 @@ packages.each do |pkg|
     options '--no-install-recommends'
   end
 end
+
+#
+# Enable Networking
+#
+
+service 'systemd-networkd.service' do
+  action :enable
+end
