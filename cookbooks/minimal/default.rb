@@ -30,6 +30,12 @@ when :debian, :ubuntu
   packages << 'iputils-ping'
   packages << 'netbase'
   packages << 'netcat-openbsd'
+
+  # utils
+  packages << 'less'
+  packages << 'lsb-release'
+  packages << 'sudo'
+  packages << 'vim-tiny'
 end
 
 #
