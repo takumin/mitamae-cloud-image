@@ -62,9 +62,9 @@ end
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
 when /^ubuntu-(?:18\.04|20\.04)-desktop-nvidia$/
-  package 'nvidia-driver-470'
+  package 'nvidia-driver-510'
 when /^ubuntu-(?:18\.04|20\.04)-server-nvidia$/
-  package 'nvidia-headless-470-server'
+  package 'nvidia-headless-510-server'
 else
   MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
   exit 1
