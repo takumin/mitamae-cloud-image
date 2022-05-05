@@ -74,7 +74,7 @@ when :debian
   node.validate! do
     {
       apt: {
-        suite:      match(/^(?:stretch|buster)$/),
+        suite:      match(/^(?:stretch|buster|bullseye)$/),
         components: array_of(match(/^(?:main|contrib|non-free)$/)),
       },
     }
@@ -111,13 +111,24 @@ when :debian
       :suite       => "#{node[:apt][:suite]}-backports",
       :components  => node[:apt][:components],
     },
-    {
+  ]
+
+  case node[:apt][:suite].to_sym
+  when :bullseye
+    entry << {
+      :default_uri => default_security_uri,
+      :mirror_uri  => mirror_security_uri,
+      :suite       => "#{node[:apt][:suite]}-security",
+      :components  => node[:apt][:components],
+    }
+  when :stretch, :buster
+    entry << {
       :default_uri => default_security_uri,
       :mirror_uri  => mirror_security_uri,
       :suite       => "#{node[:apt][:suite]}/updates",
       :components  => node[:apt][:components],
-    },
-  ]
+    }
+  end
 when :ubuntu
   case node[:apt][:architecture].to_sym
   when :i386, :amd64
