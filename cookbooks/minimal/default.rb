@@ -36,6 +36,9 @@ when :debian, :ubuntu
   packages << 'netbase'
   packages << 'netcat-openbsd'
 
+  # tuning
+  packages << 'irqbalance'
+
   # utils
   packages << 'bash-completion'
   packages << 'less'
