@@ -4,7 +4,7 @@
 # Select Packages
 #
 
-case node.kernel
+case node.target.kernel
 when 'raspi'
   node.linux_kernel.packages << 'linux-image-raspi'
 
