@@ -22,8 +22,13 @@ when :debian, :ubuntu
   packages << 'dbus-user-session'
   packages << 'policykit-1'
   packages << 'systemd'
+  packages << 'systemd-coredump'
+  packages << 'systemd-timesyncd' unless %w{stretch bionic}.include?(node.target.suite)
   packages << 'libnss-systemd'
   packages << 'libpam-systemd'
+
+  # timezone
+  packages << 'tzdata'
 
   # networking
   packages << 'iproute2'
@@ -32,6 +37,7 @@ when :debian, :ubuntu
   packages << 'netcat-openbsd'
 
   # utils
+  packages << 'bash-completion'
   packages << 'less'
   packages << 'lsb-release'
   packages << 'sudo'
