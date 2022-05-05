@@ -7,6 +7,7 @@
 case node.target.kernel
 when 'raspi'
   node.linux_kernel.packages << 'linux-image-raspi'
+  node.linux_kernel.packages << 'linux-modules-extra-raspi'
 
   case node.platform_version
   when '18.04', '20.04'
