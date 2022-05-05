@@ -1,4 +1,10 @@
-include_recipe File.expand_path('../../cookbooks/validate', __FILE__)
+#
+# Helpers
+#
+include_recipe File.expand_path('../../helpers/validate', __FILE__)
+#
+# Recipes
+#
 include_recipe File.expand_path('../../cookbooks/apt', __FILE__)
 include_recipe File.expand_path('../../cookbooks/pacman', __FILE__)
 include_recipe File.expand_path('../../cookbooks/curl', __FILE__)
