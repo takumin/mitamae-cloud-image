@@ -11,7 +11,7 @@ end
 
 unless File.exist?(mitamae_path)
   File.open(mitamae_path, 'wb') do |file|
-    open('https://github.com/itamae-kitchen/mitamae/releases/download/v1.12.7/mitamae-x86_64-linux') do |bin|
+    open('https://github.com/itamae-kitchen/mitamae/releases/download/v1.12.9/mitamae-x86_64-linux') do |bin|
       file.puts bin.read
     end
   end
