@@ -13,8 +13,6 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-when 'ubuntu-16.04-generic-hwe'
-  package 'xserver-xorg-hwe-16.04'
 when 'ubuntu-18.04-generic-hwe'
   package 'xserver-xorg-hwe-18.04'
 when 'ubuntu-20.04-generic-hwe'

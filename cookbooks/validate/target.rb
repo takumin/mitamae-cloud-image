@@ -29,7 +29,7 @@ when :ubuntu
     {
       target: {
         kernel:     match(/^(?:generic|generic-hwe|virtual|virtual-hwe)$/),
-        suite:      match(/^(?:xenial|bionic|focal|jammy)$/),
+        suite:      match(/^(?:bionic|focal|jammy)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }

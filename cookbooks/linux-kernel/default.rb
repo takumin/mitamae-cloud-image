@@ -25,8 +25,6 @@ when 'ubuntu'
     packages = %w{linux-image-raspi linux-firmware-raspi2}
   when /^(?:[0-9]+)\.(?:[0-9]+)-(?:amd64|arm64)-generic$/
     packages = %w{linux-image-generic}
-  when /^16\.04-(?:amd64|arm64)-generic-hwe$/
-    packages = %w{linux-image-generic-hwe-16.04}
   when /^18\.04-(?:amd64|arm64)-generic-hwe$/
     packages = %w{linux-image-generic-hwe-18.04}
   when /^20\.04-(?:amd64|arm64)-generic-hwe$/

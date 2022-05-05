@@ -42,12 +42,8 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
-when /^ubuntu-(?:16|18|20)\.04-generic-(?:desktop|server)-nvidia$/
+when /^ubuntu-(?:18|20)\.04-generic-(?:desktop|server)-nvidia$/
   # nothing...
-when 'ubuntu-16.04-generic-hwe-desktop-nvidia'
-  package 'xserver-xorg-hwe-16.04'
-when 'ubuntu-16.04-generic-hwe-server-nvidia'
-  package 'xserver-xorg-legacy-hwe-16.04'
 when 'ubuntu-18.04-generic-hwe-desktop-nvidia'
   package 'linux-headers-generic-hwe-18.04'
   package 'xserver-xorg-hwe-18.04'
@@ -65,12 +61,6 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
-when 'ubuntu-16.04-desktop-nvidia'
-  package 'nvidia-430'
-when 'ubuntu-16.04-server-nvidia'
-  package 'nvidia-430' do
-    options '--no-install-recommends'
-  end
 when /^ubuntu-(?:18\.04|20\.04)-desktop-nvidia$/
   package 'nvidia-driver-470'
 when /^ubuntu-(?:18\.04|20\.04)-server-nvidia$/
