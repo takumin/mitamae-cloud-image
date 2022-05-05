@@ -16,7 +16,9 @@ node.reverse_merge!({
 #
 
 if node.target.kernel == 'raspi'
-  node.linux_firmware.excludes << '/lib/firmware/*'
+  node.linux_firmware.excludes << '/lib/firmware/nvidia/*'
+  node.linux_firmware.excludes << '/lib/firmware/radeon/*'
+  node.linux_firmware.excludes << '/lib/firmware/iwlwifi*'
   node.linux_firmware.includes << '/lib/firmware/brcm/*'
   node.linux_firmware.includes << '/lib/firmware/cypress/*'
 end
