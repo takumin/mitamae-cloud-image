@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Check Role
-#
-
-if node[:target][:role].match(/minimal/)
-  return
-end
-
-#
 # Public Variables
 #
 
@@ -20,6 +12,15 @@ node[:locale][:availables] ||= [
 node[:locale][:defaults]   ||= Hashie::Mash.new({
   LANG: 'ja_JP.UTF-8',
 })
+
+#
+# Override Minimal Role
+#
+
+if node[:target][:role].match(/minimal/)
+  node[:locale][:availables] = ['en_US.UTF-8 UTF-8']
+  node[:locale][:defaults]   = Hashie::Mash.new
+end
 
 #
 # Private Variables
