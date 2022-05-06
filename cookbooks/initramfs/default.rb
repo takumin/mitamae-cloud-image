@@ -24,6 +24,26 @@ else
 end
 
 #
+# Environment Variables
+#
+
+if ENV['INITRAMFS_COMPRESS'].is_a?(String) and !ENV['INITRAMFS_COMPRESS'].empty?
+  node[:initramfs][:compress] = ENV['INITRAMFS_COMPRESS']
+end
+
+#
+# Validate Variables
+#
+
+node.validate! do
+  {
+    initramfs: {
+      compress: match(/^(?:gzip|lz4|xz|zstd)$/),
+    },
+  }
+end
+
+#
 # Package Install
 #
 
