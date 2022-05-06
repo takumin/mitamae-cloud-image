@@ -16,7 +16,6 @@ on:
         - info
         - debug
 env:
-  S3_ENDPOINT_URL: https://usc1.contabostorage.com
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
   APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
 jobs:
