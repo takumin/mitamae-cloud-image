@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Disable automatic terminal login when in desktop role
-#
-
-if node.target.role.match(/desktop/)
-  return
-end
-
-#
 # Public Variables
 #
 
@@ -47,6 +39,18 @@ node.autologin.keys.each do |k|
     }
   end
 end
+
+#
+# Disable automatic terminal login when in desktop role
+#
+
+if node.target.role.match(/desktop/)
+  return
+end
+
+#
+# Loop AutoLogin Profiles
+#
 
 node.autologin.values.each do |autologin|
   #
