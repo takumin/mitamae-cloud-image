@@ -34,6 +34,9 @@ jobs:
           profile: server-nvidia
         - arch: arm64
           profile: desktop-nvidia
+        # FIXME: Because flash-kernel package fails in desktop recipe
+        - arch: arm64
+          release: bionic
         # TODO: Remove when ubuntu 22.10 is released
         - release: jammy
           kernel: generic-hwe
