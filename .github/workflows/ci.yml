@@ -16,6 +16,7 @@ on:
         - info
         - debug
 env:
+  S3_ENDPOINT_URL: https://usc1.contabostorage.com
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
   APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
 jobs:
@@ -104,52 +105,32 @@ jobs:
     #
     # Check Difference
     #
-    # - name: Download Packages Manifest
-    #   env:
-    #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    #   run: |
-    #     wget -qO /tmp/packages.manifest https://mitamae-cloud-image.s3.${AWS_DEFAULT_REGION}.wasabisys.com/${RELEASE_DIR}/packages.manifest
-    # - name: Check Difference
-    #   run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
+    - name: Download Packages Manifest
+      env:
+        S3_BUCKET_URL: ${{ secrets.S3_BUCKET_URL }}
+      run: |
+        wget -qO /tmp/packages.manifest ${S3_BUCKET_URL}/${RELEASE_DIR}/packages.manifest
+    - name: Check Difference
+      run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
 
     #
-    # Publish Wasabi
+    # Publish S3
     #
-    # - name: AssumeRole
-    #   if: env.PUBLISH == 'true'
-    #   env:
-    #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-    #   run: |
-    #     RESULT="$(
-    #       aws sts assume-role --role-arn "${AWS_ROLE_ARN}" \
-    #                           --role-session-name "${GITHUB_RUN_ID}" \
-    #                           --endpoint-url "https://sts.${AWS_DEFAULT_REGION}.wasabisys.com"
-    #     )"
-    #     AWS_ACCESS_KEY_ID="$(echo "${RESULT}" | jq -r '.Credentials.AccessKeyId')"
-    #     AWS_SECRET_ACCESS_KEY="$(echo "${RESULT}" | jq -r '.Credentials.SecretAccessKey')"
-    #     AWS_SESSION_TOKEN="$(echo "${RESULT}" | jq -r '.Credentials.SessionToken')"
-    #     echo "::add-mask::$AWS_DEFAULT_REGION"
-    #     echo "::add-mask::$AWS_ACCESS_KEY_ID"
-    #     echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
-    #     echo "::add-mask::$AWS_SESSION_TOKEN"
-    #     echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" >> $GITHUB_ENV
-    #     echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_ENV
-    #     echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
-    #     echo "AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}" >> $GITHUB_ENV
-    # - name: Publish
-    #   if: env.PUBLISH == 'true'
-    #   uses: nick-invision/retry@v2
-    #   with:
-    #     timeout_minutes: 3
-    #     max_attempts: 3
-    #     command: >-
-    #       aws s3 sync
-    #       --no-progress
-    #       --exact-timestamps
-    #       --delete
-    #       --endpoint-url=https://s3.${AWS_DEFAULT_REGION}.wasabisys.com
-    #       releases/${RELEASE_DIR}
-    #       s3://mitamae-cloud-image/${RELEASE_DIR}
+    - name: Publish
+      if: env.PUBLISH == 'true'
+      uses: nick-invision/retry@v2
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
+      with:
+        timeout_minutes: 3
+        max_attempts: 3
+        command: >-
+          aws s3 sync
+          --no-progress
+          --exact-timestamps
+          --delete
+          --endpoint-url=${S3_ENDPOINT_URL}
+          releases/${RELEASE_DIR}
+          s3://mitamae-cloud-image/${RELEASE_DIR}
