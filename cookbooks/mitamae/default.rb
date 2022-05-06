@@ -69,4 +69,6 @@ http_request '/usr/local/bin/mitamae' do
   group  'root'
   mode   '0755'
   not_if 'test -x usr/local/bin/mitamae'
+  # disable debug log
+  sensitive true
 end
