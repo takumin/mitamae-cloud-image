@@ -23,18 +23,18 @@ node.validate! do
   }
 end
 
-case node[:target][:distribution]
-when :ubuntu
+case node.target.distribution
+when 'ubuntu'
   node.validate! do
     {
       target: {
-        kernel:     match(/^(?:generic|generic-hwe|virtual|virtual-hwe)$/),
+        kernel:     match(/^(?:(?:generic|virtual)(?:-hwe)?|raspi)$/),
         suite:      match(/^(?:bionic|focal|jammy)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }
   end
-when :debian
+when 'debian'
   node.validate! do
     {
       target: {
@@ -44,4 +44,14 @@ when :debian
       },
     }
   end
+when 'arch'
+  node.validate! do
+    {
+      target: {
+        kernel: match(/^(?:linux)(?:-lts)?$/),
+      },
+    }
+  end
+else
+  raise
 end
