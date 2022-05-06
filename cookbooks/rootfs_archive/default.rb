@@ -276,6 +276,8 @@ when 'raspberrypi', 'raspi'
       owner 'root'
       group 'root'
       mode  '0644'
+      # disable debug log
+      sensitive true
     end
   end
 
