@@ -44,11 +44,9 @@ end
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
 when /^ubuntu-(?:18|20|22)\.04-generic-(?:desktop|server)-nvidia$/
   # nothing...
-when 'ubuntu-18.04-generic-hwe-desktop-nvidia'
+when /^ubuntu-18\.04-generic-hwe-(?:desktop|server)-nvidia$/
   package 'linux-headers-generic-hwe-18.04'
-  package 'xserver-xorg-hwe-18.04'
-when 'ubuntu-18.04-generic-hwe-server-nvidia'
-  package 'linux-headers-generic-hwe-18.04'
+  package 'xserver-xorg-hwe-18.04' if node[:target][:role] == 'desktop-nvidia'
 when /^ubuntu-20\.04-generic-hwe-(?:desktop|server)-nvidia$/
   package 'linux-headers-generic-hwe-20.04'
 else
