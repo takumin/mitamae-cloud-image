@@ -201,6 +201,8 @@ http_request download_squashfs_path do
     "test -d #{directory[:extract][:path]}",
     "#{checksum_archive} | #{checksum_command}",
   ].join(' || ')
+  # disable debug log
+  sensitive true
 end
 
 #
