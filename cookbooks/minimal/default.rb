@@ -24,6 +24,7 @@ when :debian, :ubuntu
   packages << 'systemd'
   packages << 'systemd-coredump'
   packages << 'systemd-timesyncd' unless %w{stretch bionic}.include?(node.target.suite)
+  packages << 'libnss-myhostname'
   packages << 'libnss-resolve'
   packages << 'libnss-systemd'
   packages << 'libpam-systemd'
