@@ -41,6 +41,8 @@ jobs:
       PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
       TARGET_NAME: ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}
       RELEASE_DIR: ${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}
+      ROOTFS_ARCHIVE_FORMAT_TARBALL: xz
+      ROOTFS_ARCHIVE_FORMAT_SQUASHFS: xz
     steps:
     #
     # Environment Variables
