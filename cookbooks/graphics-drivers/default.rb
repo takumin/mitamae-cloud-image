@@ -42,7 +42,7 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
-when /^ubuntu-(?:18|20)\.04-generic-(?:desktop|server)-nvidia$/
+when /^ubuntu-(?:18|20|22)\.04-generic-(?:desktop|server)-nvidia$/
   # nothing...
 when 'ubuntu-18.04-generic-hwe-desktop-nvidia'
   package 'linux-headers-generic-hwe-18.04'
@@ -61,9 +61,9 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
-when /^ubuntu-(?:18\.04|20\.04)-desktop-nvidia$/
+when /^ubuntu-(?:18|20|22)\.04-desktop-nvidia$/
   package 'nvidia-driver-510'
-when /^ubuntu-(?:18\.04|20\.04)-server-nvidia$/
+when /^ubuntu-(?:18|20|22)\.04-server-nvidia$/
   package 'nvidia-headless-510-server'
 else
   MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
