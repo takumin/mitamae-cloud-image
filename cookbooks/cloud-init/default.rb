@@ -69,12 +69,6 @@ when 'debian', 'ubuntu'
 end
 
 #
-# Required AutoLogin
-#
-
-include_recipe File.expand_path('../../autologin', __FILE__)
-
-#
 # Package Install
 #
 
@@ -144,9 +138,11 @@ file '/etc/systemd/system/cloud-final.service' do
       content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=systemd-user-sessions.service")
     end
 
-    node.autologin.keys.each do |k|
-      unless content.match(/^Before=#{node.autologin[k].service}@#{node.autologin[k].port}.service$/)
-        content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=#{node.autologin[k].service}@#{node.autologin[k].port}.service")
+    if node.key?(:autologin)
+      node.autologin.keys.each do |k|
+        unless content.match(/^Before=#{node.autologin[k].service}@#{node.autologin[k].port}.service$/)
+          content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=#{node.autologin[k].service}@#{node.autologin[k].port}.service")
+        end
       end
     end
 
