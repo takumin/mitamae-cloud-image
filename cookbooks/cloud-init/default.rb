@@ -44,14 +44,6 @@ node[:cloud_init]               ||= Hashie::Mash.new
 node[:cloud_init][:datasources] ||= ['NoCloud', 'None']
 
 #
-# Public Variables - Other Recipe
-#
-
-node[:autologin]           ||= Hashie::Mash.new
-node[:autologin][:service] ||= 'getty'
-node[:autologin][:port]    ||= 'tty1'
-
-#
 # Validate Variables
 #
 
@@ -146,8 +138,10 @@ file '/etc/systemd/system/cloud-final.service' do
       content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=systemd-user-sessions.service")
     end
 
-    unless content.match(/^Before=#{node[:autologin][:service]}@#{node[:autologin][:port]}.service$/)
-      content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=#{node[:autologin][:service]}@#{node[:autologin][:port]}.service")
+    node.autologin.keys.each do |k|
+      unless content.match(/^Before=#{node.autologin[k].service}@#{node.autologin[k].port}.service$/)
+        content.gsub!(/^\[Unit\]$/, "[Unit]\nBefore=#{node.autologin[k].service}@#{node.autologin[k].port}.service")
+      end
     end
 
     unless content.match(/^Before=display-manager\.service$/)
