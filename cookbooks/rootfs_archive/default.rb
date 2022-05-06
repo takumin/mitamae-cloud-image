@@ -4,8 +4,9 @@
 # Public Variables
 #
 
-node[:rootfs_archive]          ||= Hashie::Mash.new
-node[:rootfs_archive][:format] ||= Hashie::Mash.new
+node[:rootfs_archive]              ||= Hashie::Mash.new
+node[:rootfs_archive][:format]     ||= Hashie::Mash.new
+node[:rootfs_archive][:target_dir] ||= node[:target][:directory]
 
 #
 # Public Variables - Format Archive
@@ -31,7 +32,17 @@ end
 # Public Variables - Target Directory
 #
 
-node[:rootfs_archive][:target_dir] ||= ENV['TARGET_DIRECTORY'] || node[:target][:directory]
+if ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL'].is_a?(String) and !ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL'].empty?
+  node[:rootfs_archive][:format][:tarball] = ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL']
+end
+
+if ENV['ROOTFS_ARCHIVE_FORMAT_SQUASHFS'].is_a?(String) and !ENV['ROOTFS_ARCHIVE_FORMAT_SQUASHFS'].empty?
+  node[:rootfs_archive][:format][:squashfs] = ENV['ROOTFS_ARCHIVE_FORMAT_SQUASHFS']
+end
+
+if ENV['TARGET_DIRECTORY'].is_a?(String) and !ENV['TARGET_DIRECTORY'].empty?
+  node[:rootfs_archive][:target_dir] = ENV['TARGET_DIRECTORY']
+end
 
 #
 # Public Variables - Output Directory
