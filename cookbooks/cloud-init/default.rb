@@ -69,6 +69,12 @@ when 'debian', 'ubuntu'
 end
 
 #
+# Required AutoLogin
+#
+
+include_recipe File.expand_path('../../autologin', __FILE__)
+
+#
 # Package Install
 #
 
