@@ -67,7 +67,7 @@ jobs:
     - name: Install go-apt-cacher
       run: |
         go install github.com/cybozu-go/aptutil/cmd/go-apt-cacher@latest
-    - name: Store go-apt-cacher
+    - name: Cache go-apt-cacher
       uses: actions/cache@v3
       with:
         path: $HOME/go-apt-cacher
