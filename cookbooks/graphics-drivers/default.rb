@@ -52,7 +52,7 @@ when 'ubuntu-18.04-generic-hwe-server-nvidia'
 when /^ubuntu-20\.04-generic-hwe-(?:desktop|server)-nvidia$/
   package 'linux-headers-generic-hwe-20.04'
 else
-  MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
+  MItamae.logger.error "graphics-drivers: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
   exit 1
 end
 
@@ -66,6 +66,6 @@ when /^ubuntu-(?:18|20|22)\.04-desktop-nvidia$/
 when /^ubuntu-(?:18|20|22)\.04-server-nvidia$/
   package 'nvidia-headless-510-server'
 else
-  MItamae.logger.error "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
+  MItamae.logger.error "graphics-drivers: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
   exit 1
 end
