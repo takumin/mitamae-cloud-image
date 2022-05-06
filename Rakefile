@@ -21,6 +21,8 @@ unless FileTest.executable?(mitamae_path)
   FileUtils.chmod(0755, mitamae_path)
 end
 
+log_level = ENV['LOG_LEVEL'] || 'info'
+
 profiles = []
 profiles.concat(Dir.glob('**/*.yml', base: File.join(Dir.pwd, 'profiles')))
 profiles.concat(Dir.glob('**/*.yaml', base: File.join(Dir.pwd, 'profiles')))
@@ -48,7 +50,7 @@ profiles.each do |profile|
     task :initialize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'initialize.rb')
 
-      unless execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
+      unless execution(['sudo', '-E', mitamae_path, 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
         abort('failed command')
       end
     end
@@ -66,6 +68,7 @@ profiles.each do |profile|
       unless execution([
         'sudo', '-E', 'chroot', target_dir,
         'mitamae', 'local',
+        '-l', log_level,
         '--plugins=/mitamae/plugins',
         '-y', "/mitamae/profiles/#{profile}",
         recipe_path
@@ -82,7 +85,7 @@ profiles.each do |profile|
     task :finalize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'finalize.rb')
 
-      unless execution(['sudo', '-E', mitamae_path, 'local', '-y', profile_path, recipe_path].join(' '))
+      unless execution(['sudo', '-E', mitamae_path, 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
         abort('failed command')
       end
 
