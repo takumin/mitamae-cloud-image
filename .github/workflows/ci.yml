@@ -6,14 +6,15 @@ on:
   schedule:
   - cron: '12 12 * * *'
   workflow_dispatch:
-    logLevel:
-      description: 'Log level'
-      required: true
-      default: 'info'
-      type: choice
-      options:
-      - info
-      - debug
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'info'
+        type: choice
+        options:
+        - info
+        - debug
 env:
   APT_REPO_URL_UBUNTU: http://azure.archive.ubuntu.com/ubuntu
   APT_REPO_URL_UBUNTU_PORTS: http://azure.ports.ubuntu.com/ubuntu-ports
