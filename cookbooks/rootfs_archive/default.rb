@@ -29,7 +29,33 @@ else
 end
 
 #
-# Public Variables - Target Directory
+# Public Variables - Output Directory
+#
+
+case node[:target][:distribution]
+when 'debian', 'ubuntu'
+  node[:rootfs_archive][:output_dir] ||= File.join(
+    'releases',
+    node[:target][:distribution],
+    node[:target][:suite],
+    node[:target][:kernel],
+    node[:target][:architecture],
+    node[:target][:role],
+  )
+when 'arch'
+  node[:rootfs_archive][:output_dir] ||= File.join(
+    'releases',
+    node[:target][:distribution],
+    node[:target][:kernel],
+    node[:target][:architecture],
+    node[:target][:role],
+  )
+else
+  raise
+end
+
+#
+# Environment Variables
 #
 
 if ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL'].is_a?(String) and !ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL'].empty?
@@ -44,30 +70,8 @@ if ENV['TARGET_DIRECTORY'].is_a?(String) and !ENV['TARGET_DIRECTORY'].empty?
   node[:rootfs_archive][:target_dir] = ENV['TARGET_DIRECTORY']
 end
 
-#
-# Public Variables - Output Directory
-#
-
-case node[:target][:distribution]
-when 'debian', 'ubuntu'
-  node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
-    'releases',
-    node[:target][:distribution],
-    node[:target][:suite],
-    node[:target][:kernel],
-    node[:target][:architecture],
-    node[:target][:role],
-  )
-when 'arch'
-  node[:rootfs_archive][:output_dir] ||= ENV['OUTPUT_DIRECTORY'] || File.join(
-    'releases',
-    node[:target][:distribution],
-    node[:target][:kernel],
-    node[:target][:architecture],
-    node[:target][:role],
-  )
-else
-  raise
+if ENV['OUTPUT_DIRECTORY'].is_a?(String) and !ENV['OUTPUT_DIRECTORY'].empty?
+  node[:rootfs_archive][:output_dir] = ENV['OUTPUT_DIRECTORY']
 end
 
 #
