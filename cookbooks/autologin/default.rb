@@ -4,7 +4,7 @@
 # Disable automatic terminal login when in desktop role
 #
 
-if node[:target][:role].match(/desktop/)
+if node.target.role.match(/desktop/)
   return
 end
 
@@ -12,113 +12,106 @@ end
 # Public Variables
 #
 
-node[:autologin]           ||= Hashie::Mash.new
-node[:autologin][:service] ||= 'getty'
-node[:autologin][:getty]   ||= '/sbin/agetty'
-node[:autologin][:user]    ||= 'root'
-node[:autologin][:port]    ||= 'tty1'
-node[:autologin][:term]    ||= 'linux'
-node[:autologin][:baud]    ||= []
-node[:autologin][:opts]    ||= ['--noclear']
+node.reverse_merge!({
+  autologin: {
+    default: {
+      service: 'getty',
+      getty:   '/sbin/agetty',
+      user:    'root',
+      port:    'tty1',
+      term:    'linux',
+      baud:    [],
+      opts:    ['--noclear'],
+    },
+  },
+})
 
 #
 # Validate Variables
 #
 
-node.validate! do
-  {
-    autologin: {
-      service: match(/^(?:serial-)?getty$/),
-      getty:   string,
-      user:    match(/^(?:[a-zA-Z0-9]*)$/),
-      port:    match(/^(?:tty[a-zA-Z0-9]+)$/),
-      term:    string,
-      baud:    array_of(integer),
-      opts:    array_of(string),
-    },
-  }
-end
-
-#
-# Check Enable Recipe
-#
-
-if node[:autologin][:user].empty?
-  return
-end
-
-#
-# Build Command Options
-#
-
-agetty_args = [
-  '--autologin', node[:autologin][:user],
-]
-
-unless node[:autologin][:opts].empty?
-  node[:autologin][:opts].each do |opt|
-    agetty_args.push(opt)
+node.autologin.keys.each do |k|
+  node.validate! do
+    {
+      autologin: {
+        "#{k}": {
+          service: match(/^(?:serial-)?getty$/),
+          getty:   string,
+          user:    match(/^(?:[a-zA-Z0-9]*)$/),
+          port:    match(/^(?:tty[a-zA-Z0-9]+)$/),
+          term:    string,
+          baud:    array_of(integer),
+          opts:    array_of(string),
+        },
+      },
+    }
   end
 end
 
-agetty_args.push('%I')
+node.autologin.values.each do |autologin|
+  #
+  # Build Command Options
+  #
 
-unless node[:autologin][:baud].empty?
-  agetty_args.push(node[:autologin][:baud].map{|b| b.to_s}.join(','))
-end
+  agetty_args = [
+    '--autologin', autologin.user,
+  ]
 
-agetty_args.push(node[:autologin][:term])
+  unless autologin.opts.empty?
+    autologin.opts.each do |opt|
+      agetty_args.push(opt)
+    end
+  end
 
-#
-# Override Systemd Directory
-#
+  agetty_args.push('%I')
 
-directory "/etc/systemd/system/#{node[:autologin][:service]}@#{node[:autologin][:port]}.service.d" do
-  owner 'root'
-  group 'root'
-  mode  '0755'
-end
+  unless autologin.baud.empty?
+    agetty_args.push(autologin.baud.map{|b| b.to_s}.join(','))
+  end
 
-#
-# Override Systemd Service
-#
+  agetty_args.push(autologin.term)
 
-file "/etc/systemd/system/#{node[:autologin][:service]}@#{node[:autologin][:port]}.service.d/autologin.conf" do
-  owner 'root'
-  group 'root'
-  mode  '0644'
-  content [
-    '[Service]',
-    'Type=idle',
-    'ExecStart=',
-    "ExecStart=-#{node[:autologin][:getty]} #{agetty_args.join(' ')}",
-  ].join("\n")
-end
+  #
+  # Override Systemd Directory
+  #
 
-file "/etc/systemd/system/#{node[:autologin][:service]}@#{node[:autologin][:port]}.service.d/noclear.conf" do
-  owner 'root'
-  group 'root'
-  mode  '0644'
-  content [
-    '[Service]',
-    'TTYVTDisallocate=no',
-  ].join("\n")
-end
+  directory "/etc/systemd/system/#{autologin.service}@#{autologin.port}.service.d" do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
 
-#
-# Enable Systemd Service
-#
+  #
+  # Override Systemd Service
+  #
 
-service "#{node[:autologin][:service]}@#{node[:autologin][:port]}.service" do
-  action :enable
-end
+  file "/etc/systemd/system/#{autologin.service}@#{autologin.port}.service.d/autologin.conf" do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      '[Service]',
+      'Type=idle',
+      'ExecStart=',
+      "ExecStart=-#{autologin.getty} #{agetty_args.join(' ')}",
+    ].join("\n")
+  end
 
-#
-# Remove Unused Terminal
-#
+  file "/etc/systemd/system/#{autologin.service}@#{autologin.port}.service.d/noclear.conf" do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      '[Service]',
+      'TTYVTDisallocate=no',
+    ].join("\n")
+  end
 
-if node[:autologin][:port] != 'tty1'
-  service 'getty@tty1' do
-    action :disable
+  #
+  # Enable Systemd Service
+  #
+
+  service "#{autologin.service}@#{autologin.port}.service" do
+    action :enable
   end
 end
