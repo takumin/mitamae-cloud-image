@@ -40,8 +40,17 @@ jobs:
       PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
       TARGET_NAME: ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}
       RELEASE_DIR: ${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}
-      LOG_LEVEL: ${{ github.event.inputs.logLevel }}
     steps:
+    #
+    # Environment Variables
+    #
+    - name: Log Level
+      if: github.event.inputs.logLevel != ''
+      env:
+        MITAMAE_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
+      run: |
+        echo "LOG_LEVEL=${MITAMAE_LOG_LEVEL}" >> $GITHUB_ENV
+
     #
     # Build Image
     #
@@ -89,9 +98,10 @@ jobs:
     # Check Difference
     #
     # - name: Download Packages Manifest
-    #   run: wget -qO /tmp/packages.manifest https://mitamae-cloud-image.s3.${AWS_DEFAULT_REGION}.wasabisys.com/${RELEASE_DIR}/packages.manifest
     #   env:
     #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    #   run: |
+    #     wget -qO /tmp/packages.manifest https://mitamae-cloud-image.s3.${AWS_DEFAULT_REGION}.wasabisys.com/${RELEASE_DIR}/packages.manifest
     # - name: Check Difference
     #   run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
 
@@ -100,6 +110,11 @@ jobs:
     #
     # - name: AssumeRole
     #   if: env.PUBLISH == 'true'
+    #   env:
+    #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
     #   run: |
     #     RESULT="$(
     #       aws sts assume-role --role-arn "${AWS_ROLE_ARN}" \
@@ -117,11 +132,6 @@ jobs:
     #     echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >> $GITHUB_ENV
     #     echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
     #     echo "AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN}" >> $GITHUB_ENV
-    #   env:
-    #     AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-    #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
     # - name: Publish
     #   if: env.PUBLISH == 'true'
     #   uses: nick-invision/retry@v2
