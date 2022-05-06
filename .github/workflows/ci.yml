@@ -105,13 +105,13 @@ jobs:
     #
     # Check Difference
     #
-    # - name: Download Packages Manifest
-    #   env:
-    #     S3_BUCKET_URL: ${{ secrets.S3_BUCKET_URL }}
-    #   run: |
-    #     wget -qO /tmp/packages.manifest ${S3_BUCKET_URL}/${RELEASE_DIR}/packages.manifest
-    # - name: Check Difference
-    #   run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
+    - name: Download Packages Manifest
+      env:
+        S3_BUCKET_URL: ${{ secrets.S3_BUCKET_URL }}
+      run: |
+        wget -qO /tmp/packages.manifest ${S3_BUCKET_URL}/${RELEASE_DIR}/packages.manifest || touch /tmp/packages.manifest
+    - name: Check Difference
+      run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
 
     #
     # Publish S3
