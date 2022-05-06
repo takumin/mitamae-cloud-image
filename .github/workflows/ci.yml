@@ -100,14 +100,14 @@ jobs:
     - name: Running go-apt-cacher
       run: |
         $HOME/go/bin/go-apt-cacher -f go-apt-cacher.toml &
-        echo 'APT_REPO_URL_DEBIAN="http://localhost:3142/debian"' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_DEBIAN_SECURITY="http://localhost:3142/debian-security"' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_PPA_GRAPHICS_DRIVERS="http://localhost:3142/ppa-graphics-drivers"' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_RASPBERRYPI="http://localhost:3142/raspberrypi"' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU="http://localhost:3142/ubuntu"' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU_JA="http://localhost:3142/ubuntu-ja"' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU_JA_NON_FREE="http://localhost:3142/ubuntu-ja-non-free"' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU_PORTS="http://localhost:3142/ubuntu-ports"' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_DEBIAN=http://localhost:3142/debian' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_DEBIAN_SECURITY=http://localhost:3142/debian-security' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_PPA_GRAPHICS_DRIVERS=http://localhost:3142/ppa-graphics-drivers' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_RASPBERRYPI=http://localhost:3142/raspberrypi' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_UBUNTU=http://localhost:3142/ubuntu' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_UBUNTU_JA=http://localhost:3142/ubuntu-ja' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_UBUNTU_JA_NON_FREE=http://localhost:3142/ubuntu-ja-non-free' >> $GITHUB_ENV
+        echo 'APT_REPO_URL_UBUNTU_PORTS=http://localhost:3142/ubuntu-ports' >> $GITHUB_ENV
 
     #
     # Build Image
