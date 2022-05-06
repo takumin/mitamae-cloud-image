@@ -26,16 +26,17 @@ jobs:
       matrix:
         distro:  [ubuntu]
         arch:    [amd64, arm64]
-        release: [bionic, focal]
+        release: [bionic, focal, jammy]
         kernel:  [generic, generic-hwe]
-        profile: [server, server-nvidia, desktop, desktop-nvidia]
+        profile: [minimal, server, server-nvidia, desktop, desktop-nvidia]
         exclude:
         - arch: arm64
           profile: server-nvidia
         - arch: arm64
           profile: desktop-nvidia
-        - arch: arm64
-          release: bionic
+        # TODO: Remove when ubuntu 22.10 is released
+        - release: jammy
+          kernel: generic-hwe
     env:
       PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
       TARGET_NAME: ${{ matrix.distro }}_${{ matrix.release }}_${{ matrix.kernel }}_${{ matrix.arch }}_${{ matrix.profile }}
