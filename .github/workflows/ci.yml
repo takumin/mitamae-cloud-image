@@ -70,7 +70,7 @@ jobs:
     - name: Cache go-apt-cacher
       uses: actions/cache@v3
       with:
-        path: $HOME/go-apt-cacher
+        path: /tmp/go-apt-cacher
         key: ${{ matrix.distro }}-${{ matrix.release }}-${{ matrix.kernel }}-${{ matrix.arch }}-${{ matrix.profile }}
     - name: Configure go-apt-cacher
       run: |
@@ -80,8 +80,8 @@ jobs:
         cache_period = 3
         cache_capacity = 10
         check_interval = 3600
-        meta_dir = "$HOME/go-apt-cacher/meta"
-        cache_dir = "$HOME/go-apt-cacher/cache"
+        meta_dir = "/tmp/go-apt-cacher/meta"
+        cache_dir = "/tmp/go-apt-cacher/cache"
 
         [log]
         level = "info"
