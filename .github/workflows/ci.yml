@@ -58,58 +58,6 @@ jobs:
         echo "LOG_LEVEL=${MITAMAE_LOG_LEVEL}" >> $GITHUB_ENV
 
     #
-    # Install go-apt-cacher
-    #
-    - name: Setup Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: '1.18'
-    - name: Install go-apt-cacher
-      run: |
-        go install github.com/cybozu-go/aptutil/cmd/go-apt-cacher@latest
-    - name: Cache go-apt-cacher
-      uses: actions/cache@v3
-      with:
-        path: /tmp/go-apt-cacher
-        key: ${{ matrix.distro }}-${{ matrix.release }}-${{ matrix.kernel }}-${{ matrix.arch }}-${{ matrix.profile }}
-    - name: Configure go-apt-cacher
-      run: |
-        cat << __EOF__ > go-apt-cacher.toml
-        listen_address = ":3142"
-        max_conns = 10
-        cache_period = 3
-        cache_capacity = 10
-        check_interval = 3600
-        meta_dir = "/tmp/go-apt-cacher/meta"
-        cache_dir = "/tmp/go-apt-cacher/cache"
-
-        [log]
-        level = "info"
-        format = "plain"
-
-        [mapping]
-        debian = "http://deb.debian.org/debian"
-        debian-security = "http://security.debian.org/debian-security"
-        ppa-graphics-drivers = "http://ppa.launchpad.net/graphics-drivers/ppa/ubuntu"
-        raspberrypi = "http://archive.raspberrypi.org/debian"
-        ubuntu = "http://archive.ubuntu.com/ubuntu"
-        ubuntu-ja = "http://archive.ubuntulinux.jp/ubuntu"
-        ubuntu-ja-non-free = "http://archive.ubuntulinux.jp/ubuntu-ja-non-free"
-        ubuntu-ports = "http://ports.ubuntu.com/ubuntu-ports"
-        __EOF__
-    - name: Running go-apt-cacher
-      run: |
-        $HOME/go/bin/go-apt-cacher -f go-apt-cacher.toml &
-        echo 'APT_REPO_URL_DEBIAN=http://localhost:3142/debian' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_DEBIAN_SECURITY=http://localhost:3142/debian-security' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_PPA_GRAPHICS_DRIVERS=http://localhost:3142/ppa-graphics-drivers' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_RASPBERRYPI=http://localhost:3142/raspberrypi' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU=http://localhost:3142/ubuntu' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU_JA=http://localhost:3142/ubuntu-ja' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU_JA_NON_FREE=http://localhost:3142/ubuntu-ja-non-free' >> $GITHUB_ENV
-        echo 'APT_REPO_URL_UBUNTU_PORTS=http://localhost:3142/ubuntu-ports' >> $GITHUB_ENV
-
-    #
     # Build Image
     #
     - name: Checkout
