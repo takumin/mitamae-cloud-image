@@ -88,7 +88,7 @@ jobs:
         format = "plain"
 
         [mapping]
-        debian = "http://ftp.jp.debian.org/debian"
+        debian = "http://deb.debian.org/debian"
         debian-security = "http://security.debian.org/debian-security"
         ppa-graphics-drivers = "http://ppa.launchpad.net/graphics-drivers/ppa/ubuntu"
         raspberrypi = "http://archive.raspberrypi.org/debian"
