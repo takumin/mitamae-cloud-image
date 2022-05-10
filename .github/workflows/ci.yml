@@ -23,11 +23,24 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        distro:  [ubuntu]
-        arch:    [amd64, arm64]
-        release: [bionic, focal, jammy]
-        kernel:  [generic, generic-hwe]
-        profile: [minimal, server, server-nvidia, desktop, desktop-nvidia]
+        distro:
+        - ubuntu
+        arch:
+        - amd64
+        - arm64
+        release:
+        - bionic
+        - focal
+        - jammy
+        kernel:
+        - generic
+        - generic-hwe
+        profile:
+        - minimal
+        - server
+        - server-nvidia
+        - desktop
+        - desktop-nvidia
         exclude:
         - arch: arm64
           profile: server-nvidia
