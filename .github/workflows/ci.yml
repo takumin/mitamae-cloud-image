@@ -42,6 +42,27 @@ jobs:
         - desktop
         - desktop-nvidia
         exclude:
+        # Debian distros ignore ubuntu release
+        - distro: debian
+          release: bionic
+        - distro: debian
+          release: focal
+        - distro: debian
+          release: jammy
+        # Debian distros ignore ubuntu kernel packages
+        - distro: debian
+          release: generic-hwe
+        # Ubuntu distros ignore debian release
+        - distro: ubuntu
+          release: stretch
+        - distro: ubuntu
+          release: buster
+        - distro: ubuntu
+          release: bullseye
+        # Ubuntu distros ignore debian kernel packages
+        - distro: ubuntu
+          release: generic-backports
+        # Ignore nvidia profile for arm64 machine
         - arch: arm64
           profile: server-nvidia
         - arch: arm64
