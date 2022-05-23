@@ -10,10 +10,6 @@ binaries = {
     path: File.join(binary_path, 'mitamae'),
     url:  'https://github.com/itamae-kitchen/mitamae/releases/download/v1.12.9/mitamae-x86_64-linux'
   },
-  zsyncmake2: {
-    path: File.join(binary_path, 'zsyncmake2'),
-    url:  'https://github.com/AppImage/zsync2/releases/download/2.0.0-alpha-1-20220517/zsyncmake2-47-1f5749c-x86_64.AppImage'
-  },
 }
 
 unless Dir.exist?(binary_path)
