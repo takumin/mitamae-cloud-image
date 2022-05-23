@@ -14,6 +14,15 @@ else
 end
 
 #
+# Enabled Systemd Networkd
+#
+
+service 'systemd-networkd.service' do
+  action :enable
+  not_if 'systemctl is-enabled NetworkManager.service'
+end
+
+#
 # Clear Machine ID File
 #
 
