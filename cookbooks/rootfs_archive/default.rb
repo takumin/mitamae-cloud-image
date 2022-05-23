@@ -167,7 +167,7 @@ when 'debian', 'ubuntu'
       "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/$(#{INITRD_NAME}) && cp #{target_dir}/boot/{} #{output_dir}/$(#{INITRD_NAME}) || true'",
     ].join(' | ')
   else
-    %w{vmlinuz initrd.img config}.each do |f|
+    %w{vmlinuz initrd.img}.each do |f|
       execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
         not_if "test -f #{output_dir}/#{f}"
       end
@@ -176,6 +176,11 @@ when 'debian', 'ubuntu'
         owner 'root'
         group 'root'
         mode  '0644'
+      end
+
+      execute "zsyncmake2 #{f}" do
+        cwd output_dir
+        not_if "test -f #{output_dir}/#{f}"
       end
     end
   end
@@ -189,6 +194,11 @@ when 'arch'
       owner 'root'
       group 'root'
       mode  '0644'
+    end
+
+    execute "zsyncmake2 #{f}" do
+      cwd output_dir
+      not_if "test -f #{output_dir}/#{f}"
     end
   end
 else
@@ -208,6 +218,11 @@ if ENV['DISABLE_SQUASHFS'] != 'true'
     owner 'root'
     group 'root'
     mode  '0644'
+  end
+
+  execute "zsyncmake2 rootfs.squashfs" do
+    cwd output_dir
+    not_if "test -f #{output_dir}/rootfs.squashfs.zsync"
   end
 end
 
@@ -241,6 +256,11 @@ if ENV['DISABLE_TARBALL'] != 'true'
     owner 'root'
     group 'root'
     mode  '0644'
+  end
+
+  execute "zsyncmake2 rootfs.tar.#{ext}" do
+    cwd output_dir
+    not_if "test -f #{output_dir}/rootfs.tar.#{ext}.zsync"
   end
 end
 

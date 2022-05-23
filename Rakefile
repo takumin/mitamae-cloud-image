@@ -3,23 +3,38 @@ require 'open-uri'
 require 'open3'
 require 'yaml'
 
-mitamae_path = File.join(Dir.pwd, '.bin', 'mitamae')
+binary_path = File.join(Dir.pwd, '.bin')
 
-unless Dir.exist?(File.dirname(mitamae_path))
-  Dir.mkdir(File.dirname(mitamae_path))
+binaries = {
+  mitamae: {
+    path: File.join(binary_path, 'mitamae'),
+    url:  'https://github.com/itamae-kitchen/mitamae/releases/download/v1.12.9/mitamae-x86_64-linux'
+  },
+  zsyncmake2: {
+    path: File.join(binary_path, 'zsyncmake2'),
+    url:  'https://github.com/AppImage/zsync2/releases/download/2.0.0-alpha-1-20220517/zsyncmake2-47-1f5749c-x86_64.AppImage'
+  },
+}
+
+unless Dir.exist?(binary_path)
+  Dir.mkdir(binary_path)
 end
 
-unless File.exist?(mitamae_path)
-  File.open(mitamae_path, 'wb') do |file|
-    open('https://github.com/itamae-kitchen/mitamae/releases/download/v1.12.9/mitamae-x86_64-linux') do |bin|
-      file.puts bin.read
+binaries.each do |binname, v|
+  unless File.exist?(v[:path])
+    File.open(v[:path], 'wb') do |file|
+      URI.open(v[:url]) do |bin|
+        file.puts bin.read
+      end
     end
+  end
+
+  unless FileTest.executable?(v[:path])
+    FileUtils.chmod(0755, v[:path])
   end
 end
 
-unless FileTest.executable?(mitamae_path)
-  FileUtils.chmod(0755, mitamae_path)
-end
+ENV['PATH'] = ENV['PATH'].split(':').prepend(binary_path).join(':')
 
 log_level = ENV['LOG_LEVEL'] || 'info'
 
@@ -50,7 +65,7 @@ profiles.each do |profile|
     task :initialize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'initialize.rb')
 
-      unless execution(['sudo', '-E', mitamae_path, 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
+      unless execution(['sudo', '-E', binaries[:mitamae][:path], 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
         abort('failed command')
       end
     end
@@ -85,7 +100,7 @@ profiles.each do |profile|
     task :finalize do
       recipe_path  = File.join(Dir.pwd, 'phases', 'finalize.rb')
 
-      unless execution(['sudo', '-E', mitamae_path, 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
+      unless execution(['sudo', '-E', binaries[:mitamae][:path], 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
         abort('failed command')
       end
 
