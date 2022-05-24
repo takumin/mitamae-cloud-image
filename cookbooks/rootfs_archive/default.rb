@@ -130,18 +130,26 @@ directory output_dir do
   mode  '0755'
 end
 
+directory "#{output_dir}/desync.chunks" do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
 #
 # Package Manifest
 #
 
 case node[:target][:distribution]
 when 'debian', 'ubuntu'
-  execute "chroot #{target_dir} dpkg -l | sed -E '1,5d' | awk '{print $2 \"\\t\" $3}' > #{output_dir}/packages.manifest" do
-    not_if "test -f #{output_dir}/packages.manifest"
+  execute "chroot #{target_dir} dpkg -l | sed -E '1,5d' | awk '{print $2 \"\\t\" $3}' > packages.manifest" do
+    cwd output_dir
+    not_if "test -f packages.manifest"
   end
 when 'arch'
-  execute "chroot #{target_dir} pacman -Q > #{output_dir}/packages.manifest" do
-    not_if "test -f #{output_dir}/packages.manifest"
+  execute "chroot #{target_dir} pacman -Q > packages.manifest" do
+    cwd output_dir
+    not_if "test -f packages.manifest"
   end
 else
   raise
@@ -168,8 +176,9 @@ when 'debian', 'ubuntu'
     ].join(' | ')
   else
     %w{vmlinuz initrd.img}.each do |f|
-      execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{output_dir}/#{f} \\;" do
-        not_if "test -f #{output_dir}/#{f}"
+      execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{f} \\;" do
+        cwd output_dir
+        not_if "test -f #{f}"
       end
 
       file "#{output_dir}/#{f}" do
@@ -180,14 +189,20 @@ when 'debian', 'ubuntu'
 
       execute "zsyncmake2 #{f}" do
         cwd output_dir
-        not_if "test -f #{output_dir}/#{f}"
+        not_if "test -f #{f}.zsync"
+      end
+
+      execute "desync make -s desync.chunks #{f}.caibx #{f}" do
+        cwd output_dir
+        not_if "test -f #{f}.caibx"
       end
     end
   end
 when 'arch'
   %W{vmlinuz-#{node[:target][:kernel]} initramfs-#{node[:target][:kernel]}.img}.each do |f|
-    execute "find '#{target_dir}/boot' -type f -name '#{f}' -exec cp {} #{output_dir}/#{f} \\;" do
-      not_if "test -f #{output_dir}/#{f}"
+    execute "find '#{target_dir}/boot' -type f -name '#{f}' -exec cp {} #{f} \\;" do
+      cwd output_dir
+      not_if "test -f #{f}"
     end
 
     file "#{output_dir}/#{f}" do
@@ -198,7 +213,12 @@ when 'arch'
 
     execute "zsyncmake2 #{f}" do
       cwd output_dir
-      not_if "test -f #{output_dir}/#{f}"
+      not_if "test -f #{f}.zsync"
+    end
+
+    execute "desync make -s desync.chunks #{f}.caibx #{f}" do
+      cwd output_dir
+      not_if "test -f #{f}.caibx"
     end
   end
 else
@@ -210,8 +230,9 @@ end
 #
 
 if ENV['DISABLE_SQUASHFS'] != 'true'
-  execute "mksquashfs #{target_dir} #{output_dir}/rootfs.squashfs -comp #{node[:rootfs_archive][:format][:squashfs]}" do
-    not_if "test -f #{output_dir}/rootfs.squashfs"
+  execute "mksquashfs #{target_dir} rootfs.squashfs -comp #{node[:rootfs_archive][:format][:squashfs]}" do
+    cwd output_dir
+    not_if "test -f rootfs.squashfs"
   end
 
   file "#{output_dir}/rootfs.squashfs" do
@@ -222,7 +243,12 @@ if ENV['DISABLE_SQUASHFS'] != 'true'
 
   execute "zsyncmake2 rootfs.squashfs" do
     cwd output_dir
-    not_if "test -f #{output_dir}/rootfs.squashfs.zsync"
+    not_if "test -f rootfs.squashfs.zsync"
+  end
+
+  execute "desync make -s desync.chunks rootfs.squashfs.caibx rootfs.squashfs" do
+    cwd output_dir
+    not_if "test -f rootfs.squashfs.caibx"
   end
 end
 
@@ -248,8 +274,9 @@ if ENV['DISABLE_TARBALL'] != 'true'
     raise
   end
 
-  execute "tar -I #{cmd} -p --acls --xattrs --one-file-system -cf #{output_dir}/rootfs.tar.#{ext} -C #{target_dir} ." do
-    not_if "test -f #{output_dir}/rootfs.tar.#{ext}"
+  execute "tar -I #{cmd} -p --acls --xattrs --one-file-system -cf rootfs.tar.#{ext} -C #{target_dir} ." do
+    cwd output_dir
+    not_if "test -f rootfs.tar.#{ext}"
   end
 
   file "#{output_dir}/rootfs.tar.#{ext}" do
@@ -260,7 +287,12 @@ if ENV['DISABLE_TARBALL'] != 'true'
 
   execute "zsyncmake2 rootfs.tar.#{ext}" do
     cwd output_dir
-    not_if "test -f #{output_dir}/rootfs.tar.#{ext}.zsync"
+    not_if "test -f rootfs.tar.#{ext}.zsync"
+  end
+
+  execute "desync make -s desync.chunks rootfs.tar.#{ext}.caibx rootfs.tar.#{ext}" do
+    cwd output_dir
+    not_if "test -f rootfs.tar.#{ext}.caibx"
   end
 end
 
@@ -269,7 +301,7 @@ end
 #
 
 if ENV['DISABLE_SHA256SUMS'] != 'true'
-  execute "find . -type f -not -name 'SHA256SUMS' -print0 | sed -E 's@./@@g' | sort -zn | xargs -0 sha256sum > SHA256SUMS" do
+  execute "find . -mindepth 1 -maxdepth 1 -type f -not -name 'SHA256SUMS' -print0 | sed -E 's@./@@g' | sort -zn | xargs -0 sha256sum > SHA256SUMS" do
     cwd    output_dir
     not_if "test -f SHA256SUMS"
   end
