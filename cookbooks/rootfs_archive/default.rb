@@ -4,9 +4,12 @@
 # Public Variables
 #
 
-node[:rootfs_archive]              ||= Hashie::Mash.new
-node[:rootfs_archive][:format]     ||= Hashie::Mash.new
-node[:rootfs_archive][:target_dir] ||= node[:target][:directory]
+node[:rootfs_archive]                    ||= Hashie::Mash.new
+node[:rootfs_archive][:enabled]          ||= Hashie::Mash.new
+node[:rootfs_archive][:enabled][:desync] ||= false # Error: An error occurred (429) when calling the PutObject operation: Too Many Requests
+node[:rootfs_archive][:enabled][:zsync]  ||= true
+node[:rootfs_archive][:format]           ||= Hashie::Mash.new
+node[:rootfs_archive][:target_dir]       ||= node[:target][:directory]
 
 #
 # Public Variables - Format Archive
@@ -130,10 +133,12 @@ directory output_dir do
   mode  '0755'
 end
 
-directory "#{output_dir}/desync.chunks" do
-  owner 'root'
-  group 'root'
-  mode  '0755'
+if node[:rootfs_archive][:enabled][:desync]
+  directory "#{output_dir}/desync.chunks" do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
 end
 
 #
@@ -192,9 +197,11 @@ when 'debian', 'ubuntu'
         not_if "test -f #{f}.zsync"
       end
 
-      execute "desync make -s desync.chunks #{f}.caibx #{f}" do
-        cwd output_dir
-        not_if "test -f #{f}.caibx"
+      if node[:rootfs_archive][:enabled][:desync]
+        execute "desync make -s desync.chunks #{f}.caibx #{f}" do
+          cwd output_dir
+          not_if "test -f #{f}.caibx"
+        end
       end
     end
   end
@@ -216,9 +223,11 @@ when 'arch'
       not_if "test -f #{f}.zsync"
     end
 
-    execute "desync make -s desync.chunks #{f}.caibx #{f}" do
-      cwd output_dir
-      not_if "test -f #{f}.caibx"
+    if node[:rootfs_archive][:enabled][:desync]
+      execute "desync make -s desync.chunks #{f}.caibx #{f}" do
+        cwd output_dir
+        not_if "test -f #{f}.caibx"
+      end
     end
   end
 else
@@ -246,9 +255,11 @@ if ENV['DISABLE_SQUASHFS'] != 'true'
     not_if "test -f rootfs.squashfs.zsync"
   end
 
-  execute "desync make -s desync.chunks rootfs.squashfs.caibx rootfs.squashfs" do
-    cwd output_dir
-    not_if "test -f rootfs.squashfs.caibx"
+  if node[:rootfs_archive][:enabled][:desync]
+    execute "desync make -s desync.chunks rootfs.squashfs.caibx rootfs.squashfs" do
+      cwd output_dir
+      not_if "test -f rootfs.squashfs.caibx"
+    end
   end
 end
 
@@ -290,9 +301,11 @@ if ENV['DISABLE_TARBALL'] != 'true'
     not_if "test -f rootfs.tar.#{ext}.zsync"
   end
 
-  execute "desync make -s desync.chunks rootfs.tar.#{ext}.caibx rootfs.tar.#{ext}" do
-    cwd output_dir
-    not_if "test -f rootfs.tar.#{ext}.caibx"
+  if node[:rootfs_archive][:enabled][:desync]
+    execute "desync make -s desync.chunks rootfs.tar.#{ext}.caibx rootfs.tar.#{ext}" do
+      cwd output_dir
+      not_if "test -f rootfs.tar.#{ext}.caibx"
+    end
   end
 end
 
