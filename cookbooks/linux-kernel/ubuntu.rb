@@ -5,6 +5,10 @@
 #
 
 case node.target.kernel
+when 'generic', 'virtual'
+  node.linux_kernel.packages << "linux-image-#{node.target.kernel}"
+when 'generic-hwe', 'virtual-hwe'
+  node.linux_kernel.packages << "linux-image-#{node.target.kernel}-#{node.platform_version}"
 when 'raspi'
   node.linux_kernel.packages << 'linux-image-raspi'
   node.linux_kernel.packages << 'linux-modules-extra-raspi'
@@ -17,19 +21,8 @@ when 'raspi'
   else
     raise
   end
-when 'generic-hwe'
-  case node.platform_version
-  when '18.04'
-    node.linux_kernel.packages << 'linux-image-generic-hwe-18.04'
-  when '20.04'
-    node.linux_kernel.packages << 'linux-image-generic-hwe-20.04'
-  when '22.04'
-    # nothing...
-  else
-    raise
-  end
 else
-  node.linux_kernel.packages << 'linux-image-generic'
+  raise
 end
 
 #
