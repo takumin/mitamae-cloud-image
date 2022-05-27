@@ -5,6 +5,10 @@
 # Workaround: Removed netplan yaml file created in initramfs stage
 # See also: https://askubuntu.com/questions/1228433/what-is-creating-run-netplan-eth0-yaml
 reset_network_interfaces() {(
+	if ! test -r "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg"; then
+		return 0
+	fi
+
 	for intf in /sys/class/net/*; do
 		if [ "${intf##*/}" = "lo" ]; then
 			continue

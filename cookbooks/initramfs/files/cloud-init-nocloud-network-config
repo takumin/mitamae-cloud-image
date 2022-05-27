@@ -52,35 +52,6 @@ cloud_init_nocloud_network_config() {(
 			wget -q -O "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg" "${seedfrom}network-config"
 		fi
 	fi
-
-	# Workaround: Undefined network interface times out
-	if [ ! -f "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg" ]; then
-		{
-			echo 'network:'
-			echo '  version: 2'
-			echo '  ethernets:'
-		} > "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg"
-
-		for intf in /sys/class/net/*; do
-			if [ "${intf##*/}" = "lo" ]; then
-				continue
-			fi
-
-			{
-				echo "    ${intf##*/}:"
-				echo "      match:"
-				echo "        macaddress: $(cat "/sys/class/net/${intf##*/}/address")"
-				echo "      link-local:"
-				echo "      - ipv4"
-				echo "      - ipv6"
-				echo "      dhcp4: true"
-				echo "      dhcp6: true"
-				echo "      accept-ra: true"
-				echo "      ipv6-privacy: true"
-				echo "      optional: true"
-			} >> "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg"
-		done
-	fi
 )}
 
 . /scripts/functions
