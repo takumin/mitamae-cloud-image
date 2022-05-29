@@ -4,6 +4,7 @@ require 'fileutils'
 require 'open-uri'
 require 'open3'
 require 'yaml'
+require 'json'
 
 MITAMAE_VERSION = 'v1.12.9'
 
@@ -70,6 +71,7 @@ DISTRIBUTIONS.each do |distribution|
       ROLES[distribution].each do |role|
         ARCHITECTURES.each do |architecture|
           next if architecture.match('amd64') and kernel.match(/raspi|raspberrypi/)
+          next if architecture.match('arm64') and suite.match('bionic')
           next if architecture.match('arm64') and role.match(/nvidia/)
           next if kernel.match(/virtual/) and role.match(/nvidia/)
 
@@ -162,6 +164,20 @@ targets.each do |target|
       :provision,
       :finalize,
     ]
+  end
+end
+
+namespace :github do
+  namespace :actions do
+    task :all do
+      puts JSON.pretty_generate(targets.map{|v|
+        {
+          title: v.values.join(':'),
+          name:  v.values.join(' '),
+          dir:   v.values.join('/'),
+        }
+      })
+    end
   end
 end
 

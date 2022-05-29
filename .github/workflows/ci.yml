@@ -18,65 +18,27 @@ on:
 permissions:
   contents: read
 jobs:
+  matrix:
+    name: Setup matrix
+    runs-on: ubuntu-20.04
+    outputs:
+      targets: ${{ steps.matrix.outputs.targets }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup matrix
+      id: matrix
+      run: echo "::set-output name=targets::$(rake github:actions:all)"
   build-and-publish:
-    name: ${{ matrix.distro }} ${{ matrix.release }} ${{ matrix.kernel }} ${{ matrix.profile }} (${{ matrix.arch }})
+    needs: matrix
+    name: ${{ matrix.target.title }})
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        distro:
-        - ubuntu
-        arch:
-        - amd64
-        - arm64
-        release:
-        - bionic
-        - focal
-        - jammy
-        kernel:
-        - generic
-        - generic-hwe
-        profile:
-        - minimal
-        - server
-        - server-nvidia
-        - desktop
-        - desktop-nvidia
-        exclude:
-        # Debian distros ignore ubuntu release
-        - distro: debian
-          release: bionic
-        - distro: debian
-          release: focal
-        - distro: debian
-          release: jammy
-        # Debian distros ignore ubuntu kernel packages
-        - distro: debian
-          release: generic-hwe
-        # Ubuntu distros ignore debian release
-        - distro: ubuntu
-          release: stretch
-        - distro: ubuntu
-          release: buster
-        - distro: ubuntu
-          release: bullseye
-        # Ubuntu distros ignore debian kernel packages
-        - distro: ubuntu
-          release: generic-backports
-        # Ignore nvidia profile for arm64 machine
-        - arch: arm64
-          profile: server-nvidia
-        - arch: arm64
-          profile: desktop-nvidia
-        # FIXME: Because flash-kernel package fails in desktop recipe
-        - arch: arm64
-          release: bionic
-        # TODO: Remove when ubuntu 22.10 is released
-        - release: jammy
-          kernel: generic-hwe
+        target: ${{ fromJson(needs.matrix.outputs.targets) }}
     env:
-      PROFILE_YAML: profiles/${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}.yml
-      TARGET_NAME: ${{ matrix.distro }}:${{ matrix.release }}:${{ matrix.kernel }}:${{ matrix.arch }}:${{ matrix.profile }}
-      RELEASE_DIR: ${{ matrix.distro }}/${{ matrix.release }}/${{ matrix.kernel }}/${{ matrix.arch }}/${{ matrix.profile }}
+      TARGET_NAME: ${{ matrix.target.name }})
+      RELEASE_DIR: ${{ matrix.target.dir }})
       INITRAMFS_COMPRESS: xz
       ROOTFS_ARCHIVE_FORMAT_TARBALL: xz
       ROOTFS_ARCHIVE_FORMAT_SQUASHFS: xz
@@ -90,7 +52,6 @@ jobs:
         MITAMAE_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
       run: |
         echo "LOG_LEVEL=${MITAMAE_LOG_LEVEL}" >> $GITHUB_ENV
-
     #
     # Build Image
     #
@@ -110,7 +71,6 @@ jobs:
     - name: Finalize
       id: finalize
       run: rake ${TARGET_NAME}:finalize
-
     #
     # Build Artifacts
     #
@@ -123,7 +83,6 @@ jobs:
     - name: Checksums
       if: success()
       run: cat releases/${RELEASE_DIR}/SHA256SUMS
-
     #
     # Check Mount Point
     #
@@ -133,7 +92,6 @@ jobs:
     - name: Check Open Process
       if: failure()
       run: lsof /
-
     #
     # Check Difference
     #
@@ -144,7 +102,6 @@ jobs:
         wget -qO /tmp/packages.manifest ${S3_BUCKET_URL}/${RELEASE_DIR}/packages.manifest || touch /tmp/packages.manifest
     - name: Check Difference
       run: diff -u /tmp/packages.manifest releases/${RELEASE_DIR}/packages.manifest || echo 'PUBLISH=true' >> $GITHUB_ENV
-
     #
     # Publish S3
     #
