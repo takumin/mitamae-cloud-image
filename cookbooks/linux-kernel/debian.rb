@@ -4,9 +4,14 @@
 # Select Packages
 #
 
-if node.target.kernel.match(/^(?:raspberrypi)$/)
+case node.target.kernel
+when 'generic'
+  node.linux_kernel.packages << "linux-image-#{node.target.architecture}"
+when 'virtual'
+  node.linux_kernel.packages << "linux-image-cloud-#{node.platform_version}"
+when 'raspberrypi'
   node.linux_kernel.packages << 'raspberrypi-bootloader'
   node.linux_kernel.packages << 'raspberrypi-kernel'
 else
-  node.linux_kernel.packages << "linux-image-#{node.target.architecture}"
+  raise
 end
