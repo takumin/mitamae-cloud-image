@@ -47,8 +47,8 @@ when /^ubuntu-(?:18|20|22)\.04-generic-(?:desktop|server)-nvidia$/
 when /^ubuntu-18\.04-generic-hwe-(?:desktop|server)-nvidia$/
   package 'linux-headers-generic-hwe-18.04'
   package 'xserver-xorg-hwe-18.04' if node[:target][:role] == 'desktop-nvidia'
-when /^ubuntu-20\.04-generic-hwe-(?:desktop|server)-nvidia$/
-  package 'linux-headers-generic-hwe-20.04'
+when /^ubuntu-(?:20|22)\.04-generic-hwe-(?:desktop|server)-nvidia$/
+  package "linux-headers-generic-hwe-#{node[:platform_version]}"
 else
   MItamae.logger.error "graphics-drivers: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
   exit 1
