@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
 #
+# Check Suite
+#
+
+unless node.target.suite.match(/stretch|buster/)
+  return
+end
+
+#
 # Install Package
 #
 
