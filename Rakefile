@@ -170,7 +170,7 @@ end
 namespace :github do
   namespace :actions do
     task :all do
-      puts JSON.pretty_generate(targets.map{|v|
+      puts JSON.dump(targets.map{|v|
         {
           title: v.values.join(':'),
           name:  v.values.join(' '),
