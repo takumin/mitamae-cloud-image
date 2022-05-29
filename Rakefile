@@ -1,115 +1,203 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 require 'open-uri'
 require 'open3'
 require 'yaml'
 
-binary_path = File.join(Dir.pwd, '.bin')
+MITAMAE_VERSION = 'v1.12.9'
 
-binaries = {
-  mitamae: {
-    path: File.join(binary_path, 'mitamae'),
-    url:  'https://github.com/itamae-kitchen/mitamae/releases/download/v1.12.9/mitamae-x86_64-linux'
-  },
+LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
+
+DISTRIBUTIONS = [
+  'debian',
+  'ubuntu',
+]
+
+SUITES = {
+  'debian' => [
+    'stretch',
+    'buster',
+    'bullseye',
+  ],
+  'ubuntu' => [
+    'bionic',
+    'focal',
+    'jammy',
+  ],
 }
 
-unless Dir.exist?(binary_path)
-  Dir.mkdir(binary_path)
+KERNELS = {
+  'debian' => [
+    'generic',
+    'virtual',
+  ],
+  'ubuntu' => [
+    'generic',
+    'generic-hwe',
+    'virtual',
+    'virtual-hwe',
+  ],
+}
+
+ROLES = {
+  'debian' => [
+    'minimal',
+    'server',
+    'desktop',
+  ],
+  'ubuntu' => [
+    'minimal',
+    'server',
+    'server-nvidia',
+    'desktop',
+    'desktop-nvidia',
+  ],
+}
+
+ARCHITECTURES = [
+  'amd64',
+  'arm64',
+]
+
+DISTRIBUTIONS.each do |distribution|
+  SUITES[distribution].each do |suite|
+    KERNELS[distribution].each do |kernel|
+      ROLES[distribution].each do |role|
+        ARCHITECTURES.each do |architecture|
+          target = {
+            'distribution' => distribution,
+            'suite'        => suite,
+            'kernel'       => kernel,
+            'architecture' => architecture,
+            'role'         => role,
+          }
+
+          namespace target.values.join(':') do
+            task :initialize do
+              setup_mitamae
+              setup_profile(target)
+
+              cmd = [
+                'sudo', '-E',
+                './.bin/mitamae', 'local',
+                '-l', LOG_LEVEL,
+                '-y', './.bin/profile.yaml',
+                './phases/initialize.rb',
+              ].join(' ')
+
+              unless execution(cmd)
+                abort('failed command')
+              end
+            end
+
+            task :provision do
+              target_dir  = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
+
+              cmd = [
+                'sudo', 'rsync', '-a',
+                '--exclude=".git/"',
+                '--exclude="releases/"',
+                "#{File.expand_path(__dir__)}/",
+                "#{File.join(target_dir, 'mitamae')}/"
+              ].join(' ')
+
+              unless execution(cmd)
+                abort('failed command')
+              end
+
+              cmd = [
+                'sudo', '-E', 'chroot', target_dir,
+                'mitamae', 'local',
+                '-l', LOG_LEVEL,
+                '-y', '/mitamae/.bin/profile.yaml',
+                '--plugins=/mitamae/plugins',
+                '/mitamae/phases/provision.rb',
+              ].join(' ')
+
+              unless execution(cmd)
+                abort('failed command')
+              end
+
+              unless execution("sudo rm -fr #{File.join(target_dir, 'mitamae')}")
+                abort('failed command')
+              end
+            end
+
+            task :finalize do
+              cmd = [
+                'sudo', '-E',
+                './.bin/mitamae', 'local',
+                '-l', LOG_LEVEL,
+                '-y', './.bin/profile.yaml',
+                './phases/finalize.rb',
+              ].join(' ')
+
+              unless execution(cmd)
+                abort('failed command')
+              end
+
+              unless execution("sudo chown -R $(id -u):$(id -g) #{File.expand_path(__dir__)}")
+                abort('failed command')
+              end
+            end
+
+            desc target.values.join(' ')
+            task :all => [
+              :initialize,
+              :provision,
+              :finalize,
+            ]
+          end
+        end
+      end
+    end
+  end
 end
 
-binaries.each do |binname, v|
-  unless File.exist?(v[:path])
-    File.open(v[:path], 'wb') do |file|
-      URI.open(v[:url]) do |bin|
-        file.puts bin.read
-      end
-    end
-  end
-
-  unless FileTest.executable?(v[:path])
-    FileUtils.chmod(0755, v[:path])
+def setup_profile(target)
+  dir = File.expand_path('.bin', __dir__)
+  yaml = File.join(dir, 'profile.yaml')
+  data = { 'target' => target }
+  File.open(yaml, 'w') do |file|
+    YAML.dump(data, file)
   end
 end
 
-ENV['PATH'] = ENV['PATH'].split(':').prepend(binary_path).join(':')
+def setup_mitamae
+  dir = File.expand_path('.bin', __dir__)
+  bin = File.join(dir, 'mitamae')
+  url = "https://github.com/itamae-kitchen/mitamae/releases/download/#{MITAMAE_VERSION}/mitamae-x86_64-linux"
 
-log_level = ENV['LOG_LEVEL'] || 'info'
-
-profiles = []
-profiles.concat(Dir.glob('**/*.yml', base: File.join(Dir.pwd, 'profiles')))
-profiles.concat(Dir.glob('**/*.yaml', base: File.join(Dir.pwd, 'profiles')))
-profiles.each do |profile|
-  profile_name = profile.gsub(/\//, '_').gsub(/\.ya?ml$/, '')
-  profile_path = File.join(Dir.pwd, 'profiles', profile)
-  profile_yaml = YAML.load_file(profile_path)
-
-  if ENV['TARGET_DIRECTORY']
-    target_dir = ENV['TARGET_DIRECTORY']
-  elsif profile_yaml['target']['directory']
-    target_dir = profile_yaml['target']['directory']
-  else
-    target_name = []
-    target_name << profile_yaml['target']['distribution']
-    target_name << profile_yaml['target']['suite'] if profile_yaml['target']['distribution'].match(/^(?:debian|ubuntu)$/)
-    target_name << profile_yaml['target']['kernel']
-    target_name << profile_yaml['target']['architecture']
-    target_name << profile_yaml['target']['role']
-    target_dir = "/tmp/#{target_name.join('-')}"
+  unless Dir.exist?(dir)
+    Dir.mkdir(dir)
   end
 
-  namespace profile_name do
-    desc 'initialize'
-    task :initialize do
-      recipe_path  = File.join(Dir.pwd, 'phases', 'initialize.rb')
-
-      unless execution(['sudo', '-E', binaries[:mitamae][:path], 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
-        abort('failed command')
+  if File.exist?(bin)
+    if FileTest.executable?(bin)
+      begin
+        unless `#{bin} version`.match(MITAMAE_VERSION)
+          File.delete(bin)
+        end
+      rescue
+        File.delete(bin)
       end
+    else
+      File.delete(bin)
     end
-
-    desc 'provision'
-    task :provision do
-      mitamae_dir  = File.join(target_dir, 'mitamae')
-      recipe_path  = File.join('/mitamae', 'phases', 'provision.rb')
-      exclude_list = ['--exclude=".git/"', '--exclude="releases/"']
-
-      unless execution(['sudo', 'rsync', '-av', exclude_list.join(' '), "#{Dir.pwd}/", "#{mitamae_dir}/"].join(' '))
-        abort('failed command')
-      end
-
-      unless execution([
-        'sudo', '-E', 'chroot', target_dir,
-        'mitamae', 'local',
-        '-l', log_level,
-        '--plugins=/mitamae/plugins',
-        '-y', "/mitamae/profiles/#{profile}",
-        recipe_path
-      ].join(' '))
-        abort('failed command')
-      end
-
-      unless execution(['sudo', 'rm', '-fr', File.join(target_dir, 'mitamae')].join(' '))
-        abort('failed command')
-      end
-    end
-
-    desc 'finalize'
-    task :finalize do
-      recipe_path  = File.join(Dir.pwd, 'phases', 'finalize.rb')
-
-      unless execution(['sudo', '-E', binaries[:mitamae][:path], 'local', '-l', log_level, '-y', profile_path, recipe_path].join(' '))
-        abort('failed command')
-      end
-
-      unless execution(['sudo', 'chown', '-R', '"$(id -u):$(id -g)"', Dir.pwd].join(' '))
-        abort('failed command')
-      end
-    end
-
-    task :all => [:initialize, :provision, :finalize]
   end
 
-  desc profile_name.gsub(/_/, ' ')
-  task profile_name => ["#{profile_name}:all"]
+  unless File.exist?(bin)
+    File.open(bin, 'wb') do |file|
+      URI.open(url) do |data|
+        file.puts data.read
+      end
+    end
+  end
+
+  unless FileTest.executable?(bin)
+    FileUtils.chmod(0755, bin)
+  end
 end
 
 def execution(cmd)
