@@ -185,3 +185,21 @@ end
 #
 
 execute 'apt-get update'
+
+#
+# Clean Cache Repository
+#
+
+contents = <<~__EOF__
+DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
+APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
+Dir::Cache::pkgcache "";
+Dir::Cache::srcpkgcache "";
+__EOF__
+
+file '/etc/apt.conf.d/cache-clean' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content contents
+end
