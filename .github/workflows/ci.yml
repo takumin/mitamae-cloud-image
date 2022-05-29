@@ -53,6 +53,13 @@ jobs:
       run: |
         echo "LOG_LEVEL=${MITAMAE_LOG_LEVEL}" >> $GITHUB_ENV
     #
+    # Prepare
+    #
+    - name: Update
+      run: sudo apt-get -y update
+    - name: Mount
+      run: sudo mount -t tmpfs -o size=4g tmpfs /mnt
+    #
     # Build Image
     #
     - name: Checkout
@@ -60,8 +67,6 @@ jobs:
       with:
         submodules: true
         fetch-depth: 1
-    - name: Update
-      run: sudo apt-get -y update
     - name: Initialize
       id: initialize
       run: rake ${TARGET_NAME}:initialize
