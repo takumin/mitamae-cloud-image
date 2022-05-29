@@ -57,8 +57,6 @@ jobs:
     #
     - name: Update
       run: sudo apt-get -y update
-    - name: Mount
-      run: sudo mount -t tmpfs -o size=6g tmpfs /tmp
     #
     # Build Image
     #
