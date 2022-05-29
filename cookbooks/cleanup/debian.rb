@@ -65,7 +65,7 @@ file '/var/lib/apt/lists/lock' do
   mode  '0640'
 end
 
-file '/etc/apt.conf.d/cache-clean' do
+file '/etc/apt/apt.conf.d/cache-clean' do
   action :delete
 end
 

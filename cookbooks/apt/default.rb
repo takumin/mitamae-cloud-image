@@ -197,7 +197,7 @@ Dir::Cache::pkgcache "";
 Dir::Cache::srcpkgcache "";
 __EOF__
 
-file '/etc/apt.conf.d/cache-clean' do
+file '/etc/apt/apt.conf.d/cache-clean' do
   owner 'root'
   group 'root'
   mode  '0644'
