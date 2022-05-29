@@ -1,9 +1,0 @@
----
-#
-# Target Config
-#
-target:
-  distribution: 'arch'
-  kernel:       'linux-lts'
-  architecture: 'amd64'
-  role:         'server'
