@@ -31,12 +31,14 @@ KERNELS = {
   'debian' => [
     'generic',
     'virtual',
+    'raspberrypi',
   ],
   'ubuntu' => [
     'generic',
     'generic-hwe',
     'virtual',
     'virtual-hwe',
+    'raspi',
   ],
 }
 
@@ -65,6 +67,10 @@ DISTRIBUTIONS.each do |distribution|
     KERNELS[distribution].each do |kernel|
       ROLES[distribution].each do |role|
         ARCHITECTURES.each do |architecture|
+          next if architecture.match('amd64') and kernel.match(/raspi|raspberrypi/)
+          next if architecture.match('arm64') and role.match(/nvidia/)
+          next if kernel.match(/virtual/) and role.match(/nvidia/)
+
           target = {
             'distribution' => distribution,
             'suite'        => suite,
@@ -159,6 +165,19 @@ def setup_profile(target)
   dir = File.expand_path('.bin', __dir__)
   yaml = File.join(dir, 'profile.yaml')
   data = { 'target' => target }
+  if target['kernel'].match(/raspi|raspberrypi/)
+    data['autologin'] = {
+      'miniuart-bt' => {
+        'service' => 'serial-getty',
+        'getty'   => '/sbin/agetty',
+        'port'    => 'ttyAMA0',
+        'user'    => 'root',
+        'term'    => 'linux',
+        'baud'    => [115200,38400,9600],
+        'opts'    => ['--keep-baud', '--flow-control'],
+      }
+    }
+  end
   File.open(yaml, 'w') do |file|
     YAML.dump(data, file)
   end
