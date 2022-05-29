@@ -172,9 +172,8 @@ namespace :github do
     task :all do
       puts JSON.dump(targets.map{|v|
         {
-          title: v.values.join(':'),
-          name:  v.values.join(' '),
-          dir:   v.values.join('/'),
+          name: v.values.join(':'),
+          dir:  v.values.join('/'),
         }
       })
     end

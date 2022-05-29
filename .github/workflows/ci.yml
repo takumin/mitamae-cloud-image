@@ -31,14 +31,14 @@ jobs:
       run: echo "::set-output name=targets::$(rake github:actions:all)"
   build-and-publish:
     needs: matrix
-    name: ${{ matrix.target.title }})
+    name: ${{ matrix.target.name }}
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         target: ${{ fromJson(needs.matrix.outputs.targets) }}
     env:
-      TARGET_NAME: ${{ matrix.target.name }})
-      RELEASE_DIR: ${{ matrix.target.dir }})
+      TARGET_NAME: ${{ matrix.target.name }}
+      RELEASE_DIR: ${{ matrix.target.dir }}
       INITRAMFS_COMPRESS: xz
       ROOTFS_ARCHIVE_FORMAT_TARBALL: xz
       ROOTFS_ARCHIVE_FORMAT_SQUASHFS: xz
