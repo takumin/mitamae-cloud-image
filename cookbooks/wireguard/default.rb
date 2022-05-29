@@ -4,7 +4,7 @@
 # Check Suite
 #
 
-unless node.target.suite.match(/stretch|buster/)
+unless node.target.suite.match?(/^(?:stretch|buster)$/)
   return
 end
 
@@ -12,7 +12,7 @@ end
 # Install Package
 #
 
-case node[:platform]
+case node.platform
 when 'debian', 'ubuntu'
   package 'wireguard'
 when 'arch'
