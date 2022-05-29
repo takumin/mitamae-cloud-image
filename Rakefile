@@ -32,7 +32,8 @@ KERNELS = {
   'debian' => [
     'generic',
     'virtual',
-    'raspberrypi',
+    # FIXME: Raspberry Pi Repository Error
+    # 'raspberrypi',
   ],
   'ubuntu' => [
     'generic',
