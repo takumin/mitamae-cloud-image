@@ -62,6 +62,8 @@ ARCHITECTURES = [
   'arm64',
 ]
 
+targets = []
+
 DISTRIBUTIONS.each do |distribution|
   SUITES[distribution].each do |suite|
     KERNELS[distribution].each do |kernel|
@@ -71,93 +73,95 @@ DISTRIBUTIONS.each do |distribution|
           next if architecture.match('arm64') and role.match(/nvidia/)
           next if kernel.match(/virtual/) and role.match(/nvidia/)
 
-          target = {
+          targets << {
             'distribution' => distribution,
             'suite'        => suite,
             'kernel'       => kernel,
             'architecture' => architecture,
             'role'         => role,
           }
-
-          namespace target.values.join(':') do
-            task :initialize do
-              setup_mitamae
-              setup_profile(target)
-
-              cmd = [
-                'sudo', '-E',
-                './.bin/mitamae', 'local',
-                '-l', LOG_LEVEL,
-                '-y', './.bin/profile.yaml',
-                './phases/initialize.rb',
-              ].join(' ')
-
-              unless execution(cmd)
-                abort('failed command')
-              end
-            end
-
-            task :provision do
-              target_dir  = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
-
-              cmd = [
-                'sudo', 'rsync', '-a',
-                '--exclude=".git/"',
-                '--exclude="releases/"',
-                "#{File.expand_path(__dir__)}/",
-                "#{File.join(target_dir, 'mitamae')}/"
-              ].join(' ')
-
-              unless execution(cmd)
-                abort('failed command')
-              end
-
-              cmd = [
-                'sudo', '-E', 'chroot', target_dir,
-                'mitamae', 'local',
-                '-l', LOG_LEVEL,
-                '-y', '/mitamae/.bin/profile.yaml',
-                '--plugins=/mitamae/plugins',
-                '/mitamae/phases/provision.rb',
-              ].join(' ')
-
-              unless execution(cmd)
-                abort('failed command')
-              end
-
-              unless execution("sudo rm -fr #{File.join(target_dir, 'mitamae')}")
-                abort('failed command')
-              end
-            end
-
-            task :finalize do
-              cmd = [
-                'sudo', '-E',
-                './.bin/mitamae', 'local',
-                '-l', LOG_LEVEL,
-                '-y', './.bin/profile.yaml',
-                './phases/finalize.rb',
-              ].join(' ')
-
-              unless execution(cmd)
-                abort('failed command')
-              end
-
-              unless execution("sudo chown -R $(id -u):$(id -g) #{File.expand_path(__dir__)}")
-                abort('failed command')
-              end
-            end
-
-            desc target.values.join(' ')
-            task :all => [
-              :initialize,
-              :provision,
-              :finalize,
-            ]
-          end
         end
       end
     end
+  end
+end
+
+targets.each do |target|
+  namespace target.values.join(':') do
+    task :initialize do
+      setup_mitamae
+      setup_profile(target)
+
+      cmd = [
+        'sudo', '-E',
+        './.bin/mitamae', 'local',
+        '-l', LOG_LEVEL,
+        '-y', './.bin/profile.yaml',
+        './phases/initialize.rb',
+      ].join(' ')
+
+      unless execution(cmd)
+        abort('failed command')
+      end
+    end
+
+    task :provision do
+      target_dir  = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
+
+      cmd = [
+        'sudo', 'rsync', '-a',
+        '--exclude=".git/"',
+        '--exclude="releases/"',
+        "#{File.expand_path(__dir__)}/",
+        "#{File.join(target_dir, 'mitamae')}/"
+      ].join(' ')
+
+      unless execution(cmd)
+        abort('failed command')
+      end
+
+      cmd = [
+        'sudo', '-E', 'chroot', target_dir,
+        'mitamae', 'local',
+        '-l', LOG_LEVEL,
+        '-y', '/mitamae/.bin/profile.yaml',
+        '--plugins=/mitamae/plugins',
+        '/mitamae/phases/provision.rb',
+      ].join(' ')
+
+      unless execution(cmd)
+        abort('failed command')
+      end
+
+      unless execution("sudo rm -fr #{File.join(target_dir, 'mitamae')}")
+        abort('failed command')
+      end
+    end
+
+    task :finalize do
+      cmd = [
+        'sudo', '-E',
+        './.bin/mitamae', 'local',
+        '-l', LOG_LEVEL,
+        '-y', './.bin/profile.yaml',
+        './phases/finalize.rb',
+      ].join(' ')
+
+      unless execution(cmd)
+        abort('failed command')
+      end
+
+      unless execution("sudo chown -R $(id -u):$(id -g) #{File.expand_path(__dir__)}")
+        abort('failed command')
+      end
+    end
+
+    desc target.values.join(' ')
+    task :all => [
+      :initialize,
+      :provision,
+      :finalize,
+    ]
   end
 end
 
