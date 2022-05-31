@@ -194,6 +194,11 @@ end
     not_if "test -f #{v}"
   end
 
+  file v do
+    cwd  output_dir
+    mode '0644'
+  end
+
   execute "zsyncmake2 #{v}" do
     cwd output_dir
     not_if "test -f #{v}.zsync"
@@ -223,9 +228,7 @@ if ENV['DISABLE_SQUASHFS'] != 'true'
   end
 
   file "#{output_dir}/rootfs.squashfs" do
-    owner 'root'
-    group 'root'
-    mode  '0644'
+    mode '0644'
   end
 
   execute "zsyncmake2 rootfs.squashfs" do
@@ -269,9 +272,7 @@ if ENV['DISABLE_TARBALL'] != 'true'
   end
 
   file "#{output_dir}/rootfs.tar.#{ext}" do
-    owner 'root'
-    group 'root'
-    mode  '0644'
+    mode '0644'
   end
 
   execute "zsyncmake2 rootfs.tar.#{ext}" do
@@ -288,6 +289,66 @@ if ENV['DISABLE_TARBALL'] != 'true'
 end
 
 #
+# Diskimg Archive
+#
+
+if ENV['DISABLE_DISKIMG'] != 'true'
+  case node[:rootfs_archive][:format][:tarball]
+  when 'gzip'
+    cmd = 'pigz rootfs.ext4 > rootfs.ext4.gz'
+    ext = 'gz'
+  when 'lz4'
+    cmd = 'lz4 rootfs.ext4 rootfs.ext4.lz4'
+    ext = 'lz4'
+  when 'xz'
+    cmd = 'pixz rootfs.ext4 rootfs.ext4.xz'
+    ext = 'xz'
+  when 'zstd'
+    cmd = 'zstd rootfs.ext4 -o rootfs.ext4.xz'
+    ext = 'zstd'
+  else
+    raise
+  end
+
+  execute 'mkfs.ext4 rootfs.ext4' do
+    command [
+      'dd if=/dev/zero of=rootfs.ext4 bs=1M count=8192',
+      'mkfs.ext4 rootfs.ext4',
+    ].join(' && ')
+    cwd output_dir
+    not_if "test -f rootfs.ext4.#{ext}"
+  end
+
+  mount node[:rootfs_archive][:target_dir] do
+    device "#{output_dir}/rootfs.ext4"
+    not_if "test -f rootfs.ext4.#{ext}"
+  end
+
+  execute "tar -xf rootfs.tar.#{ext} -p --numeric-owner --acls --xattrs -C #{target_dir}" do
+    cwd output_dir
+    not_if "test -f rootfs.ext4.#{ext}"
+  end
+
+  mount node[:rootfs_archive][:target_dir] do
+    action :absent
+  end
+
+  execute cmd do
+    cwd output_dir
+    not_if "test -f rootfs.ext4.#{ext}"
+  end
+
+  file "#{output_dir}/rootfs.ext4" do
+    action :delete
+  end
+
+  execute "zsyncmake2 rootfs.ext4.#{ext}" do
+    cwd output_dir
+    not_if "test -f rootfs.ext4.#{ext}.zsync"
+  end
+end
+
+#
 # Checksum Archive
 #
 
@@ -298,9 +359,7 @@ if ENV['DISABLE_SHA256SUMS'] != 'true'
   end
 
   file "#{output_dir}/SHA256SUMS" do
-    owner 'root'
-    group 'root'
-    mode  '0644'
+    mode '0644'
   end
 end
 
@@ -340,9 +399,7 @@ when 'raspberrypi', 'raspi'
   end
 
   file "#{output_dir}/config.txt" do
-    owner   'root'
-    group   'root'
-    mode    '0644'
+    mode '0644'
     content [
       'arm_64bit=1',
       'kernel=vmlinuz',
@@ -356,9 +413,7 @@ when 'raspberrypi', 'raspi'
   end
 
   file "#{output_dir}/cmdline.txt" do
-    owner   'root'
-    group   'root'
-    mode    '0644'
+    mode '0644'
     content [
       'console=ttyAMA0,115200',
       'boot=live',
