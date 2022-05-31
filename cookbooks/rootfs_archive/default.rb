@@ -339,7 +339,7 @@ if ENV['DISABLE_DISKIMG'] != 'true'
       content JSON.pretty_generate(Hashie::Mash.new({
         'boot-source': {
           'kernel_image_path': 'vmlinux',
-          'boot_args': 'overlayroot=tmpfs console=ttyS0 reboot=k panic=1 pci=off',
+          'boot_args': 'console=ttyS0 reboot=k panic=1 pci=off i8042.noaux -- overlayroot=tmpfs',
           'initrd_path': 'initrd.img',
         },
         'drives': [
