@@ -164,74 +164,57 @@ end
 # Kernel and Initramfs
 #
 
-case node[:target][:distribution]
-when 'debian', 'ubuntu'
-  case "#{node[:target][:distribution]}-#{node[:target][:kernel]}"
-  when "debian-raspberrypi"
-    execute [
-      "find '#{target_dir}/boot' -type f -name 'kernel*img' -exec basename {} \\;",
-      "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/{} && cp #{target_dir}/boot/{} #{output_dir}/{} || true'",
-    ].join(' | ')
+files = {
+  kernel: [],
+  initrd: [],
+}
 
-    INITRD_NAME = 'echo {} | sed -E "s@-[0-9]+\.[0-9]+\.[0-9]+@@; s@\+\$@@;"'
+%w{kernel vmlinuz}.each do |prefix|
+  files[:kernel] << Dir.glob("#{target_dir}/boot/#{prefix}*")
+end
+%w{initrd initramfs}.each do |prefix|
+  files[:initrd] << Dir.glob("#{target_dir}/boot/#{prefix}*")
+end
 
-    execute [
-      "find '#{target_dir}/boot' -type f -name 'initrd.img-*' -exec basename {} \\;",
-      "xargs -I {} -n1 sh -c 'test ! -f #{output_dir}/$(#{INITRD_NAME}) && cp #{target_dir}/boot/{} #{output_dir}/$(#{INITRD_NAME}) || true'",
-    ].join(' | ')
+[:kernel, :initrd].each do |sym|
+  files[sym].flatten!
+  files[sym].reject!{|f| File.symlink?(f) }
+end
+
+if files[:kernel].length != 1 or files[:initrd].length != 1
+  raise "multiple files exist for kernel or initrd"
+end
+
+[
+  {
+    src: files[:kernel][0],
+    dst: 'vmlinuz',
+  },
+  {
+    src: files[:initrd][0],
+    dst: 'initrd.img',
+  },
+  {
+    src: 'vmlinuz',
+    dst: 'vmlinux',
+  },
+].each do |v|
+  if v[:dst] == 'vmlinux'
+    execute "extract-vmlinux #{v[:src]} > #{v[:dst]}" do
+      cwd output_dir
+      not_if "test -f #{v[:dst]}"
+    end
   else
-    %w{vmlinuz initrd.img}.each do |f|
-      execute "find '#{target_dir}/boot' -type f -name '#{f}-*' -exec cp {} #{f} \\;" do
-        cwd output_dir
-        not_if "test -f #{f}"
-      end
-
-      file "#{output_dir}/#{f}" do
-        owner 'root'
-        group 'root'
-        mode  '0644'
-      end
-
-      execute "zsyncmake2 #{f}" do
-        cwd output_dir
-        not_if "test -f #{f}.zsync"
-      end
-
-      if node[:rootfs_archive][:enabled][:desync]
-        execute "desync make -s desync.chunks #{f}.caibx #{f}" do
-          cwd output_dir
-          not_if "test -f #{f}.caibx"
-        end
-      end
+    execute "cp #{v[:src]} #{v[:dst]}" do
+      cwd output_dir
+      not_if "test -f #{v[:dst]}"
     end
   end
-when 'arch'
-  %W{vmlinuz-#{node[:target][:kernel]} initramfs-#{node[:target][:kernel]}.img}.each do |f|
-    execute "find '#{target_dir}/boot' -type f -name '#{f}' -exec cp {} #{f} \\;" do
-      cwd output_dir
-      not_if "test -f #{f}"
-    end
 
-    file "#{output_dir}/#{f}" do
-      owner 'root'
-      group 'root'
-      mode  '0644'
-    end
-
-    execute "zsyncmake2 #{f}" do
-      cwd output_dir
-      not_if "test -f #{f}.zsync"
-    end
-
-    if node[:rootfs_archive][:enabled][:desync]
-      execute "desync make -s desync.chunks #{f}.caibx #{f}" do
-        cwd output_dir
-        not_if "test -f #{f}.caibx"
-      end
-    end
+  execute "zsyncmake2 #{v[:dst]}" do
+    cwd output_dir
+    not_if "test -f #{v[:dst]}.zsync"
   end
-else
-  raise
 end
 
 #
