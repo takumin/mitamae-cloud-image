@@ -280,58 +280,82 @@ end
 #
 
 if ENV['DISABLE_DISKIMG'] != 'true'
-  case node[:rootfs_archive][:format][:tarball]
-  when 'gzip'
-    cmd = 'pigz rootfs.ext4 > rootfs.ext4.gz'
-    ext = 'gz'
-  when 'lz4'
-    cmd = 'lz4 rootfs.ext4 rootfs.ext4.lz4'
-    ext = 'lz4'
-  when 'xz'
-    cmd = 'pixz rootfs.ext4 rootfs.ext4.xz'
-    ext = 'xz'
-  when 'zstd'
-    cmd = 'zstd rootfs.ext4 -o rootfs.ext4.xz'
-    ext = 'zstd'
-  else
-    raise
-  end
+  if node.target.architecture == 'amd64'
+    case node[:rootfs_archive][:format][:tarball]
+    when 'gzip'
+      cmd = 'pigz rootfs.ext4 > rootfs.ext4.gz'
+      ext = 'gz'
+    when 'lz4'
+      cmd = 'lz4 rootfs.ext4 rootfs.ext4.lz4'
+      ext = 'lz4'
+    when 'xz'
+      cmd = 'pixz rootfs.ext4 rootfs.ext4.xz'
+      ext = 'xz'
+    when 'zstd'
+      cmd = 'zstd rootfs.ext4 -o rootfs.ext4.xz'
+      ext = 'zstd'
+    else
+      raise
+    end
 
-  execute 'mkfs.ext4 rootfs.ext4' do
-    command [
-      'dd if=/dev/zero of=rootfs.ext4 bs=1M count=8192',
-      'mkfs.ext4 rootfs.ext4',
-    ].join(' && ')
-    cwd output_dir
-    not_if "test -f rootfs.ext4.#{ext}"
-  end
+    execute 'mkfs.ext4 rootfs.ext4' do
+      command [
+        'dd if=/dev/zero of=rootfs.ext4 bs=1M count=8192',
+        'mkfs.ext4 rootfs.ext4',
+      ].join(' && ')
+      cwd output_dir
+      not_if "test -f rootfs.ext4.#{ext}"
+    end
 
-  mount node[:rootfs_archive][:target_dir] do
-    device "#{output_dir}/rootfs.ext4"
-    not_if "test -f rootfs.ext4.#{ext}"
-  end
+    mount node[:rootfs_archive][:target_dir] do
+      device "#{output_dir}/rootfs.ext4"
+      not_if "test -f rootfs.ext4.#{ext}"
+    end
 
-  execute "tar -xf rootfs.tar.#{ext} -p --numeric-owner --acls --xattrs -C #{target_dir}" do
-    cwd output_dir
-    not_if "test -f rootfs.ext4.#{ext}"
-  end
+    execute "tar -xf rootfs.tar.#{ext} -p --numeric-owner --acls --xattrs -C #{target_dir}" do
+      cwd output_dir
+      not_if "test -f rootfs.ext4.#{ext}"
+    end
 
-  mount node[:rootfs_archive][:target_dir] do
-    action :absent
-  end
+    mount node[:rootfs_archive][:target_dir] do
+      action :absent
+    end
 
-  execute cmd do
-    cwd output_dir
-    not_if "test -f rootfs.ext4.#{ext}"
-  end
+    execute cmd do
+      cwd output_dir
+      not_if "test -f rootfs.ext4.#{ext}"
+    end
 
-  file "#{output_dir}/rootfs.ext4" do
-    action :delete
-  end
+    file "#{output_dir}/rootfs.ext4" do
+      action :delete
+    end
 
-  execute "zsyncmake2 rootfs.ext4.#{ext}" do
-    cwd output_dir
-    not_if "test -f rootfs.ext4.#{ext}.zsync"
+    execute "zsyncmake2 rootfs.ext4.#{ext}" do
+      cwd output_dir
+      not_if "test -f rootfs.ext4.#{ext}.zsync"
+    end
+
+    file "#{output_dir}/firecracker.json" do
+      content JSON.pretty_generate(Hashie::Mash.new({
+        'boot-source': {
+          'kernel_image_path': 'vmlinux',
+          'boot_args': 'overlayroot=tmpfs console=ttyS0 reboot=k panic=1 pci=off',
+          'initrd_path': 'initrd.img',
+        },
+        'drives': [
+          {
+            'drive_id': 'rootfs',
+            'path_on_host': 'rootfs.ext4',
+            'is_root_device': true,
+            'is_read_only': true,
+          },
+        ],
+        'machine-config': {
+          'vcpu_count': 2,
+          'mem_size_mib': 1024,
+        },
+      })).gsub(/:/, ': ')
+    end
   end
 end
 
