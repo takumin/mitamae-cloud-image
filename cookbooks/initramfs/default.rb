@@ -82,40 +82,44 @@ end
 # Live Boot Disable Networking
 #
 
-# remote_file '/etc/initramfs-tools/scripts/init-top/liveboot-disable-networking' do
-#   owner 'root'
-#   group 'root'
-#   mode  '0755'
+# remote_file '/etc/initramfs-tools/scripts/init-top/zzz-liveboot-disable-networking' do
+#   owner  'root'
+#   group  'root'
+#   mode   '0755'
+#   source 'files/liveboot-disable-networking'
 # end
 
 #
 # Initramfs Configure Networking
 #
 
-# remote_file '/etc/initramfs-tools/scripts/init-top/initramfs-configure-networking' do
-#   owner 'root'
-#   group 'root'
-#   mode  '0755'
+# remote_file '/etc/initramfs-tools/scripts/init-top/zzz-initramfs-configure-networking' do
+#   owner  'root'
+#   group  'root'
+#   mode   '0755'
+#   source 'files/initramfs-configure-networking'
 # end
 
 #
 # Cloud-Init NoCloud Datasource Network Config
 #
 
-remote_file '/etc/initramfs-tools/scripts/init-bottom/cloud-init-nocloud-network-config' do
-  owner 'root'
-  group 'root'
-  mode  '0755'
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/cloud-init-nocloud-network-config'
 end
 
 #
 # Cloud-Init Disable Resize Rootfs
 #
 
-remote_file '/etc/initramfs-tools/scripts/init-bottom/cloud-init-disable-resize-rootfs' do
-  owner 'root'
-  group 'root'
-  mode  '0755'
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-disable-resize-rootfs' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/cloud-init-disable-resize-rootfs'
 end
 
 #
@@ -123,8 +127,9 @@ end
 # See also: https://askubuntu.com/questions/1228433/what-is-creating-run-netplan-eth0-yaml
 #
 
-remote_file '/etc/initramfs-tools/scripts/init-bottom/reset-network-interfaces' do
-  owner 'root'
-  group 'root'
-  mode  '0755'
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-reset-network-interfaces' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/reset-network-interfaces'
 end
