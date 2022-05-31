@@ -28,6 +28,7 @@ when :debian
 when :ubuntu
   package 'ubuntu-minimal'
   package 'ubuntu-standard'
+  package 'overlayroot'
 when :arch
   package 'base'
 else
