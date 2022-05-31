@@ -185,35 +185,30 @@ if files[:kernel].length != 1 or files[:initrd].length != 1
   raise "multiple files exist for kernel or initrd"
 end
 
-[
-  {
-    src: files[:kernel][0],
-    dst: 'vmlinuz',
-  },
-  {
-    src: files[:initrd][0],
-    dst: 'initrd.img',
-  },
-  {
-    src: 'vmlinuz',
-    dst: 'vmlinux',
-  },
-].each do |v|
-  if v[:dst] == 'vmlinux'
-    execute "extract-vmlinux #{v[:src]} > #{v[:dst]}" do
-      cwd output_dir
-      not_if "test -f #{v[:dst]}"
-    end
-  else
-    execute "cp #{v[:src]} #{v[:dst]}" do
-      cwd output_dir
-      not_if "test -f #{v[:dst]}"
-    end
+{
+  kernel: 'vmlinuz',
+  initrd: 'initrd.img',
+}.each do |k, v|
+  execute "cp #{files[k][0]} #{v}" do
+    cwd output_dir
+    not_if "test -f #{v}"
   end
 
-  execute "zsyncmake2 #{v[:dst]}" do
+  execute "zsyncmake2 #{v}" do
     cwd output_dir
-    not_if "test -f #{v[:dst]}.zsync"
+    not_if "test -f #{v}.zsync"
+  end
+end
+
+if node.target.architecture == 'amd64'
+  execute 'extract-vmlinux vmlinuz > vmlinux' do
+    cwd output_dir
+    not_if 'test -f vmlinux'
+  end
+
+  execute 'zsyncmake2 vmlinux' do
+    cwd output_dir
+    not_if 'test -f vmlinux.zsync'
   end
 end
 
