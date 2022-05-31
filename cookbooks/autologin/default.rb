@@ -15,6 +15,15 @@ node.reverse_merge!({
       baud:    [],
       opts:    ['--noclear'],
     },
+    serial: {
+      service: 'serial-getty',
+      getty:   '/sbin/agetty',
+      user:    'root',
+      port:    'ttyS0',
+      term:    'linux',
+      baud:    [115200,38400,9600],
+      opts:    ['--noclear', '--keep-baud'],
+    },
   },
 })
 
