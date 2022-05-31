@@ -194,11 +194,6 @@ end
     not_if "test -f #{v}"
   end
 
-  file v do
-    cwd  output_dir
-    mode '0644'
-  end
-
   execute "zsyncmake2 #{v}" do
     cwd output_dir
     not_if "test -f #{v}.zsync"
@@ -225,10 +220,6 @@ if ENV['DISABLE_SQUASHFS'] != 'true'
   execute "mksquashfs #{target_dir} rootfs.squashfs -comp #{node[:rootfs_archive][:format][:squashfs]}" do
     cwd output_dir
     not_if "test -f rootfs.squashfs"
-  end
-
-  file "#{output_dir}/rootfs.squashfs" do
-    mode '0644'
   end
 
   execute "zsyncmake2 rootfs.squashfs" do
@@ -269,10 +260,6 @@ if ENV['DISABLE_TARBALL'] != 'true'
   execute "tar -I #{cmd} -p --acls --xattrs --one-file-system -cf rootfs.tar.#{ext} -C #{target_dir} ." do
     cwd output_dir
     not_if "test -f rootfs.tar.#{ext}"
-  end
-
-  file "#{output_dir}/rootfs.tar.#{ext}" do
-    mode '0644'
   end
 
   execute "zsyncmake2 rootfs.tar.#{ext}" do
@@ -357,10 +344,6 @@ if ENV['DISABLE_SHA256SUMS'] != 'true'
     cwd    output_dir
     not_if "test -f SHA256SUMS"
   end
-
-  file "#{output_dir}/SHA256SUMS" do
-    mode '0644'
-  end
 end
 
 #
@@ -399,7 +382,6 @@ when 'raspberrypi', 'raspi'
   end
 
   file "#{output_dir}/config.txt" do
-    mode '0644'
     content [
       'arm_64bit=1',
       'kernel=vmlinuz',
@@ -413,7 +395,6 @@ when 'raspberrypi', 'raspi'
   end
 
   file "#{output_dir}/cmdline.txt" do
-    mode '0644'
     content [
       'console=ttyAMA0,115200',
       'boot=live',

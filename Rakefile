@@ -155,6 +155,14 @@ targets.each do |target|
         abort('failed command')
       end
 
+      unless execution("find #{File.expand_path(__dir__)} -type d | xargs sudo chmod 0755")
+        abort('failed command')
+      end
+
+      unless execution("find #{File.expand_path(__dir__)} -type f | xargs sudo chmod 0644")
+        abort('failed command')
+      end
+
       unless execution("sudo chown -R $(id -u):$(id -g) #{File.expand_path(__dir__)}")
         abort('failed command')
       end
