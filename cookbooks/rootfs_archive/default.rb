@@ -347,7 +347,7 @@ if ENV['DISABLE_DISKIMG'] != 'true'
             'drive_id': 'rootfs',
             'path_on_host': 'rootfs.ext4',
             'is_root_device': true,
-            'is_read_only': true,
+            'is_read_only': false,
           },
         ],
         'machine-config': {
