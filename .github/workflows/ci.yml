@@ -117,17 +117,15 @@ jobs:
     - name: Publish
       if: env.PUBLISH == 'true'
       env:
-        RCLONE_S3_ENV_AUTH: true
-        RCLONE_S3_REGION: ${{ secrets.AWS_REGION }}
-        RCLONE_S3_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        RCLONE_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         RCLONE_S3_PROVIDER: ${{ secrets.S3_PROVIDER }}
         RCLONE_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT_URL }}
+        RCLONE_S3_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        RCLONE_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: >-
-        rclone sync
+        rclone sync -v
         --config /dev/null
         --retries 360
         --retries-sleep 10s
         --low-level-retries 30
         releases/${RELEASE_DIR}
-        :s3:${{ secrets.S3_BUCKET_NAME }}/${RELEASE_DIR}
+        :s3:mitamae-cloud-image/${RELEASE_DIR}
