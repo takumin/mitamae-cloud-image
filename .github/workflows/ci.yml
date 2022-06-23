@@ -126,8 +126,8 @@ jobs:
       run: >-
         rclone sync
         --config /dev/null
-        --retries 60
-        --retries-sleep 30
-        --low-level-retries 10
+        --retries 360
+        --retries-sleep 10s
+        --low-level-retries 30
         releases/${RELEASE_DIR}
         :s3:${{ secrets.S3_BUCKET_NAME }}/${RELEASE_DIR}
