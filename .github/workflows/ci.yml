@@ -127,5 +127,8 @@ jobs:
         --retries 360
         --retries-sleep 10s
         --low-level-retries 30
+        --stats 1s
+        --stats-file-name-length 0
+        --stats-one-line
         releases/${RELEASE_DIR}
         :s3:mitamae-cloud-image/${RELEASE_DIR}
