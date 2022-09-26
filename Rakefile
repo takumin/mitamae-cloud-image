@@ -6,7 +6,7 @@ require 'open3'
 require 'yaml'
 require 'json'
 
-MITAMAE_VERSION = 'v1.12.9'
+MITAMAE_VERSION = 'v1.14.0'
 
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 
