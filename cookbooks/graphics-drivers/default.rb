@@ -60,9 +60,9 @@ end
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
 when /^ubuntu-(?:18|20|22)\.04-desktop-nvidia$/
-  package 'nvidia-driver-510'
+  package 'nvidia-driver-525'
 when /^ubuntu-(?:18|20|22)\.04-server-nvidia$/
-  package 'nvidia-headless-510-server'
+  package 'nvidia-headless-525-server'
 else
   MItamae.logger.error "graphics-drivers: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
   exit 1
