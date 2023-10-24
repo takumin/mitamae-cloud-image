@@ -28,7 +28,6 @@ when :debian, :ubuntu
   packages << 'libnss-resolve'
   packages << 'libnss-systemd'
   packages << 'libpam-systemd'
-  packages << 'overlayroot' if node[:platform] == 'ubuntu'
 
   # timezone
   packages << 'tzdata'

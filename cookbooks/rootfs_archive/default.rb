@@ -289,7 +289,7 @@ if ENV['DISABLE_DISKIMG'] != 'true'
       content JSON.pretty_generate(Hashie::Mash.new({
         'boot-source': {
           'kernel_image_path': 'vmlinux',
-          'boot_args': 'console=ttyS0 reboot=k panic=1 pci=off i8042.noaux -- overlayroot=tmpfs',
+          'boot_args': 'console=ttyS0 reboot=k panic=1 pci=off i8042.noaux',
           'initrd_path': 'initrd.img',
         },
         'drives': [
@@ -374,7 +374,6 @@ when 'raspberrypi', 'raspi'
       'boot=live',
       'ip=dhcp',
       'fetch=http://boot.internal/rpi/rootfs.squashfs',
-      'overlayroot=tmpfs',
       'ds=nocloud-net',
       'seednet=http://boot.internal/seed/#HOSTNAME#/default/',
     ].join(' ')
