@@ -5,9 +5,6 @@
 #
 
 node[:rootfs_archive]                    ||= Hashie::Mash.new
-node[:rootfs_archive][:enabled]          ||= Hashie::Mash.new
-node[:rootfs_archive][:enabled][:desync] ||= false # Error: An error occurred (429) when calling the PutObject operation: Too Many Requests
-node[:rootfs_archive][:enabled][:zsync]  ||= true
 node[:rootfs_archive][:format]           ||= Hashie::Mash.new
 node[:rootfs_archive][:target_dir]       ||= node[:target][:directory]
 
@@ -133,14 +130,6 @@ directory output_dir do
   mode  '0755'
 end
 
-if node[:rootfs_archive][:enabled][:desync]
-  directory "#{output_dir}/desync.chunks" do
-    owner 'root'
-    group 'root'
-    mode  '0755'
-  end
-end
-
 #
 # Package Manifest
 #
@@ -193,22 +182,12 @@ end
     cwd output_dir
     not_if "test -f #{v}"
   end
-
-  execute "zsyncmake2 #{v}" do
-    cwd output_dir
-    not_if "test -f #{v}.zsync"
-  end
 end
 
 if node.target.architecture == 'amd64'
   execute 'extract-vmlinux vmlinuz > vmlinux' do
     cwd output_dir
     not_if 'test -f vmlinux'
-  end
-
-  execute 'zsyncmake2 vmlinux' do
-    cwd output_dir
-    not_if 'test -f vmlinux.zsync'
   end
 end
 
@@ -220,18 +199,6 @@ if ENV['DISABLE_SQUASHFS'] != 'true'
   execute "mksquashfs #{target_dir} rootfs.squashfs -comp #{node[:rootfs_archive][:format][:squashfs]}" do
     cwd output_dir
     not_if "test -f rootfs.squashfs"
-  end
-
-  execute "zsyncmake2 rootfs.squashfs" do
-    cwd output_dir
-    not_if "test -f rootfs.squashfs.zsync"
-  end
-
-  if node[:rootfs_archive][:enabled][:desync]
-    execute "desync make -s desync.chunks rootfs.squashfs.caibx rootfs.squashfs" do
-      cwd output_dir
-      not_if "test -f rootfs.squashfs.caibx"
-    end
   end
 end
 
@@ -260,18 +227,6 @@ if ENV['DISABLE_TARBALL'] != 'true'
   execute "tar -I #{cmd} -p --acls --xattrs --one-file-system -cf rootfs.tar.#{ext} -C #{target_dir} ." do
     cwd output_dir
     not_if "test -f rootfs.tar.#{ext}"
-  end
-
-  execute "zsyncmake2 rootfs.tar.#{ext}" do
-    cwd output_dir
-    not_if "test -f rootfs.tar.#{ext}.zsync"
-  end
-
-  if node[:rootfs_archive][:enabled][:desync]
-    execute "desync make -s desync.chunks rootfs.tar.#{ext}.caibx rootfs.tar.#{ext}" do
-      cwd output_dir
-      not_if "test -f rootfs.tar.#{ext}.caibx"
-    end
   end
 end
 
@@ -328,11 +283,6 @@ if ENV['DISABLE_DISKIMG'] != 'true'
 
     file "#{output_dir}/rootfs.ext4" do
       action :delete
-    end
-
-    execute "zsyncmake2 rootfs.ext4.#{ext}" do
-      cwd output_dir
-      not_if "test -f rootfs.ext4.#{ext}.zsync"
     end
 
     file "#{output_dir}/firecracker.json" do
