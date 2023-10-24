@@ -12,7 +12,7 @@ end
 # Check Distribution
 #
 
-unless node[:target][:distribution].match?(/^ubuntu$/)
+unless node[:target][:distribution].match?(/^(?:ubuntu)$/)
   return
 end
 
@@ -33,10 +33,12 @@ node[:nvidia_cuda][:origin]                   ||= Hashie::Mash.new
 node[:nvidia_cuda][:origin][:ubuntu]          ||= Hashie::Mash.new
 node[:nvidia_cuda][:origin][:ubuntu][:bionic] ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64'
 node[:nvidia_cuda][:origin][:ubuntu][:focal]  ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64'
+node[:nvidia_cuda][:origin][:ubuntu][:jammy]  ||= 'http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64'
 node[:nvidia_cuda][:mirror]                   ||= Hashie::Mash.new
 node[:nvidia_cuda][:mirror][:ubuntu]          ||= Hashie::Mash.new
 node[:nvidia_cuda][:mirror][:ubuntu][:bionic] ||= node[:nvidia_cuda][:origin][:ubuntu][:bionic]
 node[:nvidia_cuda][:mirror][:ubuntu][:focal]  ||= node[:nvidia_cuda][:origin][:ubuntu][:focal]
+node[:nvidia_cuda][:mirror][:ubuntu][:jammy]  ||= node[:nvidia_cuda][:origin][:ubuntu][:jammy]
 
 #
 # Override Variables
@@ -50,6 +52,10 @@ if ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL'].is_a?(String) and !ENV['APT_REPO
   node[:nvidia_cuda][:mirror][:ubuntu][:focal] = ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL']
 end
 
+if ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_JAMMY'].is_a?(String) and !ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_JAMMY'].empty?
+  node[:nvidia_cuda][:mirror][:ubuntu][:jammy] = ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_JAMMY']
+end
+
 #
 # Validate Variables
 #
@@ -61,12 +67,14 @@ node.validate! do
         ubuntu: {
           bionic: match(/^(?:https?|file):\/\//),
           focal:  match(/^(?:https?|file):\/\//),
+          jammy:  match(/^(?:https?|file):\/\//),
         },
       },
       mirror: {
         ubuntu: {
           bionic: match(/^(?:https?|file):\/\//),
           focal:  match(/^(?:https?|file):\/\//),
+          jammy:  match(/^(?:https?|file):\/\//),
         },
       },
     },
@@ -82,6 +90,8 @@ when '18.04'
   platform_codename = :bionic
 when '20.04'
   platform_codename = :focal
+when '22.04'
+  platform_codename = :jammy
 end
 
 nvidia_cuda_origin = node[:nvidia_cuda][:origin][node[:platform]][platform_codename]
