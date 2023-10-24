@@ -28,39 +28,25 @@ end
 # Private Variables
 #
 
-target_dir       = node[:resolv_conf][:target_dir]
-resolv_conf_path = File.join(target_dir, 'etc', 'resolv.conf')
+target_dir = node[:resolv_conf][:target_dir]
 
 #
-# Get Absolute File Path
+# Create Systemd Resolved Directory
 #
 
-if File.symlink?(resolv_conf_path)
-  resolv_conf_path = File.expand_path(File.join(target_dir, 'etc', File.readlink(resolv_conf_path)))
-
-  directory File.dirname(resolv_conf_path) do
-    owner 'root'
-    group 'root'
-    mode  '0755'
-  end
+directory File.join(target_dir, 'run', 'systemd', 'resolve') do
+  owner 'root'
+  group 'root'
+  mode  '0755'
 end
 
 #
-# Remove Symbolic Link
+# Copy Host Systemd Resolved Stub Resolver
 #
 
-file resolv_conf_path do
-  action :delete
-  only_if "test \"'#{resolv_conf_path}'\" != \"$(stat -c '%N' #{resolv_conf_path})\""
-end
-
-#
-# Copy Host Machine File
-#
-
-file resolv_conf_path do
+file File.join(target_dir, 'run', 'systemd', 'resolve', 'stub-resolv.conf') do
   owner   'root'
   group   'root'
   mode    '0644'
-  content File.read('/etc/resolv.conf')
+  content File.read('/run/systemd/resolve/stub-resolv.conf')
 end
