@@ -23,7 +23,7 @@ when :debian, :ubuntu
   packages << 'policykit-1'
   packages << 'systemd'
   packages << 'systemd-coredump'
-  packages << 'systemd-timesyncd' unless %w{stretch buster bionic}.include?(node.target.suite)
+  packages << 'systemd-timesyncd' unless %w{buster bionic}.include?(node.target.suite)
   packages << 'libnss-myhostname'
   packages << 'libnss-resolve'
   packages << 'libnss-systemd'

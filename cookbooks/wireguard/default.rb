@@ -4,7 +4,7 @@
 # Check Suite
 #
 
-if node.target.suite.match?(/^(?:stretch|buster)$/)
+if node.target.suite.match?(/^(?:buster)$/)
   return
 end
 

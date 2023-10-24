@@ -74,8 +74,8 @@ when :debian
   node.validate! do
     {
       apt: {
-        suite:      match(/^(?:stretch|buster|bullseye)$/),
-        components: array_of(match(/^(?:main|contrib|non-free)$/)),
+        suite:      match(/^(?:buster|bullseye|bookworm)$/),
+        components: array_of(match(/^(?:main|contrib|non-free|non-free-firmware)$/)),
       },
     }
   end
@@ -114,14 +114,14 @@ when :debian
   ]
 
   case node[:apt][:suite].to_sym
-  when :bullseye
+  when :bullseye, :bookworm
     entry << {
       :default_uri => default_security_uri,
       :mirror_uri  => mirror_security_uri,
       :suite       => "#{node[:apt][:suite]}-security",
       :components  => node[:apt][:components],
     }
-  when :stretch, :buster
+  when :buster
     entry << {
       :default_uri => default_security_uri,
       :mirror_uri  => mirror_security_uri,

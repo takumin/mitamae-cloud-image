@@ -14,7 +14,7 @@ node[:rootfs_archive][:target_dir]       ||= node[:target][:directory]
 
 case node[:target][:distribution]
 when 'debian', 'ubuntu'
-  unless %w{stretch buster bionic focal}.include?(node[:target][:suite])
+  unless %w{buster bionic focal}.include?(node[:target][:suite])
     node[:rootfs_archive][:format][:tarball]  ||= 'zstd'
     node[:rootfs_archive][:format][:squashfs] ||= 'zstd'
   else

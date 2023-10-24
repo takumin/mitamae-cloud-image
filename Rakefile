@@ -17,9 +17,9 @@ DISTRIBUTIONS = [
 
 SUITES = {
   'debian' => [
-    'stretch',
     'buster',
     'bullseye',
+    'bookworm',
   ],
   'ubuntu' => [
     'bionic',
