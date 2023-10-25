@@ -37,7 +37,7 @@ link '/etc/localtime'  do
 end
 
 if node[:platform].match(/^(?:debian|ubuntu)$/)
-  execute 'dpkg-reconfigure tzdata' do
+  execute 'dpkg-reconfigure --frontend noninteractive tzdata' do
     action :nothing
 
     subscribes :run, 'file[/etc/timezone]'

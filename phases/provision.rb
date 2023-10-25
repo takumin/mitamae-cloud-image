@@ -8,6 +8,7 @@ include_recipe File.expand_path('../../helpers/validate', __FILE__)
 #
 include_recipe File.expand_path('../../cookbooks/apt', __FILE__)
 include_recipe File.expand_path('../../cookbooks/pacman', __FILE__)
+include_recipe File.expand_path('../../cookbooks/curl', __FILE__)
 include_recipe File.expand_path('../../cookbooks/minimal', __FILE__)
 include_recipe File.expand_path('../../cookbooks/standard', __FILE__)
 include_recipe File.expand_path('../../cookbooks/desktop', __FILE__)

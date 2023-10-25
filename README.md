@@ -18,6 +18,8 @@ export APT_REPO_URL_UBUNTU_PORTS="http://${APT_PROXY_HOST}/ubuntu-ports"
 export APT_REPO_URL_UBUNTU_JA="http://${APT_PROXY_HOST}/ubuntu-ja"
 export APT_REPO_URL_UBUNTU_JA_NON_FREE="http://${APT_PROXY_HOST}/ubuntu-ja-non-free"
 
+export APT_REPO_URL_PPA_MOZILLA_TEAM="http://${APT_PROXY_HOST}/ppa-mozilla-team"
+
 export APT_REPO_URL_PPA_GRAPHICS_DRIVERS="http://${APT_PROXY_HOST}/ppa-graphics-drivers"
 
 export APT_REPO_URL_DEBIAN="http://${APT_PROXY_HOST}/debian"

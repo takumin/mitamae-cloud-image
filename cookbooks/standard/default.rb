@@ -13,7 +13,7 @@ end
 #
 
 case node[:platform].to_sym
-when :debian
+when :debian, :ubuntu
   # apt
   package 'debconf'
   # hardware
@@ -43,8 +43,6 @@ when :debian
   package 'socat'
   package 'tree'
   package 'vim'
-when :ubuntu
-  package 'ubuntu-standard'
 when :arch
   # TODO
 else
