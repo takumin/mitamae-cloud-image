@@ -41,7 +41,6 @@ when :debian
   package 'procps'
   package 'psmisc'
   package 'socat'
-  package 'sudo'
   package 'tree'
   package 'vim'
 when :ubuntu
