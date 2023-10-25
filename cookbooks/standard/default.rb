@@ -14,22 +14,73 @@ end
 
 case node[:platform].to_sym
 when :debian
-  # Workaround 'mail-transport-agent'
-  package 'nullmailer'
-
-  # https://wiki.debian.org/tasksel
-  # https://unix.stackexchange.com/questions/227303/can-a-debian-packages-priority-field-be-used-for-selection-for-install
-  # https://github.com/szepeviktor/debian-server-tools/blob/master/debian-setup/debian-image-normalize.sh
-  package 'aptitude'
-  execute 'aptitude -F %p search \'~E\' | xargs apt-get install -yqq'
-  execute 'aptitude -F %p search \'~prequired\' | xargs apt-get install -yqq'
-  execute 'aptitude -F %p search \'~pimportant\' | xargs apt-get install -yqq'
-  execute 'aptitude -F %p search \'~pstandard\' | xargs apt-get install -yqq'
+  # apt
+  package 'debconf'
+  # hardware
+  package 'dmidecode'
+  package 'laptop-detect'
+  package 'pciutils'
+  package 'usbutils'
+  package 'lshw'
+  # networking
+  package 'netbase'
+  package 'ethtool'
+  package 'iproute2'
+  package 'iputils-ping'
+  package 'netcat-openbsd'
+  # utility
+  package 'bash-completion'
+  package 'bind9-dnsutils'
+  package 'diffutils'
+  package 'file'
+  package 'htop'
+  package 'less'
+  package 'lsof'
+  package 'nmap'
+  package 'patch'
+  package 'procps'
+  package 'psmisc'
+  package 'socat'
+  package 'sudo'
+  package 'tree'
+  package 'vim'
 when :ubuntu
-  package 'ubuntu-minimal'
   package 'ubuntu-standard'
 when :arch
-  package 'base'
+  # TODO
 else
   MItamae.logger.info "Ignore standard package installation for this platform: #{node[:platform]}"
+end
+
+#
+# Skelton Files
+#
+
+contents = <<__EOF__
+alias ls="ls --color=auto --show-control-chars --group-directories-first --time-style='+%Y-%m-%d %H:%M:%S'"
+
+alias la="ls -a"
+alias lf="ls -FA"
+alias li="ls -ai"
+alias ll="ls -FAlh"
+
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+
+alias free="free -h"
+
+alias du="du -h"
+alias df="df -h"
+
+alias top="htop"
+
+alias htop="htop -t"
+__EOF__
+
+file '/etc/skel/.bash_aliases' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content contents
 end

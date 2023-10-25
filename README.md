@@ -27,6 +27,8 @@ export APT_REPO_URL_RASPBERRYPI="http://${APT_PROXY_HOST}/raspberrypi"
 
 export ARCH_PACMAN_MIRROR="https://ftp.jaist.ac.jp/pub/Linux/ArchLinux/"
 
+export TIMEZONE="Asia/Tokyo"
+
 # export INITRAMFS_COMPRESS="lz4"
 # export ROOTFS_ARCHIVE_FORMAT_TARBALL="lz4"
 # export ROOTFS_ARCHIVE_FORMAT_SQUASHFS="lz4"

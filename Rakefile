@@ -31,8 +31,7 @@ SUITES = {
 KERNELS = {
   'debian' => [
     'generic',
-    # FIXME: ARM64 Kernel Error
-    # 'virtual',
+    'cloud',
     # FIXME: Raspberry Pi Repository Error
     # 'raspberrypi',
   ],
