@@ -188,7 +188,7 @@ end
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
 when 'ubuntu-18.04-generic-hwe'
-  package 'xserver-xorg-core-hwe-18.04'
+  package 'xserver-xorg-hwe-18.04'
 else
   package 'xserver-xorg-core'
 end
