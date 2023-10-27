@@ -40,7 +40,7 @@ when 'debian'
   node.validate! do
     {
       target: {
-        kernel:     match(/^(?:generic|virtual|raspberrypi)$/),
+        kernel:     match(/^(?:generic|cloud|raspberrypi)$/),
         suite:      match(/^(?:buster|bullseye|bookworm)$/),
         components: array_of(match(/^(?:main|contrib|non-free|non-free-firmware)$/)),
       },
