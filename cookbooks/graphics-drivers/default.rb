@@ -4,7 +4,7 @@
 # Check Role
 #
 
-unless node[:target][:role].match?(/-nvidia$/)
+unless node[:target][:role].match?(/(?:-nvidia|-nvidia-legacy)$/)
   return
 end
 
@@ -46,7 +46,7 @@ when /^ubuntu-(?:18|20|22)\.04-generic-(?:desktop|server)-nvidia/
   # nothing...
 when /^ubuntu-18\.04-generic-hwe-(?:desktop|server)-nvidia/
   package 'linux-headers-generic-hwe-18.04'
-  package 'xserver-xorg-hwe-18.04' if node[:target][:role] == 'desktop-nvidia'
+  package 'xserver-xorg-hwe-18.04' if node[:target][:role].match?(/(?:-nvidia|-nvidia-legacy)$/)
 when /^ubuntu-(?:20|22)\.04-generic-hwe-(?:desktop|server)-nvidia/
   package "linux-headers-generic-hwe-#{node[:platform_version]}"
 else
