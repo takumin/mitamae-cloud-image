@@ -60,11 +60,11 @@ end
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
 when /^ubuntu-(?:18|20|22)\.04-desktop-nvidia$/
-  package 'nvidia-driver-545'
+  package 'nvidia-driver-535'
 when /^ubuntu-(?:18|20|22)\.04-desktop-nvidia-legacy$/
   package 'nvidia-driver-470'
 when /^ubuntu-(?:18|20|22)\.04-server-nvidia$/
-  package 'nvidia-headless-545-server'
+  package 'nvidia-headless-535-server'
 when /^ubuntu-(?:18|20|22)\.04-server-nvidia-legacy$/
   package 'nvidia-driver-470-server'
 else
