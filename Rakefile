@@ -54,8 +54,10 @@ ROLES = {
     'minimal',
     'server',
     'server-nvidia',
+    'server-nvidia-legacy',
     'desktop',
     'desktop-nvidia',
+    'desktop-nvidia-legacy',
   ],
 }
 
