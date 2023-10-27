@@ -48,15 +48,19 @@ ROLES = {
   'debian' => [
     'minimal',
     'server',
+    'server-nvidia-cuda',
     'desktop',
+    'desktop-nvidia-cuda',
   ],
   'ubuntu' => [
     'minimal',
     'server',
     'server-nvidia',
+    'server-nvidia-cuda',
     'server-nvidia-legacy',
     'desktop',
     'desktop-nvidia',
+    'desktop-nvidia-cuda',
     'desktop-nvidia-legacy',
   ],
 }
