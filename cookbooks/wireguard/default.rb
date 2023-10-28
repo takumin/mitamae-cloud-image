@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Check Suite
-#
-
-if node.target.suite.match?(/^(?:buster)$/)
-  return
-end
-
-#
 # Install Package
 #
 

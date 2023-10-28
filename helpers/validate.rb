@@ -41,7 +41,7 @@ when 'debian'
     {
       target: {
         kernel:     match(/^(?:generic|cloud|raspberrypi)$/),
-        suite:      match(/^(?:buster|bullseye|bookworm)$/),
+        suite:      match(/^(?:bullseye|bookworm)$/),
         components: array_of(match(/^(?:main|contrib|non-free|non-free-firmware)$/)),
       },
     }

@@ -95,7 +95,7 @@ when 'debian'
   node.validate! do
     {
       debootstrap: {
-        suite:      match(/^(?:buster|bullseye|bookworm)$/),
+        suite:      match(/^(?:bullseye|bookworm)$/),
         components: array_of(match(/^(?:main|contrib|non-free|non-free-firmware)$/)),
       },
     }
