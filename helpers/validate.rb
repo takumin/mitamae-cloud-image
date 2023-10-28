@@ -30,7 +30,7 @@ when 'ubuntu'
   node.validate! do
     {
       target: {
-        kernel:     match(/^(?:(?:generic|virtual)(?:-hwe)?|raspi)$/),
+        kernel:     match(/^(?:(?:generic|virtual|lowlatency)(?:-hwe)?|raspi)$/),
         suite:      match(/^(?:focal|jammy)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
@@ -40,7 +40,7 @@ when 'debian'
   node.validate! do
     {
       target: {
-        kernel:     match(/^(?:generic|cloud|raspberrypi)$/),
+        kernel:     match(/^(?:generic|cloud|rt|raspberrypi)$/),
         suite:      match(/^(?:bullseye|bookworm)$/),
         components: array_of(match(/^(?:main|contrib|non-free|non-free-firmware)$/)),
       },
