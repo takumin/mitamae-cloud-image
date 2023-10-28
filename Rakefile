@@ -192,6 +192,34 @@ namespace :github do
         }
       })
     end
+
+    targets.map{|v|
+      task "publish:#{v.values.join(':')}" do
+        publish = false
+
+        if v['distribution'].eql?('ubuntu')
+          if v['suite'].eql?('jammy')
+            if v['kernel'].match?(/^(generic|virtual)-hwe$/)
+              unless v['role'].eql?('minimal')
+                publish = true
+              end
+            end
+          end
+        end
+
+        if v['distribution'].eql?('debian')
+          if v['suite'].eql?('bookworm')
+            if v['kernel'].match?(/^(generic|cloud)$/)
+              unless v['role'].eql?('minimal')
+                publish = true
+              end
+            end
+          end
+        end
+
+        puts "PUBLISH=#{publish}"
+      end
+    }
   end
 end
 
