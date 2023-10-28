@@ -6,6 +6,9 @@ require 'open3'
 require 'yaml'
 require 'json'
 
+PUBLISH_UBUNTU_SUITE = 'jammy'
+PUBLISH_DEBIAN_SUITE = 'bookworm'
+
 MITAMAE_VERSION = 'v1.14.0'
 
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
@@ -195,7 +198,7 @@ namespace :github do
         publish = false
 
         if v['distribution'].eql?('ubuntu')
-          if v['suite'].eql?('jammy')
+          if v['suite'].eql?(PUBLISH_UBUNTU_SUITE)
             if v['kernel'].match?(/^(generic|virtual)-hwe$/)
               unless v['role'].eql?('minimal')
                 publish = true
@@ -205,7 +208,7 @@ namespace :github do
         end
 
         if v['distribution'].eql?('debian')
-          if v['suite'].eql?('bookworm')
+          if v['suite'].eql?(PUBLISH_DEBIAN_SUITE)
             if v['kernel'].match?(/^(generic|cloud)$/)
               unless v['role'].eql?('minimal')
                 publish = true
