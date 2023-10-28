@@ -22,7 +22,6 @@ SUITES = {
     'bookworm',
   ],
   'ubuntu' => [
-    'bionic',
     'focal',
     'jammy',
   ],
@@ -78,7 +77,6 @@ DISTRIBUTIONS.each do |distribution|
       ROLES[distribution].each do |role|
         ARCHITECTURES.each do |architecture|
           next if architecture.match('amd64') and kernel.match(/raspi|raspberrypi/)
-          next if architecture.match('arm64') and suite.match('bionic')
           next if architecture.match('arm64') and role.match(/nvidia/)
           next if kernel.match(/virtual/) and role.match(/nvidia/)
 

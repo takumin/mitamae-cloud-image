@@ -12,7 +12,7 @@ node[:initramfs] ||= Hashie::Mash.new
 
 case node[:target][:distribution]
 when 'debian', 'ubuntu'
-  unless %w{buster bionic focal}.include?(node[:target][:suite])
+  unless %w{buster focal}.include?(node[:target][:suite])
     node[:initramfs][:compress] ||= 'zstd'
   else
     node[:initramfs][:compress] ||= 'gzip'

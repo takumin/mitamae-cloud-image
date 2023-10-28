@@ -9,15 +9,6 @@ unless node[:target][:role].match(/desktop/)
 end
 
 #
-# Required Packages
-#
-
-case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-when 'ubuntu-18.04-generic-hwe'
-  package 'xserver-xorg-hwe-18.04'
-end
-
-#
 # Check Platform
 #
 
@@ -84,14 +75,6 @@ when 'debian'
   package 'task-desktop'
 when 'ubuntu'
   package 'ubuntu-desktop'
-end
-
-# Workaround: Fix System Log Error Message
-case "#{node[:platform]}-#{node[:platform_version]}"
-when 'ubuntu-18.04'
-  package 'gir1.2-clutter-1.0'
-  package 'gir1.2-clutter-gst-3.0'
-  package 'gir1.2-gtkclutter-1.0'
 end
 
 # Workaround: Manage all network interfaces with Network Manager

@@ -42,11 +42,8 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}-#{node[:target][:role]}"
-when /^ubuntu-(?:18|20|22)\.04-generic-(?:desktop|server)-nvidia/
+when /^ubuntu-(?:20|22)\.04-generic-(?:desktop|server)-nvidia/
   # nothing...
-when /^ubuntu-18\.04-generic-hwe-(?:desktop|server)-nvidia/
-  package 'linux-headers-generic-hwe-18.04'
-  package 'xserver-xorg-hwe-18.04' if node[:target][:role].match?(/(?:-nvidia|-nvidia-legacy)$/)
 when /^ubuntu-(?:20|22)\.04-generic-hwe-(?:desktop|server)-nvidia/
   package "linux-headers-generic-hwe-#{node[:platform_version]}"
 else
@@ -59,13 +56,13 @@ end
 #
 
 case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
-when /^ubuntu-(?:18|20|22)\.04-desktop-nvidia$/
+when /^ubuntu-(?:20|22)\.04-desktop-nvidia$/
   package 'nvidia-driver-535'
-when /^ubuntu-(?:18|20|22)\.04-desktop-nvidia-legacy$/
+when /^ubuntu-(?:20|22)\.04-desktop-nvidia-legacy$/
   package 'nvidia-driver-470'
-when /^ubuntu-(?:18|20|22)\.04-server-nvidia$/
+when /^ubuntu-(?:20|22)\.04-server-nvidia$/
   package 'nvidia-headless-535-server'
-when /^ubuntu-(?:18|20|22)\.04-server-nvidia-legacy$/
+when /^ubuntu-(?:20|22)\.04-server-nvidia-legacy$/
   package 'nvidia-driver-470-server'
 else
   MItamae.logger.error "graphics-drivers: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"

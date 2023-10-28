@@ -13,7 +13,7 @@ when 'raspi'
   node.linux_kernel.packages << 'linux-image-raspi'
 
   case node.platform_version
-  when '18.04', '20.04'
+  when '20.04'
     node.linux_kernel.packages << 'linux-firmware-raspi2'
   when '22.04'
     node.linux_kernel.packages << 'linux-modules-extra-raspi'

@@ -31,7 +31,6 @@ end
 node[:nvidia_cuda]                              ||= Hashie::Mash.new
 node[:nvidia_cuda][:origin]                     ||= Hashie::Mash.new
 node[:nvidia_cuda][:origin][:ubuntu]            ||= Hashie::Mash.new
-node[:nvidia_cuda][:origin][:ubuntu][:bionic]   ||= 'https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64'
 node[:nvidia_cuda][:origin][:ubuntu][:focal]    ||= 'https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64'
 node[:nvidia_cuda][:origin][:ubuntu][:jammy]    ||= 'https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64'
 node[:nvidia_cuda][:origin][:debian]            ||= Hashie::Mash.new
@@ -40,7 +39,6 @@ node[:nvidia_cuda][:origin][:debian][:bullseye] ||= 'https://developer.download.
 node[:nvidia_cuda][:origin][:debian][:bookworm] ||= 'https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64'
 node[:nvidia_cuda][:mirror]                     ||= Hashie::Mash.new
 node[:nvidia_cuda][:mirror][:ubuntu]            ||= Hashie::Mash.new
-node[:nvidia_cuda][:mirror][:ubuntu][:bionic]   ||= node[:nvidia_cuda][:origin][:ubuntu][:bionic]
 node[:nvidia_cuda][:mirror][:ubuntu][:focal]    ||= node[:nvidia_cuda][:origin][:ubuntu][:focal]
 node[:nvidia_cuda][:mirror][:ubuntu][:jammy]    ||= node[:nvidia_cuda][:origin][:ubuntu][:jammy]
 node[:nvidia_cuda][:mirror][:debian]            ||= Hashie::Mash.new
@@ -51,10 +49,6 @@ node[:nvidia_cuda][:mirror][:debian][:bookworm] ||= node[:nvidia_cuda][:origin][
 #
 # Override Variables
 #
-
-if ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_BIONIC'].is_a?(String) and !ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_BIONIC'].empty?
-  node[:nvidia_cuda][:mirror][:ubuntu][:bionic] = ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_BIONIC']
-end
 
 if ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL'].is_a?(String) and !ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL'].empty?
   node[:nvidia_cuda][:mirror][:ubuntu][:focal] = ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL']
@@ -85,7 +79,6 @@ node.validate! do
     nvidia_cuda: {
       origin: {
         ubuntu: {
-          bionic: match(/^(?:https?|file):\/\//),
           focal:  match(/^(?:https?|file):\/\//),
           jammy:  match(/^(?:https?|file):\/\//),
         },
@@ -97,7 +90,6 @@ node.validate! do
       },
       mirror: {
         ubuntu: {
-          bionic: match(/^(?:https?|file):\/\//),
           focal:  match(/^(?:https?|file):\/\//),
           jammy:  match(/^(?:https?|file):\/\//),
         },
@@ -118,8 +110,6 @@ end
 case node[:platform]
 when 'ubuntu'
   case node[:platform_version]
-  when '18.04'
-    platform_codename = :bionic
   when '20.04'
     platform_codename = :focal
   when '22.04'
@@ -186,11 +176,5 @@ end
 # Package Install
 #
 
-case "#{node[:platform]}-#{node[:platform_version]}-#{node[:target][:kernel]}"
-when 'ubuntu-18.04-generic-hwe'
-  package 'xserver-xorg-hwe-18.04'
-else
-  package 'xserver-xorg-core'
-end
-
+package 'xserver-xorg-core'
 package 'cuda-drivers'

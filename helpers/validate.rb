@@ -31,7 +31,7 @@ when 'ubuntu'
     {
       target: {
         kernel:     match(/^(?:(?:generic|virtual)(?:-hwe)?|raspi)$/),
-        suite:      match(/^(?:bionic|focal|jammy)$/),
+        suite:      match(/^(?:focal|jammy)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }

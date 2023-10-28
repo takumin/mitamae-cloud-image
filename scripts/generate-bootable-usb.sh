@@ -21,7 +21,7 @@ set -eu
 : "${DISTRIB:="ubuntu"}"
 
 # Release Codename
-# Value: [bionic|focal]
+# Value: [focal]
 : "${RELEASE:="focal"}"
 
 # Kernel Package
