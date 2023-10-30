@@ -31,6 +31,7 @@ end
 case node[:target][:distribution]
 when 'debian', 'ubuntu'
   node[:rootfs_archive][:output_dir] ||= File.join(
+    File.expand_path('../../..', __FILE__),
     'releases',
     node[:target][:distribution],
     node[:target][:suite],
@@ -40,6 +41,7 @@ when 'debian', 'ubuntu'
   )
 when 'arch'
   node[:rootfs_archive][:output_dir] ||= File.join(
+    File.expand_path('../../..', __FILE__),
     'releases',
     node[:target][:distribution],
     node[:target][:kernel],
@@ -207,6 +209,32 @@ if ENV['DISABLE_TARBALL'] != 'true'
   execute "tar -I #{cmd} -p --acls --xattrs --one-file-system -cf rootfs.tar.#{ext} -C #{target_dir} ." do
     cwd output_dir
     not_if "test -f rootfs.tar.#{ext}"
+  end
+end
+
+#
+# CPIO Archive
+#
+
+if ENV['DISABLE_CPIO'] != 'true'
+  if node[:target][:role].eql?('minimal')
+    case node[:rootfs_archive][:format]
+    when 'gzip'
+      cmd = 'pigz'
+    when 'lz4'
+      cmd = 'lz4'
+    when 'xz'
+      cmd = 'pixz'
+    when 'zstd'
+      cmd = 'zstd'
+    else
+      raise
+    end
+
+    execute "find . \\( -type f -o -type l \\) -a -printf '%P\\n' | cpio -o | #{cmd} > #{output_dir}/rootfs.cpio.img" do
+      cwd target_dir
+      not_if "test -f rootfs.tar.#{ext}"
+    end
   end
 end
 
