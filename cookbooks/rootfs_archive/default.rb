@@ -231,7 +231,7 @@ if ENV['DISABLE_CPIO'] != 'true'
       raise
     end
 
-    execute "find . \\( -type f -o -type l \\) -a -printf '%P\\n' | cpio -o | #{cmd} > #{output_dir}/rootfs.cpio.img" do
+    execute "find . \\( -type f -o -type l \\) -a -not \\( -name 'vmlinuz*' -o -name 'initrd.img*' \\) -a -printf '%P\\n' | cpio -o | #{cmd} > #{output_dir}/rootfs.cpio.img" do
       cwd target_dir
       not_if "test -f rootfs.tar.#{ext}"
     end
