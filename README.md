@@ -42,7 +42,6 @@ export TIMEZONE="Asia/Tokyo"
 
 # export DISABLE_SQUASHFS="true"
 # export DISABLE_TARBALL="true"
-# export DISABLE_DISKIMG="true"
 # export DISABLE_SHA256SUMS="true"
 
 # export LOG_LEVEL="debug"
