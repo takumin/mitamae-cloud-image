@@ -171,13 +171,6 @@ end
   end
 end
 
-if node.target.architecture == 'amd64'
-  execute 'extract-vmlinux vmlinuz > vmlinux' do
-    cwd output_dir
-    not_if 'test -f vmlinux'
-  end
-end
-
 #
 # SquashFS Archive
 #
