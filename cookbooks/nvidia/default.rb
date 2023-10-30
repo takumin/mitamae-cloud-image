@@ -32,7 +32,11 @@ end
 
 case node[:platform]
 when 'ubuntu'
-  package "linux-headers-#{node[:target][:kernel]}-#{node[:platform_version]}"
+  if node[:target][:kernel].match?(/-hwe$/)
+    package "linux-headers-#{node[:target][:kernel]}-#{node[:platform_version]}"
+  else
+    package "linux-headers-#{node[:target][:kernel]}"
+  end
 when 'debian'
   case node[:target][:kernel]
   when 'generic'
