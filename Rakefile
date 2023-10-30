@@ -49,9 +49,13 @@ ROLES = {
   'debian' => [
     'minimal',
     'server',
+    'server-nvidia',
     'server-nvidia-cuda',
+    'server-nvidia-legacy',
     'desktop',
+    'desktop-nvidia',
     'desktop-nvidia-cuda',
+    'desktop-nvidia-legacy',
   ],
   'ubuntu' => [
     'minimal',
@@ -79,8 +83,8 @@ DISTRIBUTIONS.each do |distribution|
       ROLES[distribution].each do |role|
         ARCHITECTURES.each do |architecture|
           next if architecture.match('amd64') and kernel.match(/raspi|raspberrypi/)
-          next if architecture.match('arm64') and role.match(/nvidia/)
-          next if kernel.match(/virtual/) and role.match(/nvidia/)
+          next if !architecture.match('amd64') and role.match(/nvidia/)
+          next if !kernel.match(/generic/) and role.match(/nvidia/)
 
           targets << {
             'distribution' => distribution,
