@@ -4,9 +4,8 @@
 # Public Variables
 #
 
-node[:rootfs_archive]                    ||= Hashie::Mash.new
-node[:rootfs_archive][:format]           ||= Hashie::Mash.new
-node[:rootfs_archive][:target_dir]       ||= node[:target][:directory]
+node[:rootfs_archive]              ||= Hashie::Mash.new
+node[:rootfs_archive][:target_dir] ||= node[:target][:directory]
 
 #
 # Public Variables - Format Archive
@@ -15,15 +14,12 @@ node[:rootfs_archive][:target_dir]       ||= node[:target][:directory]
 case node[:target][:distribution]
 when 'debian', 'ubuntu'
   unless %w{focal}.include?(node[:target][:suite])
-    node[:rootfs_archive][:format][:tarball]  ||= 'zstd'
-    node[:rootfs_archive][:format][:squashfs] ||= 'zstd'
+    node[:rootfs_archive][:format] ||= 'zstd'
   else
-    node[:rootfs_archive][:format][:tarball]  ||= 'gzip'
-    node[:rootfs_archive][:format][:squashfs] ||= 'gzip'
+    node[:rootfs_archive][:format] ||= 'gzip'
   end
 when 'arch'
-  node[:rootfs_archive][:format][:tarball]  ||= 'zstd'
-  node[:rootfs_archive][:format][:squashfs] ||= 'zstd'
+  node[:rootfs_archive][:format] ||= 'zstd'
 else
   raise
 end
@@ -58,12 +54,8 @@ end
 # Environment Variables
 #
 
-if ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL'].is_a?(String) and !ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL'].empty?
-  node[:rootfs_archive][:format][:tarball] = ENV['ROOTFS_ARCHIVE_FORMAT_TARBALL']
-end
-
-if ENV['ROOTFS_ARCHIVE_FORMAT_SQUASHFS'].is_a?(String) and !ENV['ROOTFS_ARCHIVE_FORMAT_SQUASHFS'].empty?
-  node[:rootfs_archive][:format][:squashfs] = ENV['ROOTFS_ARCHIVE_FORMAT_SQUASHFS']
+if ENV['ROOTFS_ARCHIVE_FORMAT'].is_a?(String) and !ENV['ROOTFS_ARCHIVE_FORMAT'].empty?
+  node[:rootfs_archive][:format] = ENV['ROOTFS_ARCHIVE_FORMAT']
 end
 
 if ENV['TARGET_DIRECTORY'].is_a?(String) and !ENV['TARGET_DIRECTORY'].empty?
@@ -81,10 +73,7 @@ end
 node.validate! do
   {
     rootfs_archive: {
-      format: {
-        tarball:  match(/^(?:gzip|lz4|xz|zstd)$/),
-        squashfs: match(/^(?:gzip|lz4|xz|zstd)$/),
-      },
+      format:     match(/^(?:gzip|lz4|xz|zstd)$/),
       target_dir: match(/^(?:[0-9a-zA-Z-_\/\.]+)$/),
       output_dir: match(/^(?:[0-9a-zA-Z-_\/\.]+)$/),
     },
@@ -105,19 +94,17 @@ output_dir = node[:rootfs_archive][:output_dir]
 package 'squashfs-tools'
 package 'tar'
 
-[:tarball, :squashfs].each do |sym|
-  case node[:rootfs_archive][:format][sym]
-  when 'gzip'
-    package 'pigz'
-  when 'lz4'
-    package 'liblz4-tool'
-  when 'xz'
-    package 'pixz'
-  when 'zstd'
-    package 'zstd'
-  else
-    raise
-  end
+case node[:rootfs_archive][:format]
+when 'gzip'
+  package 'pigz'
+when 'lz4'
+  package 'liblz4-tool'
+when 'xz'
+  package 'pixz'
+when 'zstd'
+  package 'zstd'
+else
+  raise
 end
 
 #
@@ -196,7 +183,7 @@ end
 #
 
 if ENV['DISABLE_SQUASHFS'] != 'true'
-  execute "mksquashfs #{target_dir} rootfs.squashfs -comp #{node[:rootfs_archive][:format][:squashfs]}" do
+  execute "mksquashfs #{target_dir} rootfs.squashfs -comp #{node[:rootfs_archive][:format]}" do
     cwd output_dir
     not_if "test -f rootfs.squashfs"
   end
@@ -207,7 +194,7 @@ end
 #
 
 if ENV['DISABLE_TARBALL'] != 'true'
-  case node[:rootfs_archive][:format][:tarball]
+  case node[:rootfs_archive][:format]
   when 'gzip'
     cmd = 'pigz'
     ext = 'gz'
