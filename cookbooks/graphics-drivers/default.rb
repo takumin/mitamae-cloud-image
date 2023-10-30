@@ -63,7 +63,7 @@ when /^ubuntu-(?:20|22)\.04-desktop-nvidia-legacy$/
 when /^ubuntu-(?:20|22)\.04-server-nvidia$/
   package 'nvidia-headless-535-server'
 when /^ubuntu-(?:20|22)\.04-server-nvidia-legacy$/
-  package 'nvidia-driver-470-server'
+  package 'nvidia-headless-470-server'
 else
   MItamae.logger.error "graphics-drivers: #{node[:platform]}-#{node[:platform_version]}-#{node[:target][:role]}"
   exit 1
