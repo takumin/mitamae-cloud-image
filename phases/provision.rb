@@ -1,4 +1,8 @@
 #
+# Phase
+#
+node[:phase] = :provision
+#
 # Helpers
 #
 include_recipe File.expand_path('../../helpers/normalize', __FILE__)
@@ -31,4 +35,5 @@ include_recipe File.expand_path('../../cookbooks/fake-hwclock', __FILE__)
 include_recipe File.expand_path('../../cookbooks/wireguard', __FILE__)
 include_recipe File.expand_path('../../cookbooks/nvidia', __FILE__)
 include_recipe File.expand_path('../../cookbooks/nvidia-cuda', __FILE__)
+include_recipe File.expand_path('../../cookbooks/nvidia-vgpu', __FILE__)
 include_recipe File.expand_path('../../cookbooks/cleanup', __FILE__)

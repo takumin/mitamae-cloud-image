@@ -1,4 +1,8 @@
 #
+# Phase
+#
+node[:phase] = :finalize
+#
 # Helpers
 #
 include_recipe File.expand_path('../../helpers/normalize', __FILE__)

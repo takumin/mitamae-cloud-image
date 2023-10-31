@@ -1,4 +1,8 @@
 #
+# Phase
+#
+node[:phase] = :initialize
+#
 # Helpers
 #
 include_recipe File.expand_path('../../helpers/normalize', __FILE__)
@@ -12,3 +16,4 @@ include_recipe File.expand_path('../../cookbooks/archbootstrap', __FILE__)
 include_recipe File.expand_path('../../cookbooks/rootfs_mount', __FILE__)
 include_recipe File.expand_path('../../cookbooks/resolv_conf', __FILE__)
 include_recipe File.expand_path('../../cookbooks/mitamae', __FILE__)
+include_recipe File.expand_path('../../cookbooks/nvidia-vgpu', __FILE__)

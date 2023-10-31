@@ -12,6 +12,7 @@ AVAILABLE_ROLES = [
   'desktop-nvidia-cuda',
   'server-nvidia-legacy',
   'desktop-nvidia-legacy',
+  'server-nvidia-vgpu',
 ]
 
 node.validate! do

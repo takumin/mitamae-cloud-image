@@ -99,6 +99,28 @@ DISTRIBUTIONS.each do |distribution|
   end
 end
 
+unless Dir.glob('./.bin/NVIDIA-Linux-x86_64-*-vgpu-kvm.run').empty?
+  DISTRIBUTIONS.each do |distribution|
+    SUITES[distribution].each do |suite|
+      KERNELS[distribution].each do |kernel|
+        ARCHITECTURES.each do |architecture|
+          next unless distribution.match?(/^(?:debian|ubuntu)$/)
+          next unless kernel.match?(/^(?:generic|generic-hwe)$/)
+          next unless architecture.match?(/^(?:amd64)$/)
+
+          targets << {
+            'distribution' => distribution,
+            'suite'        => suite,
+            'kernel'       => kernel,
+            'architecture' => architecture,
+            'role'         => 'server-nvidia-vgpu',
+          }
+        end
+      end
+    end
+  end
+end
+
 targets.each do |target|
   namespace target.values.join(':') do
     task :initialize do
