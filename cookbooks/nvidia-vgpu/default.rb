@@ -142,13 +142,11 @@ if node[:phase].eql?(:provision)
   # Patch Installer
   #
 
-  # TODO
+  custom_installer = files.installer.filename.gsub(/kvm\.run$/, 'kvm-custom.run')
 
-  # custom_installer = files.installer.filename.gsub(/kvm\.run$/, 'kvm-custom.run')
-
-  # execute "/#{files.installer.filename} --apply-patch /#{files.custompatch.filename}" do
-  #   not_if "test -f /#{custom_installer}"
-  # end
+  execute "/#{files.installer.filename} --apply-patch /#{files.custompatch.filename}" do
+    not_if "test -f /#{custom_installer}"
+  end
 
   #
   # Install NVIDIA vGPU Manager
@@ -156,5 +154,17 @@ if node[:phase].eql?(:provision)
 
   # TODO
 
-  # execute "/#{custom_installer} --accept-license --no-ncurses-color"
+  # opts = [
+  #   '--dkms',
+  #   '--accept-license',
+  #   '--no-questions',
+  #   '--no-ncurses-color',
+  #   '--skip-module-unload',
+  #   '--no-nvidia-modprobe',
+  #   '--no-backup',
+  #   '--no-nouveau-check',
+  #   '--skip-depmod',
+  # ]
+
+  # execute "/#{custom_installer} #{opts.join(' ')}"
 end
