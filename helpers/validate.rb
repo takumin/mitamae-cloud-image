@@ -13,6 +13,8 @@ AVAILABLE_ROLES = [
   'server-nvidia-legacy',
   'desktop-nvidia-legacy',
   'server-nvidia-vgpu',
+  'proxmox-ve',
+  'proxmox-ve-nvidia-vgpu',
 ]
 
 node.validate! do
@@ -41,7 +43,7 @@ when 'debian'
   node.validate! do
     {
       target: {
-        kernel:     match(/^(?:generic|cloud|rt|raspberrypi)$/),
+        kernel:     match(/^(?:generic|cloud|rt|raspberrypi|proxmox)$/),
         suite:      match(/^(?:bullseye|bookworm)$/),
         components: array_of(match(/^(?:main|contrib|non-free|non-free-firmware)$/)),
       },

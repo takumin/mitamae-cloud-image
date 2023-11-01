@@ -106,22 +106,12 @@ when :debian
       :components  => node[:apt][:components],
     },
     {
-      :default_uri => default_uri,
-      :mirror_uri  => mirror_uri,
-      :suite       => "#{node[:apt][:suite]}-backports",
-      :components  => node[:apt][:components],
-    },
-  ]
-
-  case node[:apt][:suite].to_sym
-  when :bullseye, :bookworm
-    entry << {
       :default_uri => default_security_uri,
       :mirror_uri  => mirror_security_uri,
       :suite       => "#{node[:apt][:suite]}-security",
       :components  => node[:apt][:components],
-    }
-  end
+    },
+  ]
 when :ubuntu
   case node[:apt][:architecture].to_sym
   when :i386, :amd64

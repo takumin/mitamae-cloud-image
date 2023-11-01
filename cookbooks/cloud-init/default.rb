@@ -4,7 +4,7 @@
 # Check Role
 #
 
-if node[:target][:role].match(/minimal/)
+if node[:target][:role].match?(/(?:minimal|proxmox-ve)/)
   return
 end
 

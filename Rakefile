@@ -99,25 +99,23 @@ DISTRIBUTIONS.each do |distribution|
   end
 end
 
-unless Dir.glob('./.bin/NVIDIA-Linux-x86_64-*-vgpu-kvm.run').empty?
-  DISTRIBUTIONS.each do |distribution|
-    SUITES[distribution].each do |suite|
-      KERNELS[distribution].each do |kernel|
-        ARCHITECTURES.each do |architecture|
-          next unless distribution.match?(/^(?:debian|ubuntu)$/)
-          next unless kernel.match?(/^(?:generic|generic-hwe)$/)
-          next unless architecture.match?(/^(?:amd64)$/)
+SUITES['debian'].each do |suite|
+  targets << {
+    'distribution' => 'debian',
+    'suite'        => suite,
+    'kernel'       => 'proxmox',
+    'architecture' => 'amd64',
+    'role'         => 'proxmox-ve',
+  }
 
-          targets << {
-            'distribution' => distribution,
-            'suite'        => suite,
-            'kernel'       => kernel,
-            'architecture' => architecture,
-            'role'         => 'server-nvidia-vgpu',
-          }
-        end
-      end
-    end
+  unless Dir.glob('./.bin/NVIDIA-Linux-x86_64-*-vgpu-kvm.run').empty?
+    targets << {
+      'distribution' => 'debian',
+      'suite'        => suite,
+      'kernel'       => 'proxmox',
+      'architecture' => 'amd64',
+      'role'         => 'proxmox-ve-nvidia-vgpu',
+    }
   end
 end
 

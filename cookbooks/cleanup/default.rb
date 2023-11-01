@@ -17,9 +17,11 @@ end
 # Enabled Systemd Networkd
 #
 
-service 'systemd-networkd.service' do
-  action :enable
-  not_if 'systemctl is-enabled NetworkManager.service'
+unless node.target.role.match?(/proxmox-ve/)
+  service 'systemd-networkd.service' do
+    action :enable
+    not_if 'systemctl is-enabled NetworkManager.service'
+  end
 end
 
 #
