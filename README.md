@@ -37,6 +37,14 @@ export ARCH_PACMAN_MIRROR="https://ftp.jaist.ac.jp/pub/Linux/ArchLinux/"
 
 export TIMEZONE="Asia/Tokyo"
 
+# For minimal or proxmox-ve profile
+# Generate password:
+# openssl passwd -6 -salt "$(cat /dev/urandom | tr -dc 'A-Za-z0-9' | fold -w 8 | head -n 1)"
+# export ADMIN_USERNAME="admin"
+# export ADMIN_FULLNAME="Admin User"
+# export ADMIN_PASSWORD=""
+# export ADMIN_SSH_AUTHORIZED_KEYS=""
+
 # export ROOTFS_ARCHIVE_FORMAT="xz"
 
 # export DISABLE_SQUASHFS="true"
