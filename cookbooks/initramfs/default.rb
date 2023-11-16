@@ -79,26 +79,26 @@ else
 end
 
 #
-# Live Boot Disable Networking
+# Live Boot Disable Internal Networking
 #
 
-remote_file '/etc/initramfs-tools/scripts/init-top/zzz-liveboot-disable-networking' do
+remote_file '/etc/initramfs-tools/scripts/init-top/zzz-liveboot-disable-internal-networking' do
   owner  'root'
   group  'root'
   mode   '0755'
-  source 'files/liveboot-disable-networking'
+  source 'files/liveboot-disable-internal-networking'
 end
 
 #
-# Initramfs Enable Networking
+# Live Boot Enable Initramfs Networking
 #
 
-# remote_file '/etc/initramfs-tools/scripts/init-top/zzz-initramfs-configure-networking' do
-#   owner  'root'
-#   group  'root'
-#   mode   '0755'
-#   source 'files/initramfs-configure-networking'
-# end
+remote_file '/etc/initramfs-tools/scripts/init-top/zzz-liveboot-enable-initramfs-networking' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/liveboot-enable-initramfs-networking'
+end
 
 #
 # Cloud-Init NoCloud Datasource Network Config
