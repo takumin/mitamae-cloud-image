@@ -128,22 +128,22 @@ if ppa_nvidia_vgpu
   DISTRIBUTIONS.each do |distribution|
     case distribution
     when 'debian'
+      suite  = 'bookworm'
       kernel = 'generic'
     when 'ubuntu'
+      suite  = 'jammy'
       kernel = 'generic-hwe'
     else
       next
     end
 
-    SUITES[distribution].each do |suite|
-      targets << {
-        'distribution' => distribution,
-        'suite'        => suite,
-        'kernel'       => kernel,
-        'architecture' => 'amd64',
-        'role'         => 'server-nvidia-vgpu',
-      }
-    end
+    targets << {
+      'distribution' => distribution,
+      'suite'        => suite,
+      'kernel'       => kernel,
+      'architecture' => 'amd64',
+      'role'         => 'server-nvidia-vgpu',
+    }
   end
 end
 
