@@ -115,23 +115,21 @@ end
 # Cloud-Init NoCloud Datasource Network Config
 #
 
-# remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
-#   owner  'root'
-#   group  'root'
-#   mode   '0755'
-#   source 'files/cloud-init-nocloud-network-config'
-# end
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/cloud-init-nocloud-network-config'
+end
 
 #
 # Workaround: Removed netplan yaml file created in initramfs stage
 # See also: https://askubuntu.com/questions/1228433/what-is-creating-run-netplan-eth0-yaml
 #
 
-if node.target.role.match?(/proxmox-ve/)
-  remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-reset-network-interfaces' do
-    owner  'root'
-    group  'root'
-    mode   '0755'
-    source 'files/reset-network-interfaces'
-  end
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-reset-network-interfaces' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/reset-network-interfaces'
 end

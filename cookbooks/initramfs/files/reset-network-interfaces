@@ -1,4 +1,5 @@
 #!/bin/sh
+# vim: set noet :
 
 [ "$1" = 'prereqs' ] && { exit 0; }
 
@@ -6,7 +7,11 @@
 # See also: https://askubuntu.com/questions/1228433/what-is-creating-run-netplan-eth0-yaml
 reset_network_interfaces() {(
 	if ! test -r "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg"; then
-		return 0
+		return
+	fi
+
+	if [ "${BOOT:-}" != "live" ]; then
+		return
 	fi
 
 	for intf in /sys/class/net/*; do
