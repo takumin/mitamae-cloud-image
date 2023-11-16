@@ -82,15 +82,15 @@ end
 # Live Boot Disable Networking
 #
 
-# remote_file '/etc/initramfs-tools/scripts/init-top/zzz-liveboot-disable-networking' do
-#   owner  'root'
-#   group  'root'
-#   mode   '0755'
-#   source 'files/liveboot-disable-networking'
-# end
+remote_file '/etc/initramfs-tools/scripts/init-top/zzz-liveboot-disable-networking' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/liveboot-disable-networking'
+end
 
 #
-# Initramfs Configure Networking
+# Initramfs Enable Networking
 #
 
 # remote_file '/etc/initramfs-tools/scripts/init-top/zzz-initramfs-configure-networking' do

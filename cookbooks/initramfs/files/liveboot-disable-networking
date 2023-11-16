@@ -1,6 +1,9 @@
 #!/bin/sh
+# vim: set noet :
 
 [ "$1" = 'prereqs' ] && { exit 0; }
 
-NONETWORKING="true"
-export NONETWORKING
+if [ "${BOOT:-}" = "live" ]; then
+	NONETWORKING="true"
+	export NONETWORKING
+fi
