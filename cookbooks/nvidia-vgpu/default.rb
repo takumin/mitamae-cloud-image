@@ -111,3 +111,13 @@ package 'dkms'
 #
 
 package 'nvidia-vgpu'
+
+#
+# Enable Services
+#
+
+%w{nvidia-vgpu-mgr.service nvidia-vgpud.service}.each do |s|
+  service s do
+    action :enable
+  end
+end
