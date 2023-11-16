@@ -116,9 +116,11 @@ ppa_nvidia_vgpu = true
   APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL
   APT_REPO_PPA_NVIDIA_VGPU_URL
 }.each do |k|
-  if ENV[k].empty?
-    ppa_nvidia_vgpu = false
-    break
+  if ENV.key?(k)
+    if ENV[k].empty?
+      ppa_nvidia_vgpu = false
+      break
+    end
   end
 end
 
