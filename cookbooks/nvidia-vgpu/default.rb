@@ -27,144 +27,87 @@ unless node[:platform].match?(/(?:debian|ubuntu)$/)
 end
 
 #
-# Private Variables
+# Check Environment Variables
 #
 
-case node[:phase]
-when :initialize
-  base = File.expand_path('../../../.bin', __FILE__)
-when :provision
-  base = '/'
-else
-  raise
-end
-
-files = Hashie::Mash.new({
-  installer: Hashie::Mash.new({
-    searchname: 'NVIDIA-Linux-x86_64-*-vgpu-kvm.run',
-    version:    '',
-    filename:   '',
-    filepath:   '',
-  }),
-  custompatch: Hashie::Mash.new({
-    searchname: 'NVIDIA-Linux-x86_64-*-vgpu-kvm.run.patch',
-    version:    '',
-    filename:   '',
-    filepath:   '',
-  }),
-})
-
-#
-# Check Installer
-#
-
-files.each do |k, v|
-  if Dir.glob(File.expand_path(File.join(base, v.searchname), __FILE__)).empty?
-    MItamae.logger.error "nvidia-vgpu: Not found #{v.searchname}"
+%w{
+  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID
+  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT
+  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL
+  APT_REPO_PPA_NVIDIA_VGPU_URL
+}.each do |k|
+  if ENV[k].empty?
+    MItamae.logger.error "nvidia-vgpu: Required environment variables: #{k}"
     exit 1
   end
 end
 
 #
-# Check Version
+# Apt Keyring
 #
 
-files.each do |k, v|
-  result = run_command("find #{base} -mindepth 1 -maxdepth 1 -type f -name '#{v.searchname}' | sort -Vr | head -n 1")
-  raise unless result.success?
-
-  files[k].filepath = result.stdout.chomp.strip
-  files[k].filename = File.basename(files[k].filepath)
-  files[k].version  = files[k].filename.gsub(/.*-(\d+\.\d+\.\d+)-.*/){$1}
-end
-
-unless files.installer.version == files.custompatch.version
-  MItamae.logger.error 'nvidia-vgpu: Unmatch Installer and Patch Version'
-  exit 1
+apt_keyring ENV['APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID'] do
+  finger ENV['APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT']
+  uri ENV['APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL']
 end
 
 #
-# Copy Installer (Initialize Phase)
+# Apt Repository
 #
 
-if node[:phase].eql?(:initialize)
-  files.each do |k, v|
-    target_dir  = node[:target][:directory]
-    target_path = File.join(target_dir, v.filename)
+apt_repository 'PPA NVIDIA vGPU Repository' do
+  path '/etc/apt/sources.list.d/nvidia-vgpu.list'
+  entry [
+    {
+      :default_uri => ENV['APT_REPO_PPA_NVIDIA_VGPU_URL'],
+      :suite       => '###platform_codename###',
+      :components  => [
+        'main',
+      ],
+    },
+  ]
+  notifies :run, 'execute[apt-get update]', :immediately
+end
 
-    execute "cp #{v.filepath} #{target_path}" do
-      not_if "test -f #{target_path}"
-    end
+#
+# Event Handler
+#
+
+execute 'apt-get update' do
+  action :nothing
+end
+
+#
+# Required Packages
+#
+
+case node[:platform]
+when 'ubuntu'
+  if node[:target][:kernel].match?(/-hwe$/)
+    package "linux-headers-#{node[:target][:kernel]}-#{node[:platform_version]}"
+  else
+    package "linux-headers-#{node[:target][:kernel]}"
   end
-end
-
-#
-# Running Intaller (Provision Phase)
-#
-
-if node[:phase].eql?(:provision)
-  #
-  # Required Packages
-  #
-
-  case node[:platform]
-  when 'ubuntu'
-    case node[:target][:kernel]
-    when 'generic-hwe'
-      package "linux-headers-#{node[:target][:kernel]}-#{node[:platform_version]}"
-    when 'generic'
-      package "linux-headers-#{node[:target][:kernel]}"
-    else
-      raise
-    end
-  when 'debian'
-    case node[:target][:kernel]
-    when 'generic'
-      package "linux-headers-#{node[:target][:architecture]}"
-    else
-      raise
-    end
+when 'debian'
+  case node[:target][:kernel]
+  when 'generic'
+    package "linux-headers-#{node[:target][:architecture]}"
+  when 'cloud'
+    package "linux-headers-cloud-#{node[:target][:architecture]}"
+  when 'rt'
+    package "linux-headers-rt-#{node[:target][:architecture]}"
   else
     raise
   end
-
-  #
-  # Installer Permission
-  #
-
-  file files.installer.filepath do
-    owner 'root'
-    group 'root'
-    mode  '0755'
-  end
-
-  #
-  # Patch Installer
-  #
-
-  custom_installer = files.installer.filename.gsub(/kvm\.run$/, 'kvm-custom.run')
-
-  execute "/#{files.installer.filename} --apply-patch /#{files.custompatch.filename}" do
-    not_if "test -f /#{custom_installer}"
-  end
-
-  #
-  # Install NVIDIA vGPU Manager
-  #
-
-  # TODO
-
-  # opts = [
-  #   '--dkms',
-  #   '--accept-license',
-  #   '--no-questions',
-  #   '--no-ncurses-color',
-  #   '--skip-module-unload',
-  #   '--no-nvidia-modprobe',
-  #   '--no-backup',
-  #   '--no-nouveau-check',
-  #   '--skip-depmod',
-  # ]
-
-  # execute "/#{custom_installer} #{opts.join(' ')}"
+else
+  raise
 end
+
+package 'build-essential'
+package 'dkms'
+
+#
+# Install Package
+#
+
+package 'nvidia-vgpu'

@@ -71,12 +71,27 @@ jobs:
         fetch-depth: 1
     - name: Initialize
       id: initialize
+      env:
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID }}
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT }}
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL }}
+        APT_REPO_PPA_NVIDIA_VGPU_URL: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_URL }}
       run: rake ${TARGET_NAME}:initialize
     - name: Provision
       id: provision
+      env:
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID }}
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT }}
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL }}
+        APT_REPO_PPA_NVIDIA_VGPU_URL: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_URL }}
       run: rake ${TARGET_NAME}:provision
     - name: Finalize
       id: finalize
+      env:
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID }}
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT }}
+        APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL }}
+        APT_REPO_PPA_NVIDIA_VGPU_URL: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_URL }}
       run: rake ${TARGET_NAME}:finalize
     #
     # Build Artifacts

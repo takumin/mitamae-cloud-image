@@ -107,15 +107,41 @@ SUITES['debian'].each do |suite|
     'architecture' => 'amd64',
     'role'         => 'proxmox-ve',
   }
+end
 
-  unless Dir.glob('./.bin/NVIDIA-Linux-x86_64-*-vgpu-kvm.run').empty?
-    targets << {
-      'distribution' => 'debian',
-      'suite'        => suite,
-      'kernel'       => 'proxmox',
-      'architecture' => 'amd64',
-      'role'         => 'proxmox-ve-nvidia-vgpu',
-    }
+ppa_nvidia_vgpu = true
+%w{
+  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID
+  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT
+  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL
+  APT_REPO_PPA_NVIDIA_VGPU_URL
+}.each do |k|
+  if ENV[k].empty?
+    ppa_nvidia_vgpu = false
+    break
+  end
+end
+
+if ppa_nvidia_vgpu
+  DISTRIBUTIONS.each do |distribution|
+    case distribution
+    when 'debian'
+      kernel = 'generic'
+    when 'ubuntu'
+      kernel = 'generic-hwe'
+    else
+      next
+    end
+
+    SUITES[distribution].each do |suite|
+      targets << {
+        'distribution' => distribution,
+        'suite'        => suite,
+        'kernel'       => kernel,
+        'architecture' => 'amd64',
+        'role'         => 'server-nvidia-vgpu',
+      }
+    end
   end
 end
 

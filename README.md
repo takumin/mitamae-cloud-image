@@ -33,6 +33,11 @@ export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_JAMMY="http://${APT_PROXY_HOST}/nvidia-cu
 export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BULLSEYE="http://${APT_PROXY_HOST}/nvidia-cuda-bullseye"
 export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM="http://${APT_PROXY_HOST}/nvidia-cuda-bookworm"
 
+export APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID="[GPG_UID]"
+export APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT="[GPG_FINGER_PRINT]"
+export APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL="http://${APT_PROXY_HOST}/ppa-nvidia-vgpu/public.gpg"
+export APT_REPO_PPA_NVIDIA_VGPU_URL="http://${APT_PROXY_HOST}/ppa-nvidia-vgpu"
+
 export ARCH_PACMAN_MIRROR="https://ftp.jaist.ac.jp/pub/Linux/ArchLinux/"
 
 export TIMEZONE="Asia/Tokyo"
