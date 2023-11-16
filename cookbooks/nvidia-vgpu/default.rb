@@ -36,7 +36,7 @@ end
   APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL
   APT_REPO_PPA_NVIDIA_VGPU_URL
 }.each do |k|
-  if ENV[k].empty?
+  if !ENV.key?(k) or ENV[k].empty?
     MItamae.logger.error "nvidia-vgpu: Required environment variables: #{k}"
     exit 1
   end
