@@ -79,6 +79,17 @@ else
 end
 
 #
+# Live Boot Disable Cloud-Init Resize Rootfs
+#
+
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-liveboot-disable-cloud-init-resize-rootfs' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/liveboot-disable-cloud-init-resize-rootfs'
+end
+
+#
 # Live Boot Disable Internal Networking
 #
 
@@ -109,17 +120,6 @@ end
 #   group  'root'
 #   mode   '0755'
 #   source 'files/cloud-init-nocloud-network-config'
-# end
-
-#
-# Cloud-Init Disable Resize Rootfs
-#
-
-# remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-disable-resize-rootfs' do
-#   owner  'root'
-#   group  'root'
-#   mode   '0755'
-#   source 'files/cloud-init-disable-resize-rootfs'
 # end
 
 #

@@ -1,0 +1,10 @@
+#!/bin/sh
+# vim: set noet :
+
+[ "$1" = 'prereqs' ] && { exit 0; }
+
+if [ "${BOOT:-}" = "live" ]; then
+	if [ -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
+		echo 'resize_rootfs: false' > "${rootmnt}/etc/cloud/cloud.cfg.d/99_disable_resize_rootfs.cfg"
+	fi
+fi
