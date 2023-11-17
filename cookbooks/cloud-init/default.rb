@@ -75,17 +75,6 @@ end
 package 'cloud-init'
 
 #
-# Netplan Permission
-#
-
-file '/etc/netplan/50-cloud-init.yaml' do
-  owner   'root'
-  group   'root'
-  mode    '0600'
-  only_if 'test -f /etc/netplan/50-cloud-init.yaml'
-end
-
-#
 # Package Config
 #
 
