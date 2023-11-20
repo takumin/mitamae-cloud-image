@@ -49,6 +49,52 @@ if node.target.role.match(/desktop/)
 end
 
 #
+# Required Packages
+#
+
+package 'bash'
+package 'wget'
+package 'ca-certificates'
+
+#
+# Autologin Script
+#
+
+contents = <<~__EOF__
+# ~/.profile: executed by Bourne-compatible login shells.
+
+mesg n 2> /dev/null || true
+
+if [ "$BASH" ]; then
+	if [ -f ~/.bashrc ]; then
+		. ~/.bashrc
+	fi
+fi
+
+for cmdline in $(cat /proc/cmdline); do
+	case "${cmdline}" in
+		script=*)
+			script="${cmdline#script=}"
+			;;
+	esac
+done
+
+if [ -n "${script:-}" ]; then
+	if echo "${script}" | grep -qsE '^https?://'; then
+		wget -O /tmp/livescript "${script}" 2>&1 | tee /var/log/livescript.log
+		bash /tmp/livescript 2>&1 | tee -a /var/log/livescript.log
+	fi
+fi
+__EOF__
+
+file '/root/.profile' do
+  owner   'root'
+  group   'root'
+  mode    '0600'
+  content contents
+end
+
+#
 # Loop AutoLogin Profiles
 #
 
@@ -98,7 +144,7 @@ node.autologin.values.each do |autologin|
       'Type=idle',
       'ExecStart=',
       "ExecStart=-#{autologin.getty} #{agetty_args.join(' ')}",
-    ].join("\n")
+    ].join("\n").concat("\n")
   end
 
   file "/etc/systemd/system/#{autologin.service}@#{autologin.port}.service.d/noclear.conf" do
@@ -108,7 +154,17 @@ node.autologin.values.each do |autologin|
     content [
       '[Service]',
       'TTYVTDisallocate=no',
-    ].join("\n")
+    ].join("\n").concat("\n")
+  end
+
+  file "/etc/systemd/system/#{autologin.service}@#{autologin.port}.service.d/cloudinit.conf" do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      '[Unit]',
+      'After=cloud-init.target',
+    ].join("\n").concat("\n")
   end
 
   #
