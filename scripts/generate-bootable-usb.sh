@@ -21,7 +21,7 @@ set -eu
 : "${DISTRIB:="ubuntu"}"
 
 # Release Codename
-# Value: [noble]
+# Value: [bookworm|noble]
 : "${RELEASE:="noble"}"
 
 # Kernel Package
