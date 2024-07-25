@@ -73,11 +73,14 @@ else
 end
 
 #
-# Check Distribution
+# Cloud-Init NoCloud Datasource Network Config
 #
 
-unless node[:target][:distribution].match(/^ubuntu$/)
-  return
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/cloud-init-nocloud-network-config'
 end
 
 #
@@ -89,6 +92,14 @@ remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-liveboot-disable-cloud
   group  'root'
   mode   '0755'
   source 'files/liveboot-disable-cloud-init-resize-rootfs'
+end
+
+#
+# Check Distribution
+#
+
+unless node[:target][:distribution].match(/^ubuntu$/)
+  return
 end
 
 #
@@ -111,17 +122,6 @@ remote_file '/etc/initramfs-tools/scripts/init-top/zzz-liveboot-enable-initramfs
   group  'root'
   mode   '0755'
   source 'files/liveboot-enable-initramfs-networking'
-end
-
-#
-# Cloud-Init NoCloud Datasource Network Config
-#
-
-remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
-  owner  'root'
-  group  'root'
-  mode   '0755'
-  source 'files/cloud-init-nocloud-network-config'
 end
 
 #
