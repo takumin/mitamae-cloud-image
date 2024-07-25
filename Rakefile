@@ -56,6 +56,7 @@ ROLES = {
     'desktop-nvidia',
     'desktop-nvidia-cuda',
     'desktop-nvidia-legacy',
+    'desktop-rtl8852au-nvidia-cuda',
   ],
   'ubuntu' => [
     'minimal',
@@ -67,6 +68,7 @@ ROLES = {
     'desktop-nvidia',
     'desktop-nvidia-cuda',
     'desktop-nvidia-legacy',
+    'desktop-rtl8852au-nvidia-cuda',
   ],
 }
 
@@ -237,6 +239,9 @@ end
 namespace :github do
   namespace :actions do
     task :all do
+      # NOTE: Unused NVIDIA Legacy Version
+      targets.delete_if{|v| v.values.include?('server-nvidia-legacy')}
+      targets.delete_if{|v| v.values.include?('desktop-nvidia-legacy')}
       # TODO: GitHub Actions Once the arm64 runner is GA, remove the following
       targets.delete_if{|v| v.values.include?('arm64')}
       # FIXME: install error nvidia-vgpu-dkms 535.129.03
