@@ -10,6 +10,7 @@ AVAILABLE_ROLES = [
   'desktop-nvidia',
   'server-nvidia-cuda',
   'desktop-nvidia-cuda',
+  'desktop-rtl8852au-nvidia-cuda',
   'server-nvidia-legacy',
   'desktop-nvidia-legacy',
   'server-nvidia-vgpu',
