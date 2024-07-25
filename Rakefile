@@ -72,7 +72,8 @@ ROLES = {
 
 ARCHITECTURES = [
   'amd64',
-  'arm64',
+  # TODO: GitHub Actions When arm64 runner becomes GA, enable it
+  # 'arm64',
 ]
 
 targets = []
