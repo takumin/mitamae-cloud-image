@@ -239,6 +239,8 @@ namespace :github do
     task :all do
       # TODO: GitHub Actions Once the arm64 runner is GA, remove the following
       targets.delete_if{|v| v.values.include?('arm64')}
+      # FIXME: install error nvidia-vgpu-dkms 535.129.03
+      targets.delete_if{|v| v.values.include?('ubuntu') && v.values.include?('noble') && v.values.include?('server-nvidia-vgpu')}
 
       puts JSON.dump(targets.map{|v|
         {
