@@ -9,7 +9,7 @@ require 'json'
 PUBLISH_UBUNTU_SUITE = 'noble'
 PUBLISH_DEBIAN_SUITE = 'bookworm'
 
-MITAMAE_VERSION = 'v1.14.0'
+MITAMAE_VERSION = 'v1.14.1'
 
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 
