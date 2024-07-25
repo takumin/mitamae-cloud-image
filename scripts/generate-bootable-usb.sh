@@ -17,23 +17,41 @@ set -eu
 : "${DESTDIR:="$(cd "$(dirname "$0")/.."; pwd)/releases"}"
 
 # Linux Distribution
-# Value: [debian|ubuntu]
-: "${DISTRIB:="ubuntu"}"
+# Value:
+# - debian
+# - ubuntu
+: "${DISTRIB:="debian"}"
 
 # Release Codename
-# Value: [bookworm|noble]
-: "${RELEASE:="noble"}"
+# Value:
+# - bullseye
+# - bookworm
+# - jammy
+# - noble
+: "${RELEASE:="bookworm"}"
 
 # Kernel Package
-# Value: [generic|generic-hwe]
-: "${KERNEL:="generic-hwe"}"
+# Value:
+# - generic
+# - generic-hwe
+# - generic-backports
+: "${KERNEL:="generic"}"
 
 # Package Selection
-# Value: [server|server-nvidia|server-nvidia-cuda|desktop|desktop-nvidia|desktop-nvidia-cuda]
-: "${PROFILE:="server"}"
+# Value:
+# - server
+# - server-nvidia
+# - server-nvidia-cuda
+# - desktop
+# - desktop-nvidia
+# - desktop-nvidia-cuda
+# - desktop-rtl8852au-nvidia-cuda
+: "${PROFILE:="desktop-rtl8852au-nvidia-cuda"}"
 
 # CPU Architecture
-# Value: [amd64|arm64]
+# Value:
+# - amd64
+# - arm64
 : "${ARCH:="amd64"}"
 
 ################################################################################
