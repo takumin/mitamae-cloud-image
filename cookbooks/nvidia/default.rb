@@ -60,11 +60,11 @@ case node[:platform]
 when 'ubuntu'
   case node[:target][:role]
   when 'desktop-nvidia'
-    package 'nvidia-driver-535'
+    package 'nvidia-driver-550'
   when 'desktop-nvidia-legacy'
     package 'nvidia-driver-470'
   when 'server-nvidia'
-    package 'nvidia-headless-535-server'
+    package 'nvidia-headless-550-server'
   when 'server-nvidia-legacy'
     package 'nvidia-headless-470-server'
   else
