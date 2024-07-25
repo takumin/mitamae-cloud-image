@@ -4,7 +4,7 @@
 # Check Role
 #
 
-if node.target.role.match(/rtl8852au/)
+unless node.target.role.match(/rtl8852au/)
   return
 end
 
