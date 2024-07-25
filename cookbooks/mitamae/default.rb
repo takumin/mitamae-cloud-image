@@ -10,7 +10,7 @@ node[:mitamae] ||= Hashie::Mash.new
 # Public Variables - Version
 #
 
-node[:mitamae][:version] ||= '1.14.0'
+node[:mitamae][:version] ||= '1.14.1'
 
 #
 # Public Variables - Architecture
