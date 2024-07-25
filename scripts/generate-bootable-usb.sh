@@ -147,7 +147,10 @@ cp "${DESTDIR}/vmlinuz" "${WORKDIR}/live/vmlinuz"
 cp "${DESTDIR}/initrd.img" "${WORKDIR}/live/initrd.img"
 
 # Rootfs
-cp "${DESTDIR}/rootfs.squashfs" "${WORKDIR}/live/rootfs.squashfs"
+cp "${DESTDIR}/rootfs.squashfs" "${WORKDIR}/live/filesystem.squashfs"
+
+# Packages
+cp "${DESTDIR}/packages.manifest" "${WORKDIR}/live/filesystem.packages"
 
 ################################################################################
 # Grub
@@ -192,7 +195,7 @@ set timeout=0
 
 menuentry 'ubuntu' {
 	search --no-floppy --fs-uuid --set=root ${UUID}
-	linux /live/vmlinuz boot=live bootfrom=removable-usb toram noeject nopersistence cgroup_enable=memory swapaccount=1 silent quiet ---
+	linux /live/vmlinuz boot=live bootfrom=removable-usb toram noeject nopersistence silent quiet ---
 	initrd /live/initrd.img
 }
 __EOF__
