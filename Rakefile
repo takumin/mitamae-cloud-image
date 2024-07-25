@@ -238,7 +238,7 @@ namespace :github do
   namespace :actions do
     task :all do
       # TODO: GitHub Actions Once the arm64 runner is GA, remove the following
-      targets.delete_if{|v| v.include?('arm64')}
+      targets.delete_if{|v| v.values.include?('arm64')}
 
       puts JSON.dump(targets.map{|v|
         {
