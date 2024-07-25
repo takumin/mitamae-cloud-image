@@ -10,8 +10,11 @@ set -eu
 # USB Device ID
 : "${USB_NAME:="$1"}"
 
-# Root File System Mount Point
-: "${WORKDIR:="/run/liveusb"}"
+# LiveUSB Mount Point
+: "${LIVEUSB:="/run/liveusb"}"
+
+# Cloud-Init Mount Point
+: "${CIDATA:="/run/cidata"}"
 
 # Destination Directory
 : "${DESTDIR:="$(cd "$(dirname "$0")/.."; pwd)/releases"}"
@@ -93,14 +96,16 @@ dpkg -l | awk '{print $2}' | grep -qs '^grub-efi-amd64-bin$' || apt-get -y insta
 awk '{print $1}' /proc/mounts | grep -s "${USB_PATH}" | sort -r | xargs --no-run-if-empty umount
 
 # Unmount Working Directory
-awk '{print $2}' /proc/mounts | grep -s "${WORKDIR}" | sort -r | xargs --no-run-if-empty umount
+awk '{print $2}' /proc/mounts | grep -s "${LIVEUSB}" | sort -r | xargs --no-run-if-empty umount
+awk '{print $2}' /proc/mounts | grep -s "${CIDATA}" | sort -r | xargs --no-run-if-empty umount
 
 ################################################################################
 # Initialize
 ################################################################################
 
 # Create Working Directory
-mkdir -p "${WORKDIR}"
+mkdir -p "${LIVEUSB}"
+mkdir -p "${CIDATA}"
 
 ################################################################################
 # Partition
@@ -113,13 +118,19 @@ sgdisk -Z "${USB_PATH}"
 sgdisk -o "${USB_PATH}"
 
 # Create BIOS Boot Partition
-sgdisk -a 1 -n 1::2047 -c 1:"BIOS" -t 1:ef02 "${USB_PATH}"
+sgdisk -a 1 -n 1::2047 -c 1:"BIOS"    -t 1:ef02 "${USB_PATH}"
 
 # Create EFI System Partition
-sgdisk      -n 2::+4G  -c 2:"ESP"  -t 2:ef00 "${USB_PATH}"
+sgdisk      -n 2::+4G  -c 2:"ESP"     -t 2:ef00 "${USB_PATH}"
+
+# Create Cloud-Init Data Partition
+sgdisk      -n 3::+64M -c 3:"CIDATA"  -t 3:0700 "${USB_PATH}"
 
 # Create USB Data Partition
-sgdisk      -n 3::-1   -c 3:"USB"  -t 3:0700 "${USB_PATH}"
+sgdisk      -n 4::-1   -c 4:"USBDATA" -t 4:0700 "${USB_PATH}"
+
+# Do not automount for Cloud-Init Data Partition
+sgdisk -A 3:set:63 "${USB_PATH}"
 
 # Wait Probe
 sleep 1
@@ -132,7 +143,8 @@ sleep 1
 
 # Get Real Path
 ESPPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part2")"
-USBPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part3")"
+CIDATAPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part3")"
+USBDATAPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part4")"
 
 ################################################################################
 # Format
@@ -140,52 +152,54 @@ USBPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part3")"
 
 # Format Partition
 mkfs.vfat -F 32 -n 'ESP' -v "${ESPPT}"
-mkfs.vfat -F 32 -n 'USB' -v "${USBPT}"
+mkfs.vfat -F 32 -n 'CIDATA' -v "${CIDATAPT}"
+mkfs.vfat -F 32 -n 'USBDATA' -v "${USBDATAPT}"
 
 ################################################################################
 # Mount
 ################################################################################
 
 # Mount Partition
-mount -t vfat -o codepage=932,iocharset=utf8 "${ESPPT}" "${WORKDIR}"
+mount -t vfat -o codepage=932,iocharset=utf8 "${ESPPT}" "${LIVEUSB}"
+mount -t vfat -o codepage=932,iocharset=utf8 "${CIDATAPT}" "${CIDATA}"
 
 ################################################################################
 # Directory
 ################################################################################
 
 # Require Directory
-mkdir -p "${WORKDIR}/boot"
-mkdir -p "${WORKDIR}/live"
+mkdir -p "${LIVEUSB}/boot"
+mkdir -p "${LIVEUSB}/live"
 
 ################################################################################
 # Files
 ################################################################################
 
 # Kernel
-cp "${DESTDIR}/vmlinuz" "${WORKDIR}/live/vmlinuz"
+cp "${DESTDIR}/vmlinuz" "${LIVEUSB}/live/vmlinuz"
 
 # Initramfs
-cp "${DESTDIR}/initrd.img" "${WORKDIR}/live/initrd.img"
+cp "${DESTDIR}/initrd.img" "${LIVEUSB}/live/initrd.img"
 
 # Rootfs
-cp "${DESTDIR}/rootfs.squashfs" "${WORKDIR}/live/filesystem.squashfs"
+cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/live/filesystem.squashfs"
 
 # Packages
-cp "${DESTDIR}/packages.manifest" "${WORKDIR}/live/filesystem.packages"
+cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/live/filesystem.packages"
 
 ################################################################################
 # Grub
 ################################################################################
 
 # Grub Install
-grub-install --target=i386-pc --recheck --boot-directory="${WORKDIR}/boot" "${USB_PATH}" --force
-grub-install --target=x86_64-efi --recheck --boot-directory="${WORKDIR}/boot" --efi-directory="${WORKDIR}" --removable
+grub-install --target=i386-pc --recheck --boot-directory="${LIVEUSB}/boot" "${USB_PATH}" --force
+grub-install --target=x86_64-efi --recheck --boot-directory="${LIVEUSB}/boot" --efi-directory="${LIVEUSB}" --removable
 
 # Get UUID
 UUID="$(blkid -p -s UUID -o value "${ESPPT}")"
 
 # Grub Config
-cat > "${WORKDIR}/boot/grub/grub.cfg" << __EOF__
+cat > "${LIVEUSB}/boot/grub/grub.cfg" << __EOF__
 if [ x\$grub_platform = xpc ]; then
 	insmod vbe
 fi
@@ -225,14 +239,31 @@ menuentry 'ubuntu' {
 __EOF__
 
 ################################################################################
+# Cloud-Init
+################################################################################
+
+# Cloud-Init Config
+cat > "${CIDATA}/user-data" << '__EOF__'
+#cloud-config
+users:
+- name: takumi
+	gecos: Takumi Takahashi,,,
+	groups: adm, users, staff, sudo, plugdev, netdev, bluetooth, dialout, cdrom, floppy, audio, video, render
+	lock_passwd: false
+	passwd: $6$MuAJon8z$tW5w.S7jzs4qe4Vmn5aQDK8aDT5GJ38.GeRzEIHMxb67fF2Z6zMEgr6IugGf40YPS2DRMaKWiD3iMWFwC7/kQ1
+__EOF__
+
+################################################################################
 # Cleanup
 ################################################################################
 
 # Unmount Working Directory
-awk '{print $2}' /proc/mounts | grep -s "${WORKDIR}" | sort -r | xargs --no-run-if-empty umount
+awk '{print $2}' /proc/mounts | grep -s "${LIVEUSB}" | sort -r | xargs --no-run-if-empty umount
+awk '{print $2}' /proc/mounts | grep -s "${CIDATA}" | sort -r | xargs --no-run-if-empty umount
 
 # Cleanup Working Directory
-rmdir "${WORKDIR}"
+rmdir "${LIVEUSB}"
+rmdir "${CIDATA}"
 
 # Disk Sync
 sync;sync;sync
