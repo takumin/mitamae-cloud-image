@@ -21,15 +21,15 @@ set -eu
 : "${DISTRIB:="ubuntu"}"
 
 # Release Codename
-# Value: [focal]
-: "${RELEASE:="focal"}"
+# Value: [noble]
+: "${RELEASE:="noble"}"
 
 # Kernel Package
 # Value: [generic|generic-hwe]
 : "${KERNEL:="generic-hwe"}"
 
 # Package Selection
-# Value: [server|server-nvidia|desktop|desktop-nvidia|desktop-nvidia]
+# Value: [server|server-nvidia|server-nvidia-cuda|desktop|desktop-nvidia|desktop-nvidia-cuda]
 : "${PROFILE:="server"}"
 
 # CPU Architecture
@@ -98,7 +98,7 @@ sgdisk -o "${USB_PATH}"
 sgdisk -a 1 -n 1::2047 -c 1:"BIOS" -t 1:ef02 "${USB_PATH}"
 
 # Create EFI System Partition
-sgdisk      -n 2::+2G  -c 2:"ESP"  -t 2:ef00 "${USB_PATH}"
+sgdisk      -n 2::+4G  -c 2:"ESP"  -t 2:ef00 "${USB_PATH}"
 
 # Create USB Data Partition
 sgdisk      -n 3::-1   -c 3:"USB"  -t 3:0700 "${USB_PATH}"

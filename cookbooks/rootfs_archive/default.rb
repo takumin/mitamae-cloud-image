@@ -12,13 +12,7 @@ node[:rootfs_archive][:target_dir] ||= node[:target][:directory]
 #
 
 case node[:target][:distribution]
-when 'debian', 'ubuntu'
-  unless %w{focal}.include?(node[:target][:suite])
-    node[:rootfs_archive][:format] ||= 'zstd'
-  else
-    node[:rootfs_archive][:format] ||= 'gzip'
-  end
-when 'arch'
+when 'debian', 'ubuntu', 'arch'
   node[:rootfs_archive][:format] ||= 'zstd'
 else
   raise

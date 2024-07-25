@@ -39,29 +39,38 @@ apt_keyring 'Launchpad PPA for Ubuntu Japanese Team' do
 end
 
 #
+# Apt Sources
+#
+
+entries = [
+  {
+    :default_uri => 'http://archive.ubuntulinux.jp/ubuntu',
+    :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA']}",
+    :suite       => '###platform_codename###',
+    :components  => [
+      'main',
+    ],
+  },
+]
+
+if node.platform_version == '22.04'
+  entries << {
+    :default_uri => 'http://archive.ubuntulinux.jp/ubuntu-ja-non-free',
+    :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA_NON_FREE']}",
+    :suite       => '###platform_codename###',
+    :components  => [
+      'multiverse',
+    ],
+  }
+end
+
+#
 # Apt Repository
 #
 
 apt_repository 'Ubuntu Japanese Team Repository' do
   path '/etc/apt/sources.list.d/ubuntu-ja.list'
-  entry [
-    {
-      :default_uri => 'http://archive.ubuntulinux.jp/ubuntu',
-      :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA']}",
-      :suite       => '###platform_codename###',
-      :components  => [
-        'main',
-      ],
-    },
-    {
-      :default_uri => 'http://archive.ubuntulinux.jp/ubuntu-ja-non-free',
-      :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA_NON_FREE']}",
-      :suite       => '###platform_codename###',
-      :components  => [
-        'multiverse',
-      ],
-    },
-  ]
+  entry entries
   notifies :run, 'execute[apt-get update]', :immediately
 end
 

@@ -28,8 +28,8 @@ export APT_REPO_URL_DEBIAN_SECURITY="http://${APT_PROXY_HOST}/debian-security"
 
 export APT_REPO_URL_RASPBERRYPI="http://${APT_PROXY_HOST}/raspberrypi"
 
-export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_FOCAL="http://${APT_PROXY_HOST}/nvidia-cuda-focal"
 export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_JAMMY="http://${APT_PROXY_HOST}/nvidia-cuda-jammy"
+export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_NOBLE="http://${APT_PROXY_HOST}/nvidia-cuda-noble"
 export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BULLSEYE="http://${APT_PROXY_HOST}/nvidia-cuda-bullseye"
 export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM="http://${APT_PROXY_HOST}/nvidia-cuda-bookworm"
 

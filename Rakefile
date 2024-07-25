@@ -6,7 +6,7 @@ require 'open3'
 require 'yaml'
 require 'json'
 
-PUBLISH_UBUNTU_SUITE = 'jammy'
+PUBLISH_UBUNTU_SUITE = 'noble'
 PUBLISH_DEBIAN_SUITE = 'bookworm'
 
 MITAMAE_VERSION = 'v1.14.0'
@@ -24,8 +24,8 @@ SUITES = {
     'bookworm',
   ],
   'ubuntu' => [
-    'focal',
     'jammy',
+    'noble',
   ],
 }
 
@@ -131,7 +131,7 @@ if ppa_nvidia_vgpu
       suite  = 'bookworm'
       kernel = 'generic'
     when 'ubuntu'
-      suite  = 'jammy'
+      suite  = 'noble'
       kernel = 'generic-hwe'
     else
       next

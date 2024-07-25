@@ -11,13 +11,7 @@ node[:initramfs] ||= Hashie::Mash.new
 #
 
 case node[:target][:distribution]
-when 'debian', 'ubuntu'
-  unless %w{focal}.include?(node[:target][:suite])
-    node[:initramfs][:compress] ||= 'zstd'
-  else
-    node[:initramfs][:compress] ||= 'gzip'
-  end
-when 'arch'
+when 'debian', 'ubuntu', 'arch'
   node[:initramfs][:compress] ||= 'zstd'
 else
   raise
