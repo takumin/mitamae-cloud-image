@@ -106,6 +106,12 @@ sgdisk      -n 3::-1   -c 3:"USB"  -t 3:0700 "${USB_PATH}"
 # Wait Probe
 sleep 1
 
+# Partition Probe
+partprobe -s
+
+# Wait Probe
+sleep 1
+
 # Get Real Path
 ESPPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part2")"
 USBPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part3")"
