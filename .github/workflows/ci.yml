@@ -3,6 +3,8 @@ on:
   push:
     branches:
     - master
+    paths-ignore:
+    - 'scripts/**'
   schedule:
   - cron: '35 17 * * *'
   workflow_dispatch:
