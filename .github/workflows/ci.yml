@@ -175,6 +175,7 @@ jobs:
         "releases/${RELEASE_DIR}"
         ":s3:mitamae-cloud-image/${RELEASE_DIR}"
   actions-timeline:
+    if: always()
     needs: [matrix, build-and-publish]
     runs-on: ubuntu-latest
     timeout-minutes: 3
