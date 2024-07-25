@@ -247,10 +247,10 @@ cat > "${CIDATA}/user-data" << '__EOF__'
 #cloud-config
 users:
 - name: takumi
-	gecos: Takumi Takahashi,,,
-	groups: adm, users, staff, sudo, plugdev, netdev, bluetooth, dialout, cdrom, floppy, audio, video, render
+	gecos: Takumi Takahashi
+	groups: adm, users, staff, sudo, plugdev, netdev, bluetooth, dialout, cdrom, floppy, audio, video
 	lock_passwd: false
-	passwd: $6$MuAJon8z$tW5w.S7jzs4qe4Vmn5aQDK8aDT5GJ38.GeRzEIHMxb67fF2Z6zMEgr6IugGf40YPS2DRMaKWiD3iMWFwC7/kQ1
+	passwd: $6$rounds=4096$CKY3OvWE255sdkW/$RsFV2h4styw0VoMaF9hb3KOWqwsjJJQrmweA2zNE2DDR9oPUj9kzoNiVjdEvspMrvqx/CzIsS3d.ujD7MLEAo/
 __EOF__
 
 ################################################################################
