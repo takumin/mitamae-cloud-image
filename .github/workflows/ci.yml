@@ -165,3 +165,8 @@ jobs:
         --stats-one-line
         releases/${RELEASE_DIR}
         :s3:mitamae-cloud-image/${RELEASE_DIR}
+  actions-timeline:
+    needs: [matrix, build-and-publish]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: Kesin11/actions-timeline@v2
