@@ -42,7 +42,7 @@ jobs:
         echo "APT_REPO_PPA_NVIDIA_VGPU_URL=${APT_REPO_PPA_NVIDIA_VGPU_URL}" >> $GITHUB_ENV
     - name: Setup matrix
       id: matrix
-      run: echo "::set-output name=targets::$(rake github:actions:all)"
+      run: echo "targets=$(rake github:actions:all)" >> $GITHUB_OUTPUT
   build-and-publish:
     needs: matrix
     name: ${{ matrix.target.name }}
