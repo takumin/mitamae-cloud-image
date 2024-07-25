@@ -4,6 +4,10 @@
 [ "$1" = 'prereqs' ] && { exit 0; }
 
 cloud_init_nocloud_network_config() {(
+	if [ ! -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
+		return
+	fi
+
 	for cmdline in $(cat /proc/cmdline); do
 		case ${cmdline} in
 			ds=*)
