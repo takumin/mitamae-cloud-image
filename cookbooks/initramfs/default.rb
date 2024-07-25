@@ -73,6 +73,14 @@ else
 end
 
 #
+# Check Distribution
+#
+
+unless node[:target][:distribution].match(/^ubuntu$/)
+  return
+end
+
+#
 # Live Boot Disable Cloud-Init Resize Rootfs
 #
 
