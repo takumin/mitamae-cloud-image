@@ -72,8 +72,7 @@ ROLES = {
 
 ARCHITECTURES = [
   'amd64',
-  # TODO: GitHub Actions When arm64 runner becomes GA, enable it
-  # 'arm64',
+  'arm64',
 ]
 
 targets = []
@@ -238,6 +237,9 @@ end
 namespace :github do
   namespace :actions do
     task :all do
+      # TODO: GitHub Actions Once the arm64 runner is GA, remove the following
+      targets.delete_if{|v| v.include?('arm64')}
+
       puts JSON.dump(targets.map{|v|
         {
           name: v.values.join(':'),
