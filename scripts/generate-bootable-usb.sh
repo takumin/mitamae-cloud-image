@@ -134,9 +134,6 @@ sleep 1
 ESPPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part2")"
 USBPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part3")"
 
-# Get UUID
-UUID="$(blkid -p -s UUID -o value "${ESPPT}")"
-
 ################################################################################
 # Format
 ################################################################################
@@ -183,6 +180,9 @@ cp "${DESTDIR}/packages.manifest" "${WORKDIR}/live/filesystem.packages"
 # Grub Install
 grub-install --target=i386-pc --recheck --boot-directory="${WORKDIR}/boot" "${USB_PATH}" --force
 grub-install --target=x86_64-efi --recheck --boot-directory="${WORKDIR}/boot" --efi-directory="${WORKDIR}" --removable
+
+# Get UUID
+UUID="$(blkid -p -s UUID -o value "${ESPPT}")"
 
 # Grub Config
 cat > "${WORKDIR}/boot/grub/grub.cfg" << __EOF__
