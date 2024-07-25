@@ -167,9 +167,9 @@ jobs:
         rclone sync -v
         --config /dev/null
         --retries 360
-        --retries-sleep 10s
+        --retries-sleep "$(( ( RANDOM % 300 )  + 1 ))s"
         --low-level-retries 30
-        --stats 1s
+        --stats 3s
         --stats-file-name-length 0
         --stats-one-line
         "releases/${RELEASE_DIR}"
