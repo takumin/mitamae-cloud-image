@@ -15,8 +15,7 @@ on:
         options:
         - info
         - debug
-permissions:
-  contents: read
+permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -24,6 +23,9 @@ jobs:
   matrix:
     name: Setup matrix
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
     outputs:
       targets: ${{ steps.matrix.outputs.targets }}
     steps:
@@ -49,6 +51,9 @@ jobs:
     needs: matrix
     name: ${{ matrix.target.name }}
     runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -172,5 +177,8 @@ jobs:
   actions-timeline:
     needs: [matrix, build-and-publish]
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      actions: read
     steps:
     - uses: Kesin11/actions-timeline@v2
