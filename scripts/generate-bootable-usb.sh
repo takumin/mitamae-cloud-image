@@ -242,13 +242,22 @@ __EOF__
 # Cloud-Init
 ################################################################################
 
-# Cloud-Init Config
+# Metadata
+cat > "${CIDATA}/meta-data" << '__EOF__'
+instance-id: iid-debian-live
+hostname: debian-live
+__EOF__
+
+# Userdata
 cat > "${CIDATA}/user-data" << '__EOF__'
 #cloud-config
+disable_ec2_metadata: true
+timezone: Asia/Tokyo
+disable_root: true
+ssh_deletekeys: true
+ssh_genkeytypes: [rsa, ecdsa, ed25519]
+ssh_quiet_keygen: true
 users:
-- name: root
-  lock_passwd: false
-  passwd: $6$rounds=4096$Na9Q5w1S1aIfWyQg$b/jjNwEb3MJT4bjv1l7D5UvnD6aQo7g7vWfsZ0wZ8OmZug5qTgf2.zw1e8FjDzYKwOxN2TrWLDIx1yUa3xMDX1
 - name: takumi
   gecos: Takumi Takahashi
   groups: adm, users, staff, sudo, plugdev, netdev, bluetooth, dialout, cdrom, floppy, audio, video
