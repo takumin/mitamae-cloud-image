@@ -38,7 +38,7 @@ set -eu
 # - generic
 # - generic-hwe
 # - generic-backports
-: "${KERNEL:="generic"}"
+: "${KERNEL:="generic-backports"}"
 
 # Package Selection
 # Value:
