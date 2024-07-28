@@ -5,11 +5,11 @@
 #
 
 case node.target.kernel
-when 'generic'
+when 'generic', 'generic-backports'
   node.linux_kernel.packages << "linux-image-#{node.target.architecture}"
-when 'cloud'
+when 'cloud', 'cloud-backports'
   node.linux_kernel.packages << "linux-image-cloud-#{node.target.architecture}"
-when 'rt'
+when 'rt', 'rt-backports'
   node.linux_kernel.packages << "linux-image-rt-#{node.target.architecture}"
 when 'proxmox'
   if node.platform_version.to_i >= 12

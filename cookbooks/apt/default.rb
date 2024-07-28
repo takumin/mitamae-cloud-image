@@ -170,6 +170,27 @@ apt_repository '/etc/apt/sources.list' do
 end
 
 #
+# Check Debian Backports
+#
+
+contents = <<~__EOF__
+Package: *
+Pin: release o=Debian Backports
+Pin-Priority: 500
+__EOF__
+
+if node.platform.eql?('debian')
+  if node.target.kernel.match?(/-backports$/)
+    file '/etc/apt/preferences.d/debian-backports' do
+      owner   'root'
+      group   'root'
+      mode    '0644'
+      content contents
+    end
+  end
+end
+
+#
 # Update Repository
 #
 

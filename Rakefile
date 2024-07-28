@@ -32,7 +32,9 @@ SUITES = {
 KERNELS = {
   'debian' => [
     'generic',
+    'generic-backports',
     'cloud',
+    'cloud-backports',
     # FIXME: Raspberry Pi Repository Error
     # 'raspberrypi',
   ],
