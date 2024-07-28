@@ -263,6 +263,7 @@ users:
   groups: adm, users, staff, sudo, plugdev, netdev, bluetooth, dialout, cdrom, floppy, audio, video
   lock_passwd: false
   passwd: $6$rounds=4096$CKY3OvWE255sdkW/$RsFV2h4styw0VoMaF9hb3KOWqwsjJJQrmweA2zNE2DDR9oPUj9kzoNiVjdEvspMrvqx/CzIsS3d.ujD7MLEAo/
+  shell: /bin/bash
 __EOF__
 
 ################################################################################
