@@ -81,27 +81,7 @@ end
 # Required Packages
 #
 
-case node[:platform]
-when 'ubuntu'
-  if node[:target][:kernel].match?(/-hwe$/)
-    package "linux-headers-#{node[:target][:kernel]}-#{node[:platform_version]}"
-  else
-    package "linux-headers-#{node[:target][:kernel]}"
-  end
-when 'debian'
-  case node[:target][:kernel]
-  when 'generic', 'generic-backports'
-    package "linux-headers-#{node[:target][:architecture]}"
-  when 'cloud', 'cloud-backports'
-    package "linux-headers-cloud-#{node[:target][:architecture]}"
-  when 'rt', 'rt-backports'
-    package "linux-headers-rt-#{node[:target][:architecture]}"
-  else
-    raise
-  end
-else
-  raise
-end
+include_recipe File.expand_path('../linux-headers', __FILE__)
 
 package 'build-essential'
 package 'dkms'
