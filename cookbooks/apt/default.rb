@@ -106,6 +106,12 @@ when :debian
       :components  => node[:apt][:components],
     },
     {
+      :default_uri => default_uri,
+      :mirror_uri  => mirror_uri,
+      :suite       => "#{node[:apt][:suite]}-backports",
+      :components  => node[:apt][:components],
+    },
+    {
       :default_uri => default_security_uri,
       :mirror_uri  => mirror_security_uri,
       :suite       => "#{node[:apt][:suite]}-security",
