@@ -39,11 +39,11 @@ when 'ubuntu'
   end
 when 'debian'
   case node[:target][:kernel]
-  when 'generic'
+  when 'generic', 'generic-backports'
     package "linux-headers-#{node[:target][:architecture]}"
-  when 'cloud'
+  when 'cloud', 'cloud-backports'
     package "linux-headers-cloud-#{node[:target][:architecture]}"
-  when 'rt'
+  when 'rt', 'rt-backports'
     package "linux-headers-rt-#{node[:target][:architecture]}"
   else
     raise
