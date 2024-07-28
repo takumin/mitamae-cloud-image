@@ -90,6 +90,9 @@ DISTRIBUTIONS.each do |distribution|
           next if !architecture.match('amd64') and role.match(/nvidia/)
           next if !kernel.match(/generic/) and role.match(/nvidia/)
 
+          # Workaround: Because the linux-headers-amd64 dependency is broken in Debian Bullseye
+          next if distribution.eql?('debian') and suite.eql?('bullseye') and kernel.match?(/backports/)
+
           targets << {
             'distribution' => distribution,
             'suite'        => suite,
