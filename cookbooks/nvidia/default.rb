@@ -30,7 +30,7 @@ end
 # Required Packages
 #
 
-include_recipe File.expand_path('../../linux-headers', __FILE__)
+include_recipe File.expand_path('../linux-headers', File.dirname(__FILE__))
 
 #
 # Install Package
