@@ -37,6 +37,7 @@ diskimg = "#{File.expand_path(node[:diskimg_mount][:target_dir])}.qcow2"
 # Required Packages
 #
 
+package 'qemu-utils'
 package 'gdisk'
 
 #
