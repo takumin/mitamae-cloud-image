@@ -39,6 +39,8 @@ diskimg = "#{File.expand_path(node[:diskimg_mount][:target_dir])}.qcow2"
 
 package 'qemu-utils'
 package 'gdisk'
+package 'dosfstools'
+package 'xfsprogs'
 
 #
 # Load Kernel Modules
