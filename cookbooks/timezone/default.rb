@@ -4,7 +4,7 @@
 # Public Variables
 #
 
-node[:timezone] ||= 'UTC'
+node[:timezone] ||= 'Asia/Tokyo'
 
 #
 # Default Variables
