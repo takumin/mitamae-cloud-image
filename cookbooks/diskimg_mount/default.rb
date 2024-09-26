@@ -151,3 +151,17 @@ end
 mount File.join(node[:diskimg_mount][:target_dir], 'boot') do
   device '/dev/nbd0p2'
 end
+
+#
+# Extract Rootfs
+#
+
+cmd = [
+  'tar',
+  '-xf', File.join(node[:rootfs_archive][:output_dir], 'rootfs.tar.zstd'),
+  '-C', node[:diskimg_mount][:target_dir],
+]
+
+execute cmd.join(' ') do
+  not_if "test -x #{node[:diskimg_mount][:target_dir]}/usr/bin/apt-get"
+end
