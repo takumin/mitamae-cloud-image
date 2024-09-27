@@ -44,9 +44,18 @@ end
 # Copy Host Systemd Resolved Stub Resolver
 #
 
-file File.join(target_dir, 'run', 'systemd', 'resolve', 'stub-resolv.conf') do
-  owner   'root'
-  group   'root'
-  mode    '0644'
-  content File.read('/run/systemd/resolve/stub-resolv.conf')
+if File.exist?('/run/systemd/resolve/stub-resolv.conf')
+  file File.join(target_dir, 'run', 'systemd', 'resolve', 'stub-resolv.conf') do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content File.read('/run/systemd/resolve/stub-resolv.conf')
+  end
+else
+  file File.join(target_dir, 'run', 'systemd', 'resolve', 'stub-resolv.conf') do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content File.read('/etc/resolv.conf')
+  end
 end
