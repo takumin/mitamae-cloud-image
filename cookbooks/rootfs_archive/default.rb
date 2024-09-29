@@ -268,13 +268,19 @@ when 'raspberrypi', 'raspi'
     start4db.elf
     start4x.elf
   }.each do |bin|
-    http_request "#{output_dir}/#{bin}" do
-      url   "https://github.com/raspberrypi/firmware/raw/master/boot/#{bin}"
-      owner 'root'
-      group 'root'
-      mode  '0644'
-      # disable debug log
-      sensitive true
+    # TODO: Ubuntu Distribution
+    # http_request "#{output_dir}/#{bin}" do
+    #   url   "https://github.com/raspberrypi/firmware/raw/master/boot/#{bin}"
+    #   owner 'root'
+    #   group 'root'
+    #   mode  '0644'
+    #   # disable debug log
+    #   sensitive true
+    # end
+
+    # NOTE: Included in Debian Kernel
+    remote_file "#{output_dir}/#{bin}" do
+      source "#{target_dir}/boot/firmware/#{bin}"
     end
   end
 

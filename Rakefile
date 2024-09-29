@@ -35,8 +35,7 @@ KERNELS = {
     'generic-backports',
     'cloud',
     'cloud-backports',
-    # FIXME: Raspberry Pi Repository Error
-    # 'raspberrypi',
+    'raspberrypi',
   ],
   'ubuntu' => [
     'generic',

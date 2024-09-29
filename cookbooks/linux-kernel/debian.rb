@@ -20,8 +20,7 @@ when 'proxmox'
   end
   node.linux_kernel.packages << 'proxmox-kernel-helper'
 when 'raspberrypi'
-  node.linux_kernel.packages << 'raspberrypi-bootloader'
-  node.linux_kernel.packages << 'raspberrypi-kernel'
+  node.linux_kernel.packages << 'linux-image-rpi-v8'
 else
   raise
 end
