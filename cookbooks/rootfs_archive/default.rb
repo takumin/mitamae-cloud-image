@@ -18,6 +18,12 @@ else
   raise
 end
 
+case node.target.kernel
+when 'raspberrypi', 'raspi'
+  # NOTE: Debian Official Kernel Unsupported Zstd SquashFS
+  node[:rootfs_archive][:format] = 'gzip'
+end
+
 #
 # Public Variables - Output Directory
 #
