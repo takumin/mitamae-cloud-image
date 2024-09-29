@@ -18,6 +18,10 @@ when 'debian', 'ubuntu'
   package 'lsb-release'
   # tuning
   package 'irqbalance'
+  # utils
+  package 'bash-completion'
+  package 'less'
+  package 'vim-tiny'
 when 'arch'
   # TODO
 else
