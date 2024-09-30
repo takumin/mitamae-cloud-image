@@ -14,6 +14,8 @@ when 'debian', 'ubuntu'
   elsif node[:platform].eql?('ubuntu') and node[:platform_version].to_i >= 22
     package 'systemd-oomd'
   end
+  # required systemd-hostnamed
+  package 'policykit-1'
   # linux standard
   package 'lsb-release'
   # tuning
