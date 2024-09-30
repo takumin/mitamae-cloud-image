@@ -306,6 +306,7 @@ when 'raspberrypi', 'raspi'
   file "#{output_dir}/cmdline.txt" do
     content [
       'console=ttyAMA0,115200',
+      'console=tty1',
       'boot=live',
       'ip=dhcp',
       'fetch=http://boot.internal/rpi/rootfs.squashfs',
