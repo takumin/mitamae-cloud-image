@@ -274,9 +274,9 @@ when 'raspberrypi', 'raspi'
       'console=tty1',
       'boot=live',
       'ip=dhcp',
-      'fetch=http://boot.internal/rpi/rootfs.squashfs',
+      'fetch=http://boot.metal.internal/rpi/rootfs.squashfs',
       'ds=nocloud-net',
-      'seednet=http://boot.internal/seed/#HOSTNAME#/default/',
+      'seednet=http://boot.metal.internal/seed/#HOSTNAME#/default/',
     ].join(' ')
   end
 end
