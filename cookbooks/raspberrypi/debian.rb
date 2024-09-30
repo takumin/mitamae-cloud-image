@@ -54,3 +54,4 @@ end
 
 package 'raspi-firmware'
 package 'raspi-utils-core'
+package 'firmware-brcm80211'
