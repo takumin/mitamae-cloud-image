@@ -54,15 +54,3 @@ end
 
 package 'raspi-firmware'
 package 'raspi-utils-core'
-
-#
-# Ignore Kernel/Initramfs Copy
-#
-
-file '/etc/default/raspi-firmware' do
-  action :edit
-  block do |content|
-    content.gsub!(/^#KERNEL=auto$/, 'KERNEL=no')
-    content.gsub!(/^#INITRAMFS=auto$/, 'INITRAMFS=no')
-  end
-end

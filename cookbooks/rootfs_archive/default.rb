@@ -255,41 +255,6 @@ end
 
 case node[:target][:kernel]
 when 'raspberrypi', 'raspi'
-  %w{
-    bootcode.bin
-    fixup.dat
-    fixup_cd.dat
-    fixup_db.dat
-    fixup_x.dat
-    fixup4.dat
-    fixup4cd.dat
-    fixup4db.dat
-    fixup4x.dat
-    start.elf
-    start_cd.elf
-    start_db.elf
-    start_x.elf
-    start4.elf
-    start4cd.elf
-    start4db.elf
-    start4x.elf
-  }.each do |bin|
-    # TODO: Ubuntu Distribution
-    # http_request "#{output_dir}/#{bin}" do
-    #   url   "https://github.com/raspberrypi/firmware/raw/master/boot/#{bin}"
-    #   owner 'root'
-    #   group 'root'
-    #   mode  '0644'
-    #   # disable debug log
-    #   sensitive true
-    # end
-
-    # NOTE: Included in Debian Kernel
-    remote_file "#{output_dir}/#{bin}" do
-      source "#{target_dir}/boot/firmware/#{bin}"
-    end
-  end
-
   file "#{output_dir}/config.txt" do
     content [
       'arm_64bit=1',
@@ -321,6 +286,12 @@ end
 #
 
 case "#{node[:target][:distribution]}-#{node[:target][:kernel]}"
+when "debian-raspberrypi"
+  %w{bin dat elf dtb}.each do |ext|
+    execute "find '#{target_dir}/boot/firmware' -mindepth 1 -maxdepth 1 -name '*.#{ext}' -exec cp {} #{output_dir} \\;"
+  end
+
+  execute "cp -r #{target_dir}/boot/firmware/overlays #{output_dir}"
 when "ubuntu-raspi"
   execute [
     "find '#{target_dir}/usr/lib/firmware' -mindepth 1 -maxdepth 1 -name '*-raspi'",
