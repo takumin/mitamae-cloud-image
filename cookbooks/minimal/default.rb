@@ -21,8 +21,16 @@ when 'debian', 'ubuntu'
   # tuning
   package 'irqbalance'
   # network
-  package 'iproute2'
   package 'ethtool'
+  package 'iproute2'
+  package 'iputils-arping'
+  package 'iputils-ping'
+  package 'iputils-tracepath'
+  package 'net-tools'
+  package 'traceroute'
+  # system
+  package 'lsof'
+  package 'pciutils'
   # utils
   package 'bash-completion'
   package 'less'
