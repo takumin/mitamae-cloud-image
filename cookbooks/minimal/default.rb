@@ -20,9 +20,11 @@ when 'debian', 'ubuntu'
   package 'lsb-release'
   # tuning
   package 'irqbalance'
+  # network
+  package 'iproute2'
+  package 'ethtool'
   # utils
   package 'bash-completion'
-  package 'iproute2'
   package 'less'
   package 'vim-tiny'
 when 'arch'
