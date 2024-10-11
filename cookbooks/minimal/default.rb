@@ -22,6 +22,7 @@ when 'debian', 'ubuntu'
   package 'irqbalance'
   # utils
   package 'bash-completion'
+  package 'iproute2'
   package 'less'
   package 'vim-tiny'
 when 'arch'
