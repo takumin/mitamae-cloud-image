@@ -157,16 +157,6 @@ node.autologin.values.each do |autologin|
     ].join("\n").concat("\n")
   end
 
-  file "/etc/systemd/system/#{autologin.service}@#{autologin.port}.service.d/cloudinit.conf" do
-    owner 'root'
-    group 'root'
-    mode  '0644'
-    content [
-      '[Unit]',
-      'After=cloud-init.target',
-    ].join("\n").concat("\n")
-  end
-
   #
   # Enable Systemd Service
   #
