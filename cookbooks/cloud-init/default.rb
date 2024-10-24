@@ -73,6 +73,7 @@ end
 #
 
 package 'cloud-init'
+package 'netplan.io' # require nocloud datasources
 
 #
 # Package Config
