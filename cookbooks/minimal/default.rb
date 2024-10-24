@@ -25,3 +25,14 @@ when 'arch'
 else
   raise
 end
+
+#
+# systemd-timesyncd speed up
+#
+
+file '/etc/systemd/timesyncd.conf' do
+  action :edit
+  block do |content|
+    content.gsub!(/^#?ConnectionRetrySec=.*/, 'ConnectionRetrySec=1')
+  end
+end
