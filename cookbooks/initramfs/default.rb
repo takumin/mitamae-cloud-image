@@ -106,6 +106,17 @@ remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-optional-wireless-netw
 end
 
 #
+# Optional Ethernet Network Interfaces
+#
+
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-optional-ethernet-network-interfaces' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/optional-ethernet-network-interfaces'
+end
+
+#
 # Check Distribution
 #
 
