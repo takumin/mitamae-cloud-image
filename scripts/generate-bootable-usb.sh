@@ -243,9 +243,9 @@ __EOF__
 ################################################################################
 
 # Metadata
-cat > "${CIDATA}/meta-data" << '__EOF__'
-instance-id: iid-debian-live
-hostname: debian-live
+cat > "${CIDATA}/meta-data" << __EOF__
+instance-id: iid-live-${DISTRIB}-${RELEASE}
+hostname: live-${DISTRIB}-${RELEASE}
 __EOF__
 
 # Userdata
