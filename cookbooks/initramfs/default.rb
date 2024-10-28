@@ -95,25 +95,14 @@ remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-liveboot-disable-cloud
 end
 
 #
-# Optional Wireless Network Interfaces
+# Live Boot Any Network Interfaces
 #
 
-remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-optional-wireless-network-interfaces' do
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-liveboot-any-network-interfaces' do
   owner  'root'
   group  'root'
   mode   '0755'
-  source 'files/optional-wireless-network-interfaces'
-end
-
-#
-# Optional Ethernet Network Interfaces
-#
-
-remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-optional-ethernet-network-interfaces' do
-  owner  'root'
-  group  'root'
-  mode   '0755'
-  source 'files/optional-ethernet-network-interfaces'
+  source 'files/liveboot-any-network-interfaces'
 end
 
 #

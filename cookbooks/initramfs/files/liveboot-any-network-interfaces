@@ -1,0 +1,44 @@
+#!/bin/sh
+# vim: set noet :
+
+[ "$1" = 'prereqs' ] && { exit 0; }
+
+any_network_interfaces() {(
+	if [ "${BOOT:-}" != "live" ]; then
+		return
+	fi
+
+	mkdir -p "/run/systemd/network"
+
+	{
+		echo "[Match]"
+		echo "Type=ether"
+		echo ""
+		echo "[Network]"
+		echo "DHCP=yes"
+		echo "LinkLocalAddressing=yes"
+		echo "IPv6LinkLocalAddressGenerationMode=stable-privacy"
+		echo "LLMNR=no"
+		echo "MulticastDNS=yes"
+	} > "/run/systemd/network/99-ethernet.network"
+
+	{
+		echo "[Match]"
+		echo "Type=wlan"
+		echo ""
+		echo "[Link]"
+		echo "RequiredForOnline=no"
+	} > "/run/systemd/network/99-wireless.network"
+
+	mkdir -p "/run/systemd/system/systemd-networkd-wait-online.service.d"
+
+	{
+		echo "[Service]"
+		echo "ExecStart="
+		echo "ExecStart=/usr/lib/systemd/systemd-networkd-wait-online --any"
+	} > "/run/systemd/system/systemd-networkd-wait-online.service.d/any-network-interfaces.conf"
+)}
+
+. /scripts/functions
+
+any_network_interfaces
