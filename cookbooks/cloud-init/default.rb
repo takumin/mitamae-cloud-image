@@ -76,6 +76,16 @@ package 'cloud-init'
 package 'netplan.io' # require nocloud datasources
 
 #
+# Netplan File Permission
+#
+
+file '/etc/netplan/50-cloud-init.yaml' do
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+#
 # Package Config
 #
 
