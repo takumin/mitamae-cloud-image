@@ -31,37 +31,13 @@ end
 apt_keyring 'Ubuntu-ja Archive Automatic Signing Key <archive@ubuntulinux.jp>' do
   finger '3B593C7BE6DB6A89FB7CBFFD058A05E90C4ECFEC'
   uri 'https://www.ubuntulinux.jp/ubuntu-ja-archive-keyring.gpg'
+  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
 end
 
 apt_keyring 'Launchpad PPA for Ubuntu Japanese Team' do
   finger '59676CBCF5DFD8C1CEFE375B68B5F60DCDC1D865'
   uri 'https://www.ubuntulinux.jp/ubuntu-jp-ppa-keyring.gpg'
-end
-
-#
-# Apt Sources
-#
-
-entries = [
-  {
-    :default_uri => 'http://archive.ubuntulinux.jp/ubuntu',
-    :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA']}",
-    :suite       => '###platform_codename###',
-    :components  => [
-      'main',
-    ],
-  },
-]
-
-if node.platform_version == '22.04'
-  entries << {
-    :default_uri => 'http://archive.ubuntulinux.jp/ubuntu-ja-non-free',
-    :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA_NON_FREE']}",
-    :suite       => '###platform_codename###',
-    :components  => [
-      'multiverse',
-    ],
-  }
+  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
 end
 
 #
@@ -70,7 +46,25 @@ end
 
 apt_repository 'Ubuntu Japanese Team Repository' do
   path '/etc/apt/sources.list.d/ubuntu-ja.list'
-  entry entries
+  entry [
+    {
+      :default_uri => 'http://archive.ubuntulinux.jp/ubuntu',
+      :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA']}",
+      :suite       => '###platform_codename###',
+      :components  => [
+        'main',
+      ],
+    },
+    {
+      :default_uri => 'http://archive.ubuntulinux.jp/ubuntu-ja-non-free',
+      :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA_NON_FREE']}",
+      :suite       => '###platform_codename###',
+      :components  => [
+        'multiverse',
+      ],
+    },
+  ]
+  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
   notifies :run, 'execute[apt-get update]', :immediately
 end
 
