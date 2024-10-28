@@ -94,7 +94,9 @@ end
 # GUI Japanese Packages
 #
 
-package 'ubuntu-defaults-ja'
+package 'ubuntu-defaults-ja' do
+  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
+end
 
 #
 # Input Method
