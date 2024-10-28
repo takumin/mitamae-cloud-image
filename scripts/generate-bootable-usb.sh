@@ -231,7 +231,7 @@ insmod fat
 set default=0
 set timeout=0
 
-menuentry 'ubuntu' {
+menuentry 'live' {
 	search --no-floppy --fs-uuid --set=root ${UUID}
 	linux /live/vmlinuz boot=live bootfrom=removable-usb toram noeject nopersistence silent quiet ---
 	initrd /live/initrd.img
