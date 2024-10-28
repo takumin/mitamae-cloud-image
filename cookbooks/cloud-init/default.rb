@@ -86,6 +86,21 @@ file '/etc/netplan/50-cloud-init.yaml' do
 end
 
 #
+# Disable netplan to use systemd-networkd settings for non-desktop roles
+#
+
+unless node[:target][:role].match?(/desktop/)
+  file '/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg' do
+    owner 'root'
+    group 'root'
+    mode '0644'
+    content <<~__EOF__
+    network: {config: disabled}
+    __EOF__
+  end
+end
+
+#
 # Package Config
 #
 
