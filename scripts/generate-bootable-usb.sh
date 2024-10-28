@@ -49,7 +49,7 @@ set -eu
 # - desktop-nvidia
 # - desktop-nvidia-cuda
 # - desktop-rtl8852au-nvidia-cuda
-: "${PROFILE:="desktop-rtl8852au-nvidia-cuda"}"
+: "${PROFILE:="server-nvidia-cuda"}"
 
 # CPU Architecture
 # Value:
