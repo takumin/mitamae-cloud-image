@@ -73,16 +73,15 @@ else
 end
 
 #
-# Cloud-Init NoCloud Datasource Network Config
+# Cloud-Init NoCloud Datasource SeedFrom
 #
 
-# No longer needed in Ubuntu 24.04 Desktop
-# remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
-#   owner  'root'
-#   group  'root'
-#   mode   '0755'
-#   source 'files/cloud-init-nocloud-network-config'
-# end
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-seedfrom' do
+  owner  'root'
+  group  'root'
+  mode   '0755'
+  source 'files/cloud-init-nocloud-seedfrom'
+end
 
 #
 # Live Boot Disable Cloud-Init Resize Rootfs
