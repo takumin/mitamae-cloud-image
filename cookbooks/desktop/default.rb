@@ -100,14 +100,14 @@ end
 file '/etc/netplan/01-network-manager-all.yaml' do
   owner   'root'
   group   'root'
-  mode    '0644'
+  mode    '0600'
   only_if 'test -d /etc/netplan'
-  content [
-    '# Workaround: Explicitly enable Network Manager',
-    'network:',
-    '  version: 2',
-    '  renderer: NetworkManager',
-  ].join("\n")
+  content <<~__EOF__
+  # Workaround: Explicitly enable Network Manager
+  network:
+    version: 2
+    renderer: NetworkManager
+  __EOF__
 end
 
 # Remove Example Desktop Entry
