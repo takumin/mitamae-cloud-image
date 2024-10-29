@@ -76,12 +76,13 @@ end
 # Cloud-Init NoCloud Datasource Network Config
 #
 
-remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
-  owner  'root'
-  group  'root'
-  mode   '0755'
-  source 'files/cloud-init-nocloud-network-config'
-end
+# No longer needed in Ubuntu 24.04 Desktop
+# remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
+#   owner  'root'
+#   group  'root'
+#   mode   '0755'
+#   source 'files/cloud-init-nocloud-network-config'
+# end
 
 #
 # Live Boot Disable Cloud-Init Resize Rootfs
