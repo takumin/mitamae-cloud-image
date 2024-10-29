@@ -8,6 +8,10 @@ any_network_interfaces() {(
 		return
 	fi
 
+	if grep "desktop" /proc/cmdline >/dev/null 2>&1; then
+		return
+	fi
+
 	if [ -d "${rootmnt:-}/etc/cloud/cloud.cfg.d" ]; then
 		{
 			echo "disable_network_activation: true"
