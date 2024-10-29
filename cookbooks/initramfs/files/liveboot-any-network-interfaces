@@ -8,6 +8,14 @@ any_network_interfaces() {(
 		return
 	fi
 
+	if [ -d "${rootmnt:-}/etc/cloud/cloud.cfg.d" ]; then
+		{
+			echo "disable_network_activation: true"
+			echo "network:"
+			echo "  config: disabled"
+		} > "${rootmnt:-}/etc/cloud/cloud.cfg.d/99_disable_network.cfg"
+	fi
+
 	mkdir -p "/run/systemd/network"
 
 	{
