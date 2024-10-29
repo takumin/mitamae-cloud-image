@@ -61,7 +61,7 @@ if node[:platform].match(/ubuntu/)
     'Pin-Priority: 600',
   ].join("\n")
 
-  file '/etc/apt/preferences.d/mozillateam' do
+  file '/etc/apt/preferences.d/ppa-ubuntu-mozilla-team' do
     owner   'root'
     group   'root'
     mode    '0644'
