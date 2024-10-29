@@ -28,44 +28,53 @@ end
 # Apt Keyrings
 #
 
-apt_keyring 'Ubuntu-ja Archive Automatic Signing Key <archive@ubuntulinux.jp>' do
-  finger '3B593C7BE6DB6A89FB7CBFFD058A05E90C4ECFEC'
-  uri 'https://www.ubuntulinux.jp/ubuntu-ja-archive-keyring.gpg'
-  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
-end
+if node.platform_version.split('.')[0].to_i < 24
+  http_request '/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg' do
+    url 'https://www.ubuntulinux.jp/ubuntu-ja-archive-keyring.gpg'
+    owner 'root'
+    group 'root'
+    mode '0644'
+    not_if 'test -e /etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg'
+  end
 
-apt_keyring 'Launchpad PPA for Ubuntu Japanese Team' do
-  finger '59676CBCF5DFD8C1CEFE375B68B5F60DCDC1D865'
-  uri 'https://www.ubuntulinux.jp/ubuntu-jp-ppa-keyring.gpg'
-  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
+  http_request '/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg' do
+    url 'https://www.ubuntulinux.jp/ubuntu-jp-ppa-keyring.gpg'
+    owner 'root'
+    group 'root'
+    mode '0644'
+    not_if 'test -e /etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg'
+  end
 end
 
 #
 # Apt Repository
 #
 
-apt_repository 'Ubuntu Japanese Team Repository' do
-  path '/etc/apt/sources.list.d/ubuntu-ja.list'
-  entry [
-    {
-      :default_uri => 'http://archive.ubuntulinux.jp/ubuntu',
-      :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA']}",
-      :suite       => '###platform_codename###',
-      :components  => [
-        'main',
-      ],
-    },
-    {
-      :default_uri => 'http://archive.ubuntulinux.jp/ubuntu-ja-non-free',
-      :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA_NON_FREE']}",
-      :suite       => '###platform_codename###',
-      :components  => [
-        'multiverse',
-      ],
-    },
-  ]
-  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
-  notifies :run, 'execute[apt-get update]', :immediately
+if node.platform_version.split('.')[0].to_i < 24
+  apt_repository 'Ubuntu Japanese Team Repository' do
+    path '/etc/apt/sources.list.d/ubuntu-ja.list'
+    entry [
+      {
+        :default_uri => 'http://archive.ubuntulinux.jp/ubuntu',
+        :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA']}",
+        :options     => 'signed-by=/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg',
+        :suite       => '###platform_codename###',
+        :components  => [
+          'main',
+        ],
+      },
+      {
+        :default_uri => 'http://archive.ubuntulinux.jp/ubuntu-ja-non-free',
+        :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA_NON_FREE']}",
+        :options     => 'signed-by=/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg',
+        :suite       => '###platform_codename###',
+        :components  => [
+          'multiverse',
+        ],
+      },
+    ]
+    notifies :run, 'execute[apt-get update]', :immediately
+  end
 end
 
 #
@@ -94,8 +103,12 @@ end
 # GUI Japanese Packages
 #
 
-package 'ubuntu-defaults-ja' do
-  only_if "test #{node.platform_version.split('.')[0].to_i} -lt 24"
+if node.platform_version.split('.')[0].to_i < 24
+  package 'ubuntu-defaults-ja'
+else
+  package 'language-pack-gnome-ja'
+  package 'gnome-user-docs-ja'
+  package 'fonts-noto-cjk-extra'
 end
 
 #
