@@ -3,8 +3,18 @@
 
 [ "$1" = 'prereqs' ] && { exit 0; }
 
-if [ "${BOOT:-}" = "live" ]; then
-	if [ -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
-		echo 'resize_rootfs: false' > "${rootmnt}/etc/cloud/cloud.cfg.d/99_disable_resize_rootfs.cfg"
+disable_resize_rootfs() {(
+	if [ "${BOOT:-}" != "live" ]; then
+		return
 	fi
-fi
+
+	if [ ! -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
+		return
+	fi
+
+	echo 'resize_rootfs: false' > "${rootmnt}/etc/cloud/cloud.cfg.d/99_disable_resize_rootfs.cfg"
+)}
+
+. /scripts/functions
+
+disable_resize_rootfs
