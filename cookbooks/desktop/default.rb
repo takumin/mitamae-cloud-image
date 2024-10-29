@@ -85,7 +85,7 @@ case node[:platform]
 when 'debian'
   package 'task-desktop'
 when 'ubuntu'
-  package 'ubuntu-desktop'
+  package 'ubuntu-desktop-minimal'
 end
 
 # Workaround: Manage all network interfaces with Network Manager
