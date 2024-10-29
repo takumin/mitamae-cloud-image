@@ -136,7 +136,7 @@ directory '/etc/apt/keyrings' do
 end
 
 http_request '/etc/apt/keyrings/nvidia-cuda.gpg.asc' do
-  url URI.join(nvidia_cuda_origin, '3bf863cc.pub')
+  url File.join(nvidia_cuda_origin, '3bf863cc.pub')
   owner 'root'
   group 'root'
   mode '0644'
