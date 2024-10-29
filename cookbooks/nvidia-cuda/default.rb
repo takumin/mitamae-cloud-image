@@ -129,9 +129,18 @@ package 'apt-transport-https'
 # Apt Keyring
 #
 
-apt_keyring 'cudatools <cudatools@nvidia.com>' do
-  finger 'EB693B3035CD5710E231E123A4B469963BF863CC'
-  uri File.join(nvidia_cuda_origin, '3bf863cc.pub')
+directory '/etc/apt/keyrings' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+http_request '/etc/apt/keyrings/nvidia-cuda.gpg.asc' do
+  url URI.join(nvidia_cuda_origin, '3bf863cc.pub')
+  owner 'root'
+  group 'root'
+  mode '0644'
+  not_if 'test -e /etc/apt/keyrings/nvidia-cuda.gpg.asc'
 end
 
 #
@@ -148,6 +157,7 @@ apt_repository '/etc/apt/sources.list.d/nvidia-cuda.list' do
     {
       :default_uri => nvidia_cuda_origin,
       :mirror_uri  => nvidia_cuda_mirror,
+      :options     => 'signed-by=/etc/apt/keyrings/nvidia-cuda.gpg.asc',
       :suite       => '/',
     },
   ]
