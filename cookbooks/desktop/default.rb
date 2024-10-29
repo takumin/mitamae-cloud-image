@@ -17,20 +17,31 @@ if node[:platform].match(/ubuntu/)
   # Ubuntu Mozilla Team Keyring
   #
 
-  apt_keyring 'Launchpad PPA for Mozilla Team' do
-    finger '0AB215679C571D1C8325275B9BDB3D89CE49EC21'
+  directory '/etc/apt/keyrings' do
+    owner 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  http_request '/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc' do
+    url 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xaebdf4819be21867'
+    owner 'root'
+    group 'root'
+    mode '0644'
+    not_if 'test -e /etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc'
   end
 
   #
-  # Ubuntu Mozilla Team Repository
+  # PPA Ubuntu Mozilla Team Repository
   #
 
-  apt_repository 'Ubuntu Mozilla Team Repository' do
-    path '/etc/apt/sources.list.d/mozillateam.list'
+  apt_repository 'PPA Ubuntu Mozilla Team Repository' do
+    path '/etc/apt/sources.list.d/ppa-ubuntu-mozilla-team.list'
     entry [
       {
         :default_uri => 'https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu',
         :mirror_uri  => "#{ENV['APT_REPO_URL_PPA_MOZILLA_TEAM']}",
+        :options     => 'signed-by=/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc',
         :suite       => '###platform_codename###',
         :components  => [
           'main',
