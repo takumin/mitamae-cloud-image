@@ -29,7 +29,7 @@ end
 #
 
 if node.platform_version.split('.')[0].to_i < 24
-  remote_directory '/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg' do
+  remote_file '/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg' do
     source 'keyrings/ubuntu-ja-archive-keyring.gpg'
     owner 'root'
     group 'root'
@@ -37,7 +37,7 @@ if node.platform_version.split('.')[0].to_i < 24
     not_if 'test -e /etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg'
   end
 
-  remote_directory '/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg' do
+  remote_file '/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg' do
     source 'keyrings/ubuntu-jp-ppa-keyring.gpg'
     owner 'root'
     group 'root'
