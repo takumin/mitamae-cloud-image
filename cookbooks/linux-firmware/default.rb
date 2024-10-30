@@ -12,6 +12,15 @@ node.reverse_merge!({
 })
 
 #
+# Minimize
+#
+
+if ENV['MINIMIZE_LINUX_FIRMWARE'].eql?('true')
+  node.linux_firmware.excludes << '/lib/firmware/*'
+  node.linux_firmware.includes << '/lib/firmware/rtl_nic/*'
+end
+
+#
 # Raspberry Pi
 #
 

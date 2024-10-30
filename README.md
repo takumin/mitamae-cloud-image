@@ -13,6 +13,10 @@ $ direnv edit .
 APT_CACHER_HOST="cacher.apt.internal"
 APT_MIRROR_HOST="mirror.apt.internal"
 
+# Minimize Linux Firmware
+
+export MINIMIZE_LINUX_FIRMWARE="true"
+
 # Apt Mirror List
 
 export APT_REPO_URL_DEBIAN="http://${APT_MIRROR_HOST}/debian"
