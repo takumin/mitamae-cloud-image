@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Check Role
-#
-
-if node[:target][:role].match(/minimal/)
-  return
-end
-
-#
 # Package Install
 #
 
