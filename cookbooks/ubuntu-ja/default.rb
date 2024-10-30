@@ -57,7 +57,7 @@ if node.platform_version.split('.')[0].to_i < 24
       {
         :default_uri => 'http://archive.ubuntulinux.jp/ubuntu',
         :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA']}",
-        :options     => 'signed-by=/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg',
+        :options     => 'signed-by=/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg',
         :suite       => '###platform_codename###',
         :components  => [
           'main',
@@ -66,7 +66,7 @@ if node.platform_version.split('.')[0].to_i < 24
       {
         :default_uri => 'http://archive.ubuntulinux.jp/ubuntu-ja-non-free',
         :mirror_uri  => "#{ENV['APT_REPO_URL_UBUNTU_JA_NON_FREE']}",
-        :options     => 'signed-by=/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg',
+        :options     => 'signed-by=/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg',
         :suite       => '###platform_codename###',
         :components  => [
           'multiverse',
