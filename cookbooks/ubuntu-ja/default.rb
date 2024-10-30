@@ -29,16 +29,16 @@ end
 #
 
 if node.platform_version.split('.')[0].to_i < 24
-  http_request '/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg' do
-    url 'https://www.ubuntulinux.jp/ubuntu-ja-archive-keyring.gpg'
+  remote_directory '/etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg' do
+    source 'keyrings/ubuntu-ja-archive-keyring.gpg'
     owner 'root'
     group 'root'
     mode '0644'
     not_if 'test -e /etc/apt/keyrings/ubuntu-ja-archive-keyring.gpg'
   end
 
-  http_request '/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg' do
-    url 'https://www.ubuntulinux.jp/ubuntu-jp-ppa-keyring.gpg'
+  remote_directory '/etc/apt/keyrings/ubuntu-jp-ppa-keyring.gpg' do
+    source 'keyrings/ubuntu-jp-ppa-keyring.gpg'
     owner 'root'
     group 'root'
     mode '0644'
