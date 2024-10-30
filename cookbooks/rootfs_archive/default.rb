@@ -217,7 +217,7 @@ end
 #
 
 if ENV['DISABLE_CPIO'] != 'true'
-  if node[:target][:role].eql?('minimal')
+  if node[:target][:role].match(/minimal/)
     case node[:rootfs_archive][:format]
     when 'gzip'
       cmd = 'pigz'
