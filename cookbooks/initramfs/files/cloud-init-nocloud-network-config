@@ -41,21 +41,19 @@ cloud_init_nocloud_network_config() {(
 	done
 	IFS="$OLDIFS"
 
-	if [ -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
-		if [ -z "${seedfrom}" ] && [ -n "${seednet}" ]; then
-			# If the seedfrom parameter is not set and the seednet parameter is set, reset the seedfrom parameter.
-			seedfrom="$(echo "${seednet}" | sed -E "s/#HOSTNAME#/$(hostname -s)/; s/#DOMAINNAME#/$(hostname -d)/; s/#FQDN#/$(hostname -f)/;")"
+	if [ -z "${seedfrom}" ] && [ -n "${seednet}" ]; then
+		# If the seedfrom parameter is not set and the seednet parameter is set, reset the seedfrom parameter.
+		seedfrom="$(echo "${seednet}" | sed -E "s/#HOSTNAME#/$(hostname -s)/; s/#DOMAINNAME#/$(hostname -d)/; s/#FQDN#/$(hostname -f)/;")"
 
-			# Cloud-Init expects seedfrom to be set in the kernel command line parameters, so it corresponds in the configuration file.
-			echo 'datasource:' > "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
-			echo '  NoCloud:' >> "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
-			echo "    seedfrom: ${seedfrom}" >> "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
-		fi
+		# Cloud-Init expects seedfrom to be set in the kernel command line parameters, so it corresponds in the configuration file.
+		echo 'datasource:' > "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
+		echo '  NoCloud:' >> "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
+		echo "    seedfrom: ${seedfrom}" >> "${rootmnt}/etc/cloud/cloud.cfg.d/99_seednet_to_seedfrom_param.cfg"
+	fi
 
-		if [ -n "${seedfrom}" ]; then
-			# Cloud-Init's NoCloudNet data source does not get the network configuration file, so get it manually.
-			wget -q -O "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg" "${seedfrom}network-config"
-		fi
+	if [ -n "${seedfrom}" ]; then
+		# Cloud-Init's NoCloudNet data source does not get the network configuration file, so get it manually.
+		wget -q -O "${rootmnt}/etc/cloud/cloud.cfg.d/99_nocloud_network_config.cfg" "${seedfrom}network-config"
 	fi
 )}
 
