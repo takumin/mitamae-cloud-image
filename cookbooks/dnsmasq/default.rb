@@ -13,3 +13,17 @@ end
 #
 
 package 'dnsmasq'
+
+#
+# Service Configuration
+#
+
+file '/etc/dnsmasq.d/systemd-resolved' do
+  owner 'root'
+  group 'root'
+  mode '0644'
+  content <<~__EOF__
+  except-interface=lo
+  bind-dynamic
+  __EOF__
+end
