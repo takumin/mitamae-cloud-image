@@ -11,8 +11,8 @@ end
 # Apt Repository
 #
 
-apt_repository 'Raspberry Pi Repository' do
-  path '/etc/apt/sources.list.d/raspi.list'
+apt_repository 'Raspberry Pi OS Repository' do
+  path '/etc/apt/sources.list.d/raspberrypi.list'
   entry [
     {
       :default_uri => 'http://archive.raspberrypi.org/debian',
