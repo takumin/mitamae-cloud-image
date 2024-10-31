@@ -4,6 +4,7 @@
 
 AVAILABLE_ROLES = [
   'minimal',
+  'minimal-bootstrap',
   'server',
   'desktop',
   'server-nvidia',

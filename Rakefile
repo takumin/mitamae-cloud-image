@@ -49,6 +49,7 @@ KERNELS = {
 ROLES = {
   'debian' => [
     'minimal',
+    'minimal-bootstrap',
     'server',
     'server-nvidia',
     'server-nvidia-cuda',
@@ -61,6 +62,7 @@ ROLES = {
   ],
   'ubuntu' => [
     'minimal',
+    'minimal-bootstrap',
     'server',
     'server-nvidia',
     'server-nvidia-cuda',
