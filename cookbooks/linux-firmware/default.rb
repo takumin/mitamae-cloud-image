@@ -54,30 +54,35 @@ if node.linux_firmware.excludes.empty? and node.linux_firmware.includes.empty?
 end
 
 #
+# Check Distribution
+#
+
+unless node[:target][:distribution].match(/^ubuntu$/)
+  return
+end
+
+#
 # [Ex|In]cludes Firmware
 #
 
-case node.platform
-when 'debian', 'ubuntu'
-  contents = []
+contents = []
 
-  node.linux_firmware.excludes.each do |path|
-    contents << "path-exclude #{path}"
-  end
+node.linux_firmware.excludes.each do |path|
+  contents << "path-exclude #{path}"
+end
 
-  node.linux_firmware.includes.each do |path|
-    contents << "path-include #{path}"
-  end
+node.linux_firmware.includes.each do |path|
+  contents << "path-include #{path}"
+end
 
-  file '/etc/dpkg/dpkg.cfg.d/linux-firmware' do
-    owner   'root'
-    group   'root'
-    mode    '0644'
-    content "#{contents.join("\n")}\n"
-    notifies :run, 'execute[apt-get install -y --reinstall linux-firmware]', :immediately
-  end
+file '/etc/dpkg/dpkg.cfg.d/linux-firmware' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content "#{contents.join("\n")}\n"
+  notifies :run, 'execute[apt-get install -y --reinstall linux-firmware]', :immediately
+end
 
-  execute 'apt-get install -y --reinstall linux-firmware' do
-    action :nothing
-  end
+execute 'apt-get install -y --reinstall linux-firmware' do
+  action :nothing
 end
