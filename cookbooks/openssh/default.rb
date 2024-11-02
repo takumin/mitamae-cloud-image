@@ -75,3 +75,7 @@ end
 service 'ssh-host-keygen.service' do
   action :enable
 end
+
+service 'ssh.service' do
+  action :enable
+end
