@@ -30,6 +30,9 @@ export APT_REPO_URL_RASPBERRYPI="http://${APT_MIRROR_HOST}/raspberrypi"
 export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM="http://${APT_MIRROR_HOST}/nvidia-cuda-bookworm"
 export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_NOBLE="http://${APT_MIRROR_HOST}/nvidia-cuda-noble"
 
+export APT_REPO_URL_POWERDNS_DEBIAN="http://${APT_MIRROR_HOST}/powerdns-debian"
+export APT_REPO_URL_POWERDNS_UBUNTU="http://${APT_MIRROR_HOST}/powerdns-ubuntu"
+
 # Apt Cacher List
 
 export APT_REPO_URL_UBUNTU_JA="http://${APT_CACHER_HOST}/ubuntu-ja"
