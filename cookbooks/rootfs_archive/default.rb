@@ -120,6 +120,12 @@ directory output_dir do
 end
 
 #
+# Remove Old Files
+#
+
+execute "find #{output_dir} -mindepth 1 -maxdepth 1 -type f | xargs rm -f"
+
+#
 # Package Manifest
 #
 
