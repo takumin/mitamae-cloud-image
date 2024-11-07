@@ -23,7 +23,7 @@ set -eu
 # Value:
 # - debian
 # - ubuntu
-: "${DISTRIB:="debian"}"
+: "${DISTRIB:="ubuntu"}"
 
 # Release Codename
 # Value:
@@ -31,14 +31,14 @@ set -eu
 # - bookworm
 # - jammy
 # - noble
-: "${RELEASE:="bookworm"}"
+: "${RELEASE:="noble"}"
 
 # Kernel Package
 # Value:
 # - generic
 # - generic-hwe
 # - generic-backports
-: "${KERNEL:="generic-backports"}"
+: "${KERNEL:="generic-hwe"}"
 
 # Package Selection
 # Value:
@@ -49,7 +49,7 @@ set -eu
 # - desktop-nvidia
 # - desktop-nvidia-cuda
 # - desktop-rtl8852au-nvidia-cuda
-: "${PROFILE:="server-nvidia-cuda"}"
+: "${PROFILE:="server-nvidia-vgpu"}"
 
 # CPU Architecture
 # Value:
@@ -84,6 +84,7 @@ fi
 # Install Require Packages
 dpkg -l | awk '{print $2}' | grep -qs '^gdisk$'              || apt-get -y install gdisk
 dpkg -l | awk '{print $2}' | grep -qs '^dosfstools$'         || apt-get -y install dosfstools
+dpkg -l | awk '{print $2}' | grep -qs '^xfsprogs$'           || apt-get -y install xfsprogs
 dpkg -l | awk '{print $2}' | grep -qs '^grub2-common$'       || apt-get -y install grub2-common
 dpkg -l | awk '{print $2}' | grep -qs '^grub-pc-bin$'        || apt-get -y install grub-pc-bin
 dpkg -l | awk '{print $2}' | grep -qs '^grub-efi-amd64-bin$' || apt-get -y install grub-efi-amd64-bin
@@ -121,13 +122,13 @@ sgdisk -o "${USB_PATH}"
 sgdisk -a 1 -n 1::2047 -c 1:"BIOS"    -t 1:ef02 "${USB_PATH}"
 
 # Create EFI System Partition
-sgdisk      -n 2::+4G  -c 2:"ESP"     -t 2:ef00 "${USB_PATH}"
+sgdisk      -n 2::+4G  -c 2:"BOOT"    -t 2:ef00 "${USB_PATH}"
 
 # Create Cloud-Init Data Partition
 sgdisk      -n 3::+64M -c 3:"CIDATA"  -t 3:0700 "${USB_PATH}"
 
 # Create USB Data Partition
-sgdisk      -n 4::-1   -c 4:"USBDATA" -t 4:0700 "${USB_PATH}"
+sgdisk      -n 4::-1   -c 4:"SRVDATA" -t 4:8306 "${USB_PATH}"
 
 # Do not automount for Cloud-Init Data Partition
 sgdisk -A 3:set:63 "${USB_PATH}"
@@ -142,25 +143,25 @@ partprobe -s
 sleep 1
 
 # Get Real Path
-ESPPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part2")"
+BOOTPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part2")"
 CIDATAPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part3")"
-USBDATAPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part4")"
+SRVDATAPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part4")"
 
 ################################################################################
 # Format
 ################################################################################
 
 # Format Partition
-mkfs.vfat -F 32 -n 'ESP' -v "${ESPPT}"
+mkfs.vfat -F 32 -n 'BOOT' -v "${BOOTPT}"
 mkfs.vfat -F 32 -n 'CIDATA' -v "${CIDATAPT}"
-mkfs.vfat -F 32 -n 'USBDATA' -v "${USBDATAPT}"
+mkfs.xfs -f -L 'SRVDATA' "${SRVDATAPT}"
 
 ################################################################################
 # Mount
 ################################################################################
 
 # Mount Partition
-mount -t vfat -o codepage=932,iocharset=utf8 "${ESPPT}" "${LIVEUSB}"
+mount -t vfat -o codepage=932,iocharset=utf8 "${BOOTPT}" "${LIVEUSB}"
 mount -t vfat -o codepage=932,iocharset=utf8 "${CIDATAPT}" "${CIDATA}"
 
 ################################################################################
@@ -196,7 +197,7 @@ grub-install --target=i386-pc --recheck --boot-directory="${LIVEUSB}/boot" "${US
 grub-install --target=x86_64-efi --recheck --boot-directory="${LIVEUSB}/boot" --efi-directory="${LIVEUSB}" --removable
 
 # Get UUID
-UUID="$(blkid -p -s UUID -o value "${ESPPT}")"
+UUID="$(blkid -p -s UUID -o value "${BOOTPT}")"
 
 # Grub Config
 cat > "${LIVEUSB}/boot/grub/grub.cfg" << __EOF__
@@ -233,7 +234,7 @@ set timeout=0
 
 menuentry 'live' {
 	search --no-floppy --fs-uuid --set=root ${UUID}
-	linux /live/vmlinuz boot=live bootfrom=removable-usb ds=nocloud toram noeject nopersistence silent quiet ---
+	linux /live/vmlinuz boot=live ds=nocloud toram noeject nopersistence
 	initrd /live/initrd.img
 }
 __EOF__
