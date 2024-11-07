@@ -252,18 +252,25 @@ __EOF__
 cat > "${CIDATA}/user-data" << '__EOF__'
 #cloud-config
 disable_ec2_metadata: true
-timezone: Asia/Tokyo
 disable_root: true
+ssh_pwauth: false
 ssh_deletekeys: true
 ssh_genkeytypes: [rsa, ecdsa, ed25519]
 ssh_quiet_keygen: true
+manage_etc_hosts: localhost
+preserve_hostname: false
+timezone: Asia/Tokyo
 users:
 - name: takumi
   gecos: Takumi Takahashi
   groups: adm, users, staff, sudo, plugdev, netdev, bluetooth, dialout, cdrom, floppy, audio, video
+  passwd: "$6$byTym7UB$oQJeq6Sy.t9ivuVJmLq8zqeT7lcsn42SMuM1Z2sRozsMCTUxEhjD9L6ZvN6U6Ss8ApG3kNO6S.1m2XrDv73Wc/"
   lock_passwd: false
-  passwd: $6$rounds=4096$CKY3OvWE255sdkW/$RsFV2h4styw0VoMaF9hb3KOWqwsjJJQrmweA2zNE2DDR9oPUj9kzoNiVjdEvspMrvqx/CzIsS3d.ujD7MLEAo/
-  shell: /bin/bash
+  sudo: ALL=(ALL) NOPASSWD:ALL
+  shell: "/bin/bash"
+  ssh_authorized_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOUnX4dcl4MGhuqVyHJzbUG11eHJfN2iyTu3LSJt8x3V
+    takumiiinn@gmail.com
 __EOF__
 
 ################################################################################
