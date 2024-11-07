@@ -89,6 +89,65 @@ package 'pdns-server'
 package 'pdns-recursor'
 
 #
+# Restore Configuration - PowerDNS
+#
+
+directory '/usr/local/libexec' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+file '/usr/local/libexec/powerdns-restore-config' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+  content <<~__EOF__
+    #!/bin/sh
+    /usr/bin/rsync -av --delete /srv/dnsdist/ /etc/dnsdist/
+    /usr/bin/rsync -av --delete /srv/powerdns/ /etc/powerdns/
+  __EOF__
+end
+
+file '/etc/systemd/system/powerdns-restore-config.service' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content <<~__EOF__
+    [Unit]
+    Description=PowerDNS Restore Configuration
+    Before=dnsdist.service
+    Before=pdns.service
+    Before=pdns-recursor.service
+    Wants=srv.mount
+    After=srv.mount
+    ConditionPathIsMountPoint=/srv
+    ConditionDirectoryNotEmpty=/srv/dnsdist
+    ConditionDirectoryNotEmpty=/srv/powerdns
+    ConditionPathIsDirectory=/etc/dnsdist
+    ConditionPathIsDirectory=/etc/powerdns
+    ConditionPathIsReadWrite=/etc/dnsdist
+    ConditionPathIsReadWrite=/etc/powerdns
+
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/local/libexec/powerdns-restore-config
+
+    [Install]
+    WantedBy=multi-user.target
+  __EOF__
+  notifies :run, 'execute[systemctl daemon-reload]', :immediately
+end
+
+execute 'systemctl daemon-reload' do
+  action :nothing
+end
+
+service 'powerdns-restore-config.service' do
+  action :enable
+end
+
+#
 # Disable Systemd Resolved
 #
 
