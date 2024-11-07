@@ -7,12 +7,13 @@ file '/etc/systemd/system/srv.mount' do
   content <<~__EOF__
     [Unit]
     Description=Site-specific Pertition
+    ConditionPathIsSymbolicLink=/dev/disk/by-partlabel/SRVDATA
 
     [Mount]
     What=/dev/disk/by-partlabel/SRVDATA
     Where=/srv
     Type=xfs
-    Options=defaults,nofail
+    Options=defaults
 
     [Install]
     WantedBy=multi-user.target
@@ -27,6 +28,7 @@ file '/etc/systemd/system/srv.automount' do
   content <<~__EOF__
     [Unit]
     Description=Automount Site-specific Pertition
+    ConditionPathIsSymbolicLink=/dev/disk/by-partlabel/SRVDATA
 
     [Automount]
     Where=/srv
