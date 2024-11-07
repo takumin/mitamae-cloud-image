@@ -85,6 +85,7 @@ file '/etc/systemd/system/isc-kea-restore-config.service' do
     Before=isc-kea-dhcp6-server.service
     Wants=srv.mount
     After=srv.mount
+    ConditionPathIsMountPoint=/srv
     ConditionDirectoryNotEmpty=/srv/kea
     ConditionPathIsDirectory=/etc/kea
     ConditionPathIsReadWrite=/etc/kea
