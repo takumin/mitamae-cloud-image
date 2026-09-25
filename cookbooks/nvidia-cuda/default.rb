@@ -103,20 +103,28 @@ case node[:platform]
 when 'ubuntu'
   case node[:platform_version]
   when '24.04'
-    platform_codename = :noble
-    signing_key       = '3bf863cc.pub'
+    platform_codename   = :noble
+    signing_key         = '3bf863cc.pub'
+    signing_key_fpr     = 'EB693B3035CD5710E231E123A4B469963BF863CC'
+    signing_key_user_id = 'cudatools <cudatools@nvidia.com>'
   when '26.04'
-    platform_codename = :resolute
-    signing_key       = '60DF8A40.pub'
+    platform_codename   = :resolute
+    signing_key         = '60DF8A40.pub'
+    signing_key_fpr     = '14BAFBC7562AD710CA04E69905FBB6DA60DF8A40'
+    signing_key_user_id = 'Kitmaker (Ubuntu 26.04) <kitmaker@nvidia.com>'
   end
 when 'debian'
   case node[:platform_version]
   when /^12/
-    platform_codename = :bookworm
-    signing_key       = '3bf863cc.pub'
+    platform_codename   = :bookworm
+    signing_key         = '3bf863cc.pub'
+    signing_key_fpr     = 'EB693B3035CD5710E231E123A4B469963BF863CC'
+    signing_key_user_id = 'cudatools <cudatools@nvidia.com>'
   when /^13/
-    platform_codename = :trixie
-    signing_key       = '8793F200.pub'
+    platform_codename   = :trixie
+    signing_key         = '8793F200.pub'
+    signing_key_fpr     = '02182E60104FCDC26EAE1B8597A5D4CB8793F200'
+    signing_key_user_id = 'Kitmaker (Debian 13 Trixie) <kitmaker@nvidia.com>'
   end
 end
 
@@ -139,12 +147,13 @@ directory '/etc/apt/keyrings' do
   mode '0755'
 end
 
-http_request '/etc/apt/keyrings/nvidia-cuda.gpg.asc' do
-  url File.join(nvidia_cuda_origin, signing_key)
-  owner 'root'
-  group 'root'
-  mode '0644'
-  not_if 'test -e /etc/apt/keyrings/nvidia-cuda.gpg.asc'
+gpg_keyring '/etc/apt/keyrings/nvidia-cuda.gpg.asc' do
+  fingerprint signing_key_fpr
+  user_id     signing_key_user_id
+  url         File.join(nvidia_cuda_origin, signing_key)
+  owner       'root'
+  group       'root'
+  mode        '0644'
 end
 
 #
