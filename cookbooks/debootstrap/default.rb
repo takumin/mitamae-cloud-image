@@ -133,7 +133,14 @@ end
 #
 
 package 'binfmt-support'
-package 'qemu-user-static'
+
+# qemu-user-static is purely virtual on hosts where qemu-user itself ships
+# static binaries, e.g. ubuntu resolute
+if run_command('apt-get install --simulate qemu-user-static', error: false).success?
+  package 'qemu-user-static'
+else
+  package 'qemu-user-binfmt'
+end
 
 case cmd
 when 'debootstrap'
@@ -207,15 +214,15 @@ end
 #
 
 case arch
-when 'amd64', 'i386'
-  # nothing...
-when 'armhf'
-  execute "cp /usr/bin/qemu-arm-static #{target}/usr/bin/qemu-arm-static" do
-    not_if "test -f #{target}/usr/bin/qemu-arm-static"
-  end
-when 'arm64'
-  execute "cp /usr/bin/qemu-aarch64-static #{target}/usr/bin/qemu-aarch64-static" do
-    not_if "test -f #{target}/usr/bin/qemu-aarch64-static"
+when 'armhf', 'arm64'
+  qemu = arch == 'armhf' ? 'qemu-arm' : 'qemu-aarch64'
+
+  # the interpreter registered to binfmt_misc depends on the host package
+  %W[/usr/bin/#{qemu}-static /usr/bin/#{qemu}].each do |bin|
+    execute "cp #{bin} #{target}#{bin}" do
+      only_if "test -f #{bin}"
+      not_if "test -f #{target}#{bin}"
+    end
   end
 end
 
