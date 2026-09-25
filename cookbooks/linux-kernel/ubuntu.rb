@@ -12,10 +12,6 @@ when 'generic-hwe', 'virtual-hwe', 'lowlatency-hwe'
 when 'raspi'
   node.linux_kernel.packages << 'linux-image-raspi'
   node.linux_kernel.packages << 'linux-firmware-raspi'
-
-  if node.platform_version == '22.04'
-    node.linux_kernel.packages << 'linux-modules-extra-raspi'
-  end
 else
   raise
 end
