@@ -8,12 +8,13 @@ directory '/usr/share/keyrings' do
   mode '0755'
 end
 
-http_request '/usr/share/keyrings/raspberrypi-archive-keyring.gpg' do
-  url 'https://github.com/raspberrypi/rpi-image-gen/raw/refs/heads/master/keydir/raspberrypi-archive-keyring.gpg'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  not_if 'test -e /usr/share/keyrings/raspberrypi-archive-keyring.gpg'
+gpg_keyring '/usr/share/keyrings/raspberrypi-archive-keyring.gpg' do
+  fingerprint 'CF8A1AF502A2AA2D763BAE7E82B129927FA3303E'
+  user_id     'Raspberry Pi Archive Signing Key'
+  url         'https://github.com/raspberrypi/rpi-image-gen/raw/refs/heads/master/keydir/raspberrypi-archive-keyring.gpg'
+  owner       'root'
+  group       'root'
+  mode        '0644'
 end
 
 #
