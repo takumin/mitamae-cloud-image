@@ -12,12 +12,7 @@ when 'cloud', 'cloud-backports'
 when 'rt', 'rt-backports'
   node.linux_kernel.packages << "linux-image-rt-#{node.target.architecture}"
 when 'proxmox'
-  if node.platform_version.to_i >= 12
-    node.linux_kernel.packages << 'proxmox-default-kernel'
-  else
-    # proxmox-default-kernel package does not exist in bullseye
-    node.linux_kernel.packages << 'pve-kernel-5.15'
-  end
+  node.linux_kernel.packages << 'proxmox-default-kernel'
   node.linux_kernel.packages << 'proxmox-kernel-helper'
 when 'raspberrypi'
   node.linux_kernel.packages << 'linux-image-rpi-v8'

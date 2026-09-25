@@ -11,11 +11,7 @@ target_name << node.target.role
 
 case node.target.distribution
 when 'debian'
-  if node.target.suite.match(/(?:bullseye)/)
-    components = ['main', 'contrib', 'non-free']
-  else
-    components = ['main', 'contrib', 'non-free', 'non-free-firmware']
-  end
+  components = ['main', 'contrib', 'non-free', 'non-free-firmware']
 when 'ubuntu'
   components = ['main', 'restricted', 'universe', 'multiverse']
 end
