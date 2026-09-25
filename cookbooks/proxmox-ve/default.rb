@@ -26,14 +26,14 @@ node[:proxmox_ve][:apt][:components]                ||= Hashie::Mash.new
 node[:proxmox_ve][:apt][:components][:enterprise]   ||= ['pve-enterprise']
 node[:proxmox_ve][:apt][:components][:community]    ||= ['pve-no-subscription']
 node[:proxmox_ve][:keyring]                         ||= Hashie::Mash.new
-node[:proxmox_ve][:keyring][:bullseye]              ||= Hashie::Mash.new
-node[:proxmox_ve][:keyring][:bullseye][:uid]        ||= 'Proxmox Bullseye Release Key <proxmox-release@proxmox.com>'
-node[:proxmox_ve][:keyring][:bullseye][:fpr]        ||= '28139A2F830BD68478A1A01FDD4BA3917E23BF59'
-node[:proxmox_ve][:keyring][:bullseye][:url]        ||= 'https://enterprise.proxmox.com/debian/proxmox-release-bullseye.gpg'
 node[:proxmox_ve][:keyring][:bookworm]              ||= Hashie::Mash.new
 node[:proxmox_ve][:keyring][:bookworm][:uid]        ||= 'Proxmox Bookworm Release Key <proxmox-release@proxmox.com>'
 node[:proxmox_ve][:keyring][:bookworm][:fpr]        ||= 'F4E136C67CDCE41AE6DE6FC81140AF8F639E0C39'
 node[:proxmox_ve][:keyring][:bookworm][:url]        ||= 'https://enterprise.proxmox.com/debian/proxmox-release-bookworm.gpg'
+node[:proxmox_ve][:keyring][:trixie]                ||= Hashie::Mash.new
+node[:proxmox_ve][:keyring][:trixie][:uid]          ||= 'Proxmox Trixie Release Key <proxmox-release@proxmox.com>'
+node[:proxmox_ve][:keyring][:trixie][:fpr]          ||= '24B30F06ECC1836A4E5EFECBA7BCD1420BFE778E'
+node[:proxmox_ve][:keyring][:trixie][:url]          ||= 'https://enterprise.proxmox.com/debian/proxmox-archive-keyring-trixie.gpg'
 
 #
 # Default Variables
@@ -72,12 +72,12 @@ node.validate! do
         },
       },
       keyring: {
-        bullseye: {
+        bookworm: {
           uid: string,
           fpr: string,
           url: match(/^(?:https?|file):\/\//),
         },
-        bookworm: {
+        trixie: {
           uid: string,
           fpr: string,
           url: match(/^(?:https?|file):\/\//),

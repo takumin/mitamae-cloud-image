@@ -34,15 +34,15 @@ node[:nvidia_cuda][:origin][:ubuntu]            ||= Hashie::Mash.new
 node[:nvidia_cuda][:origin][:ubuntu][:jammy]    ||= 'https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64'
 node[:nvidia_cuda][:origin][:ubuntu][:noble]    ||= 'https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64'
 node[:nvidia_cuda][:origin][:debian]            ||= Hashie::Mash.new
-node[:nvidia_cuda][:origin][:debian][:bullseye] ||= 'https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64'
 node[:nvidia_cuda][:origin][:debian][:bookworm] ||= 'https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64'
+node[:nvidia_cuda][:origin][:debian][:trixie]   ||= 'https://developer.download.nvidia.com/compute/cuda/repos/debian13/x86_64'
 node[:nvidia_cuda][:mirror]                     ||= Hashie::Mash.new
 node[:nvidia_cuda][:mirror][:ubuntu]            ||= Hashie::Mash.new
 node[:nvidia_cuda][:mirror][:ubuntu][:jammy]    ||= node[:nvidia_cuda][:origin][:ubuntu][:jammy]
 node[:nvidia_cuda][:mirror][:ubuntu][:noble]    ||= node[:nvidia_cuda][:origin][:ubuntu][:noble]
 node[:nvidia_cuda][:mirror][:debian]            ||= Hashie::Mash.new
-node[:nvidia_cuda][:mirror][:debian][:bullseye] ||= node[:nvidia_cuda][:origin][:debian][:bullseye]
 node[:nvidia_cuda][:mirror][:debian][:bookworm] ||= node[:nvidia_cuda][:origin][:debian][:bookworm]
+node[:nvidia_cuda][:mirror][:debian][:trixie]   ||= node[:nvidia_cuda][:origin][:debian][:trixie]
 
 #
 # Override Variables
@@ -56,12 +56,12 @@ if ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_NOBLE'].is_a?(String) and !ENV['APT_REPO
   node[:nvidia_cuda][:mirror][:ubuntu][:noble] = ENV['APT_REPO_URL_NVIDIA_CUDA_UBUNTU_NOBLE']
 end
 
-if ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BULLSEYE'].is_a?(String) and !ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BULLSEYE'].empty?
-  node[:nvidia_cuda][:mirror][:debian][:bullseye] = ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BULLSEYE']
-end
-
 if ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM'].is_a?(String) and !ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM'].empty?
   node[:nvidia_cuda][:mirror][:debian][:bookworm] = ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM']
+end
+
+if ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_TRIXIE'].is_a?(String) and !ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_TRIXIE'].empty?
+  node[:nvidia_cuda][:mirror][:debian][:trixie] = ENV['APT_REPO_URL_NVIDIA_CUDA_DEBIAN_TRIXIE']
 end
 
 #
@@ -77,8 +77,8 @@ node.validate! do
           noble:  match(/^(?:https?|file):\/\//),
         },
         debian: {
-          bullseye: match(/^(?:https?|file):\/\//),
           bookworm: match(/^(?:https?|file):\/\//),
+          trixie:   match(/^(?:https?|file):\/\//),
         },
       },
       mirror: {
@@ -87,8 +87,8 @@ node.validate! do
           noble:  match(/^(?:https?|file):\/\//),
         },
         debian: {
-          bullseye: match(/^(?:https?|file):\/\//),
           bookworm: match(/^(?:https?|file):\/\//),
+          trixie:   match(/^(?:https?|file):\/\//),
         },
       },
     },
@@ -109,10 +109,10 @@ when 'ubuntu'
   end
 when 'debian'
   case node[:platform_version]
-  when /^11/
-    platform_codename = :bullseye
   when /^12/
     platform_codename = :bookworm
+  when /^13/
+    platform_codename = :trixie
   end
 end
 
