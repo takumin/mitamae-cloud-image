@@ -6,30 +6,22 @@
 
 node.reverse_merge!({
   linux_firmware: {
-    excludes: [],
-    includes: [],
+    packages: [],
+    options:  [],
   },
 })
 
 #
-# Minimize
+# Select Distribution
 #
 
-if ENV['MINIMIZE_LINUX_FIRMWARE'].eql?('true')
-  node.linux_firmware.excludes << '/lib/firmware/*'
-  node.linux_firmware.includes << '/lib/firmware/rtl_nic/*'
-end
-
-#
-# Raspberry Pi
-#
-
-if node.target.kernel == 'raspi'
-  node.linux_firmware.excludes << '/lib/firmware/nvidia/*'
-  node.linux_firmware.excludes << '/lib/firmware/radeon/*'
-  node.linux_firmware.excludes << '/lib/firmware/iwlwifi*'
-  node.linux_firmware.includes << '/lib/firmware/brcm/*'
-  node.linux_firmware.includes << '/lib/firmware/cypress/*'
+case node.platform
+when 'debian', 'ubuntu'
+  include_recipe node.platform
+when 'arch'
+  # linux-kernel installs linux-firmware together with the kernel
+else
+  raise
 end
 
 #
@@ -39,50 +31,18 @@ end
 node.validate! do
   {
     linux_firmware: {
-      excludes: array_of(string),
-      includes: array_of(string),
+      packages: array_of(string),
+      options:  array_of(string),
     },
   }
 end
 
 #
-# Check Empty Variables
+# Package Install
 #
 
-if node.linux_firmware.excludes.empty? and node.linux_firmware.includes.empty?
-  return
-end
-
-#
-# Check Distribution
-#
-
-unless node[:target][:distribution].match(/^ubuntu$/)
-  return
-end
-
-#
-# [Ex|In]cludes Firmware
-#
-
-contents = []
-
-node.linux_firmware.excludes.each do |path|
-  contents << "path-exclude #{path}"
-end
-
-node.linux_firmware.includes.each do |path|
-  contents << "path-include #{path}"
-end
-
-file '/etc/dpkg/dpkg.cfg.d/linux-firmware' do
-  owner   'root'
-  group   'root'
-  mode    '0644'
-  content "#{contents.join("\n")}\n"
-  notifies :run, 'execute[apt-get install -y --reinstall linux-firmware]', :immediately
-end
-
-execute 'apt-get install -y --reinstall linux-firmware' do
-  action :nothing
+node.linux_firmware.packages.each do |pkg|
+  package pkg do
+    options node.linux_firmware.options.join(' ')
+  end
 end
