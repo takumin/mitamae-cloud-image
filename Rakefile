@@ -6,7 +6,7 @@ require 'open3'
 require 'yaml'
 require 'json'
 
-PUBLISH_UBUNTU_SUITE = 'noble'
+PUBLISH_UBUNTU_SUITE = 'resolute'
 PUBLISH_DEBIAN_SUITE = 'trixie'
 
 MITAMAE_VERSION = 'v1.14.1'
@@ -140,7 +140,7 @@ if ppa_nvidia_vgpu
       suite  = 'trixie'
       kernel = 'generic'
     when 'ubuntu'
-      suite  = 'noble'
+      suite  = 'resolute'
       kernel = 'generic-hwe'
     else
       next
