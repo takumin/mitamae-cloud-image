@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'etc'
 require 'fileutils'
 require 'open-uri'
 require 'open3'
@@ -312,7 +313,7 @@ end
 def setup_mitamae
   dir = File.expand_path('.bin', __dir__)
   bin = File.join(dir, 'mitamae')
-  url = "https://github.com/itamae-kitchen/mitamae/releases/download/#{MITAMAE_VERSION}/mitamae-x86_64-linux"
+  url = "https://github.com/itamae-kitchen/mitamae/releases/download/#{MITAMAE_VERSION}/mitamae-#{Etc.uname[:machine]}-linux"
 
   unless Dir.exist?(dir)
     Dir.mkdir(dir)
