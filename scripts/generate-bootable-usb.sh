@@ -31,7 +31,7 @@ set -eu
 # - trixie
 # - noble
 # - resolute
-: "${RELEASE:="noble"}"
+: "${RELEASE:="resolute"}"
 
 # Kernel Package
 # Value:
