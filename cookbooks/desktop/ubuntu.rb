@@ -1,0 +1,71 @@
+# frozen_string_literal: true
+
+#
+# Ubuntu Mozilla Team Keyring
+#
+
+directory '/etc/apt/keyrings' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+gpg_keyring '/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc' do
+  fingerprint '738BEB9321D1AAEC13EA9391AEBDF4819BE21867'
+  user_id     'Launchpad PPA for Mozilla Team'
+  url         'https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x738BEB9321D1AAEC13EA9391AEBDF4819BE21867'
+  owner       'root'
+  group       'root'
+  mode        '0644'
+end
+
+#
+# PPA Ubuntu Mozilla Team Repository
+#
+
+apt_repository 'PPA Ubuntu Mozilla Team Repository' do
+  path '/etc/apt/sources.list.d/ppa-ubuntu-mozilla-team.list'
+  entry [
+    {
+      :default_uri => 'https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu',
+      :mirror_uri  => "#{ENV['APT_REPO_URL_PPA_MOZILLA_TEAM']}",
+      :options     => 'signed-by=/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc',
+      :suite       => '###platform_codename###',
+      :components  => [
+        'main',
+      ],
+    },
+  ]
+  notifies :run, 'execute[apt-get update]', :immediately
+end
+
+#
+# Ubuntu Mozilla Team Preferences
+#
+
+contents = [
+  'Package: *',
+  'Pin: release o=LP-PPA-mozillateam',
+  'Pin-Priority: 600',
+].join("\n")
+
+file '/etc/apt/preferences.d/ppa-ubuntu-mozilla-team' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content "#{contents}\n"
+end
+
+#
+# Event Handler
+#
+
+execute 'apt-get update' do
+  action :nothing
+end
+
+#
+# Package Install
+#
+
+package 'ubuntu-desktop-minimal'
