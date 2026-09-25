@@ -18,7 +18,7 @@ file '/etc/apt/preferences.d/isc-kea' do
   mode  '0644'
   content <<~__EOF__
     Package: *
-    Pin: release o=cloudsmith/isc/kea-2-6
+    Pin: release o=cloudsmith/isc/kea-3-2
     Pin-Priority: 600
   __EOF__
 end
@@ -48,7 +48,7 @@ apt_repository 'ISC Kea Repository' do
   path '/etc/apt/sources.list.d/isc-kea.list'
   entry [
     {
-      :default_uri => "https://dl.cloudsmith.io/public/isc/kea-2-6/deb/#{node.platform}",
+      :default_uri => "https://dl.cloudsmith.io/public/isc/kea-3-2/deb/#{node.platform}",
       :mirror_uri  => ENV['APT_REPO_URL_ISC_KEA_' + node.platform.upcase],
       :options     => 'signed-by=/etc/apt/keyrings/isc-kea.asc',
       :suite       => '###platform_codename###',
@@ -79,7 +79,6 @@ file '/etc/systemd/system/isc-kea-restore-config.service' do
   content <<~__EOF__
     [Unit]
     Description=ISC Kea Restore Configuration
-    Before=isc-kea-ctrl-agent.service
     Before=isc-kea-dhcp-ddns-server.service
     Before=isc-kea-dhcp4-server.service
     Before=isc-kea-dhcp6-server.service
