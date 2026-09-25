@@ -244,8 +244,13 @@ namespace :github do
   namespace :actions do
     task :all do
       # NOTE: Unused NVIDIA Legacy Version
-      targets.delete_if{|v| v.values.include?('server-nvidia-legacy')}
-      targets.delete_if{|v| v.values.include?('desktop-nvidia-legacy')}
+      targets.delete_if{|v| v['role'].include?('nvidia-legacy')}
+      # NOTE: Unused NVIDIA vGPU
+      targets.delete_if{|v| v['role'].include?('nvidia-vgpu')}
+      # NOTE: Unused rtl8852au
+      targets.delete_if{|v| v['role'].include?('rtl8852au')}
+      # NOTE: Unused bootstrap
+      targets.delete_if{|v| v['role'].include?('bootstrap')}
 
       puts JSON.dump(targets.map{|v|
         {
