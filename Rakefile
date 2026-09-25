@@ -275,7 +275,7 @@ namespace :github do
 
         if v['distribution'].eql?('debian')
           if v['suite'].eql?(PUBLISH_DEBIAN_SUITE)
-            if v['kernel'].match?(/^(generic|cloud)$/)
+            if v['kernel'].match?(/^(generic|cloud)-backports$/)
               publish = true
             end
           end
