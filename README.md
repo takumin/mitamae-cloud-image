@@ -27,8 +27,8 @@ export APT_REPO_URL_UBUNTU_PORTS="http://${APT_MIRROR_HOST}/ubuntu-ports"
 
 export APT_REPO_URL_RASPBERRYPI="http://${APT_MIRROR_HOST}/raspberrypi"
 
-export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM="http://${APT_MIRROR_HOST}/nvidia-cuda-bookworm"
-export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_NOBLE="http://${APT_MIRROR_HOST}/nvidia-cuda-noble"
+export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_TRIXIE="http://${APT_MIRROR_HOST}/nvidia-cuda-trixie"
+export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_RESOLUTE="http://${APT_MIRROR_HOST}/nvidia-cuda-resolute"
 
 export APT_REPO_URL_POWERDNS_DEBIAN="http://${APT_MIRROR_HOST}/powerdns-debian"
 export APT_REPO_URL_POWERDNS_UBUNTU="http://${APT_MIRROR_HOST}/powerdns-ubuntu"
@@ -46,8 +46,8 @@ export APT_REPO_URL_PPA_MOZILLA_TEAM="http://${APT_CACHER_HOST}/ppa-mozilla-team
 export APT_REPO_URL_PROXMOX_VE_ENTERPRISE="http://${APT_CACHER_HOST}/proxmox-ve-enterprise"
 export APT_REPO_URL_PROXMOX_VE_COMMUNITY="http://${APT_CACHER_HOST}/proxmox-ve-community"
 
-export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_RESOLUTE="http://${APT_CACHER_HOST}/nvidia-cuda-resolute"
-export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_TRIXIE="http://${APT_CACHER_HOST}/nvidia-cuda-trixie"
+export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_NOBLE="http://${APT_CACHER_HOST}/nvidia-cuda-noble"
+export APT_REPO_URL_NVIDIA_CUDA_DEBIAN_BOOKWORM="http://${APT_CACHER_HOST}/nvidia-cuda-bookworm"
 
 export APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID="[GPG_UID]"
 export APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT="[GPG_FINGER_PRINT]"
