@@ -10,3 +10,6 @@
 [submodule "plugins/mitamae-plugin-resource-apt_keyring"]
 	path = plugins/mitamae-plugin-resource-apt_keyring
 	url = https://github.com/takumin/mitamae-plugin-resource-apt_keyring.git
+[submodule "plugins/mitamae-plugin-resource-gpg_keyring"]
+	path = plugins/mitamae-plugin-resource-gpg_keyring
+	url = https://github.com/takumin/mitamae-plugin-resource-gpg_keyring.git
