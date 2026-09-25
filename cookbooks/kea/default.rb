@@ -33,11 +33,13 @@ directory '/etc/apt/keyrings' do
   mode  '0755'
 end
 
-remote_file '/etc/apt/keyrings/isc-kea.asc' do
-  owner  'root'
-  group  'root'
-  mode   '0644'
-  source 'keyring.asc'
+gpg_keyring '/etc/apt/keyrings/isc-kea.asc' do
+  fingerprint '360D0B03DFE219DB0F9FEA4C720DD962343B440F'
+  user_id     'Cloudsmith Package (isc/kea-3-2) <support@cloudsmith.io>'
+  url         "file://#{File.expand_path('keyring.asc', File.dirname(__FILE__))}"
+  owner       'root'
+  group       'root'
+  mode        '0644'
 end
 
 #
