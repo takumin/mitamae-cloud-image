@@ -7,7 +7,7 @@ require 'yaml'
 require 'json'
 
 PUBLISH_UBUNTU_SUITE = 'noble'
-PUBLISH_DEBIAN_SUITE = 'bookworm'
+PUBLISH_DEBIAN_SUITE = 'trixie'
 
 MITAMAE_VERSION = 'v1.14.1'
 
@@ -140,7 +140,7 @@ if ppa_nvidia_vgpu
   DISTRIBUTIONS.each do |distribution|
     case distribution
     when 'debian'
-      suite  = 'bookworm'
+      suite  = 'trixie'
       kernel = 'generic'
     when 'ubuntu'
       suite  = 'noble'
