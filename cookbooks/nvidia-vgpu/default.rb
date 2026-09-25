@@ -52,12 +52,13 @@ directory '/etc/apt/keyrings' do
   mode '0755'
 end
 
-http_request '/etc/apt/keyrings/nvidia-vgpu.gpg' do
-  url ENV['APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL']
-  owner 'root'
-  group 'root'
-  mode '0644'
-  not_if 'test -e /etc/apt/keyrings/nvidia-vgpu.gpg'
+gpg_keyring '/etc/apt/keyrings/nvidia-vgpu.gpg' do
+  fingerprint ENV['APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT']
+  user_id     ENV['APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID']
+  url         ENV['APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL']
+  owner       'root'
+  group       'root'
+  mode        '0644'
 end
 
 #
