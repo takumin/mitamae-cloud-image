@@ -55,10 +55,13 @@ package 'fcitx5-mozc'
 # Default Input Method for Fcitx5
 #
 
+# im-config logs through systemd-cat whenever it is installed, which fails in
+# the chroot without journald, so write the same signed file it would write
 execute 'im-config -n fcitx5' do
-  # A negative verbosity stops im-config from logging through systemd-cat,
-  # which fails in the chroot without journald
-  command 'IM_CONFIG_VERBOSE=-1 im-config -n fcitx5'
+  command [
+    '{ echo "# im-config(8) generated on $(date -R)"; echo "run_im fcitx5"; } > /etc/X11/xinit/xinputrc',
+    'echo "# im-config signature: $(md5sum < /etc/X11/xinit/xinputrc)" >> /etc/X11/xinit/xinputrc',
+  ].join(' && ')
   not_if 'grep -qs "^run_im fcitx5$" /etc/X11/xinit/xinputrc'
   notifies :run, 'execute[cp /etc/X11/xinit/xinputrc /etc/skel/.xinputrc]'
 end
