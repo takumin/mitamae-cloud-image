@@ -48,6 +48,7 @@ node[:rootfs_umount][:umounts].unshift(node[:rootfs_umount][:target_dir])
 
 node[:rootfs_umount][:umounts].reverse.each do |v|
   mount v do
-    action :absent
+    action    :absent
+    recursive true
   end
 end
