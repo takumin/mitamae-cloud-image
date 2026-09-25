@@ -27,10 +27,10 @@ set -eu
 
 # Release Codename
 # Value:
-# - bullseye
 # - bookworm
-# - jammy
+# - trixie
 # - noble
+# - resolute
 : "${RELEASE:="bookworm"}"
 
 # Kernel Package
