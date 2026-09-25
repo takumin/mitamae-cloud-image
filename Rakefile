@@ -13,6 +13,10 @@ MITAMAE_VERSION = 'v1.14.1'
 
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 
+# qemu-user emulates pointer authentication with QARMA5 by default, which is
+# extremely slow for binaries built with branch protection
+ENV['QEMU_CPU'] ||= 'max,pauth-impdef=on'
+
 DISTRIBUTIONS = [
   'debian',
   'ubuntu',
