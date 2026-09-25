@@ -91,9 +91,10 @@ end
 # Private Variables
 #
 
-keyring_uid = node[:proxmox_ve][:keyring][node[:target][:suite]][:uid]
-keyring_fpr = node[:proxmox_ve][:keyring][node[:target][:suite]][:fpr]
-keyring_url = node[:proxmox_ve][:keyring][node[:target][:suite]][:url]
+keyring_uid  = node[:proxmox_ve][:keyring][node[:target][:suite]][:uid]
+keyring_fpr  = node[:proxmox_ve][:keyring][node[:target][:suite]][:fpr]
+keyring_url  = node[:proxmox_ve][:keyring][node[:target][:suite]][:url]
+keyring_path = "/etc/apt/keyrings/proxmox-release-#{node[:target][:suite]}.gpg"
 
 if node[:proxmox_ve][:subscription]
   apt_origin_url = node[:proxmox_ve][:apt][:url][:origin][:enterprise]
@@ -106,12 +107,22 @@ else
 end
 
 #
-# Proxmox VE Non Subscription Repository
+# Apt Keyring
 #
 
-apt_keyring keyring_uid do
-  finger keyring_fpr
-  uri keyring_url
+directory '/etc/apt/keyrings' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+gpg_keyring keyring_path do
+  fingerprint keyring_fpr
+  user_id     keyring_uid
+  url         keyring_url
+  owner       'root'
+  group       'root'
+  mode        '0644'
 end
 
 #
@@ -124,6 +135,7 @@ apt_repository 'Proxmox VE Repository' do
     {
       :default_uri => apt_origin_url,
       :mirror_uri  => apt_mirror_url,
+      :options     => "signed-by=#{keyring_path}",
       :suite       => node[:target][:suite],
       :components  => apt_components,
     },
