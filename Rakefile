@@ -267,7 +267,7 @@ namespace :github do
 
         if v['distribution'].eql?('ubuntu')
           if v['suite'].eql?(PUBLISH_UBUNTU_SUITE)
-            if v['kernel'].match?(/^(generic|virtual)-hwe$/)
+            if v['kernel'].match?(/^((generic|virtual)-hwe|raspi)$/)
               publish = true
             end
           end
@@ -275,7 +275,7 @@ namespace :github do
 
         if v['distribution'].eql?('debian')
           if v['suite'].eql?(PUBLISH_DEBIAN_SUITE)
-            if v['kernel'].match?(/^(generic|cloud)-backports$/)
+            if v['kernel'].match?(/^((generic|cloud)-backports|raspberrypi)$/)
               publish = true
             end
           end
