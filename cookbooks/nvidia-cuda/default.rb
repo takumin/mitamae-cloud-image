@@ -104,15 +104,19 @@ when 'ubuntu'
   case node[:platform_version]
   when '22.04'
     platform_codename = :jammy
+    signing_key       = '3bf863cc.pub'
   when '24.04'
     platform_codename = :noble
+    signing_key       = '3bf863cc.pub'
   end
 when 'debian'
   case node[:platform_version]
   when /^12/
     platform_codename = :bookworm
+    signing_key       = '3bf863cc.pub'
   when /^13/
     platform_codename = :trixie
+    signing_key       = '8793F200.pub'
   end
 end
 
@@ -136,7 +140,7 @@ directory '/etc/apt/keyrings' do
 end
 
 http_request '/etc/apt/keyrings/nvidia-cuda.gpg.asc' do
-  url File.join(nvidia_cuda_origin, '3bf863cc.pub')
+  url File.join(nvidia_cuda_origin, signing_key)
   owner 'root'
   group 'root'
   mode '0644'
