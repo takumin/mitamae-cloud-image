@@ -63,7 +63,7 @@ ROLES = {
     'desktop-nvidia',
     'desktop-nvidia-cuda',
     'desktop-nvidia-legacy',
-    'desktop-rtl8852au-nvidia-cuda',
+    # 'desktop-rtl8852au-nvidia-cuda',
   ],
   'ubuntu' => [
     'minimal',
@@ -76,7 +76,7 @@ ROLES = {
     'desktop-nvidia',
     'desktop-nvidia-cuda',
     'desktop-nvidia-legacy',
-    'desktop-rtl8852au-nvidia-cuda',
+    # 'desktop-rtl8852au-nvidia-cuda',
   ],
 }
 
