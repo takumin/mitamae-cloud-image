@@ -36,7 +36,7 @@ end
 gpg_keyring '/etc/apt/keyrings/isc-kea.asc' do
   fingerprint '360D0B03DFE219DB0F9FEA4C720DD962343B440F'
   user_id     'Cloudsmith Package (isc/kea-3-2) <support@cloudsmith.io>'
-  url         "file://#{File.expand_path('keyring.asc', File.dirname(__FILE__))}"
+  url         'https://dl.cloudsmith.io/public/isc/kea-3-2/gpg.343B440F.key'
   owner       'root'
   group       'root'
   mode        '0644'
