@@ -23,12 +23,13 @@ if node[:platform].match(/ubuntu/)
     mode '0755'
   end
 
-  http_request '/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc' do
-    url 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xaebdf4819be21867'
-    owner 'root'
-    group 'root'
-    mode '0644'
-    not_if 'test -e /etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc'
+  gpg_keyring '/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc' do
+    fingerprint '738BEB9321D1AAEC13EA9391AEBDF4819BE21867'
+    user_id     'Launchpad PPA for Mozilla Team'
+    url         'https://keyserver.ubuntu.com/pks/lookup?op=get&options=mr&search=0x738BEB9321D1AAEC13EA9391AEBDF4819BE21867'
+    owner       'root'
+    group       'root'
+    mode        '0644'
   end
 
   #
