@@ -33,7 +33,7 @@ jobs:
       targets: ${{ steps.matrix.outputs.targets }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
     - name: NVIDIA vGPU Repository
       env:
         APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID: ${{ secrets.APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID }}
@@ -99,7 +99,7 @@ jobs:
     # Build Image
     #
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
       with:
         submodules: true
         fetch-depth: 1
