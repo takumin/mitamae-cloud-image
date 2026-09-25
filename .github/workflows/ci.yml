@@ -67,6 +67,7 @@ jobs:
       INITRAMFS_COMPRESS: xz
       ROOTFS_ARCHIVE_FORMAT_TARBALL: xz
       ROOTFS_ARCHIVE_FORMAT_SQUASHFS: xz
+      TARGET_DIRECTORY: /mnt/rootfs
     steps:
     #
     # Environment Variables
@@ -103,6 +104,9 @@ jobs:
       with:
         submodules: true
         fetch-depth: 1
+    # /tmp on ubuntu-26.04 runners is mounted with nodev, which breaks debootstrap
+    - name: Mount Target Directory
+      run: sudo mount -t tmpfs -o size=8G tmpfs /mnt
     - name: Initialize
       id: initialize
       run: rake "${TARGET_NAME}:initialize"
