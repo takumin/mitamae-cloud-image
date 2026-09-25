@@ -31,7 +31,7 @@ set -eu
 # - trixie
 # - noble
 # - resolute
-: "${RELEASE:="bookworm"}"
+: "${RELEASE:="trixie"}"
 
 # Kernel Package
 # Value:
