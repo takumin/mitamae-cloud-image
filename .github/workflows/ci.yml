@@ -52,7 +52,7 @@ jobs:
   build-and-publish:
     needs: matrix
     name: ${{ matrix.target.name }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.target.runner }}
     timeout-minutes: 120
     permissions:
       contents: read

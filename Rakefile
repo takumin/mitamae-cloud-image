@@ -250,13 +250,12 @@ namespace :github do
       # NOTE: Unused NVIDIA Legacy Version
       targets.delete_if{|v| v.values.include?('server-nvidia-legacy')}
       targets.delete_if{|v| v.values.include?('desktop-nvidia-legacy')}
-      # TODO: GitHub Actions Once the arm64 runner is GA, remove the following
-      targets.delete_if{|v| v.values.include?('arm64')}
 
       puts JSON.dump(targets.map{|v|
         {
-          name: v.values.join(':'),
-          dir:  v.values.join('/'),
+          name:   v.values.join(':'),
+          dir:    v.values.join('/'),
+          runner: v['architecture'].eql?('arm64') ? 'ubuntu-26.04-arm' : 'ubuntu-26.04',
         }
       })
     end
