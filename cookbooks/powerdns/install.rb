@@ -36,7 +36,7 @@ end
 gpg_keyring '/etc/apt/keyrings/powerdns.asc' do
   fingerprint '9FAAA5577E8FCF62093D036C1B0C6205FD380FBB'
   user_id     'PowerDNS Release Signing Key <powerdns.support@powerdns.com>'
-  url         "file://#{File.expand_path('keyring.asc', File.dirname(__FILE__))}"
+  url         'https://repo.powerdns.com/FD380FBB-pub.asc'
   owner       'root'
   group       'root'
   mode        '0644'
