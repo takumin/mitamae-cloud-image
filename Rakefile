@@ -306,6 +306,7 @@ def setup_profile(target)
       }
     }
   end
+  data['target']['directory'] = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
   File.open(yaml, 'w') do |file|
     YAML.dump(data, file)
   end
