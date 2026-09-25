@@ -56,6 +56,9 @@ package 'fcitx5-mozc'
 #
 
 execute 'im-config -n fcitx5' do
+  # A negative verbosity stops im-config from logging through systemd-cat,
+  # which fails in the chroot without journald
+  command 'IM_CONFIG_VERBOSE=-1 im-config -n fcitx5'
   not_if 'grep -qs "^run_im fcitx5$" /etc/X11/xinit/xinputrc'
   notifies :run, 'execute[cp /etc/X11/xinit/xinputrc /etc/skel/.xinputrc]'
 end
