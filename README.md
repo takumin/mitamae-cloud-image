@@ -33,8 +33,8 @@ export APT_REPO_URL_NVIDIA_CUDA_UBUNTU_RESOLUTE="http://${APT_MIRROR_HOST}/nvidi
 export APT_REPO_URL_POWERDNS_DEBIAN="http://${APT_MIRROR_HOST}/powerdns-debian"
 export APT_REPO_URL_POWERDNS_UBUNTU="http://${APT_MIRROR_HOST}/powerdns-ubuntu"
 
-export APT_REPO_URL_ISC_KEA_DEBIAN="http://${APT_MIRROR_HOST}/isc-kea-26x-debian"
-export APT_REPO_URL_ISC_KEA_UBUNTU="http://${APT_MIRROR_HOST}/isc-kea-26x-ubuntu"
+export APT_REPO_URL_ISC_KEA_DEBIAN="http://${APT_MIRROR_HOST}/isc-kea-32x-debian"
+export APT_REPO_URL_ISC_KEA_UBUNTU="http://${APT_MIRROR_HOST}/isc-kea-32x-ubuntu"
 
 # Apt Cacher List
 
