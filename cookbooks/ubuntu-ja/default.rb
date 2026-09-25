@@ -50,15 +50,15 @@ package 'fonts-noto-cjk-extra'
 # Input Method
 #
 
-package 'fcitx'
-package 'fcitx-mozc'
+package 'fcitx5'
+package 'fcitx5-mozc'
 
 #
-# Default Input Method for Fcitx
+# Default Input Method for Fcitx5
 #
 
-execute 'im-config -n fcitx' do
-  not_if 'grep -qs "^run_im fcitx$" /etc/X11/xinit/xinputrc'
+execute 'im-config -n fcitx5' do
+  not_if 'grep -qs "^run_im fcitx5$" /etc/X11/xinit/xinputrc'
   notifies :run, 'execute[cp /etc/X11/xinit/xinputrc /etc/skel/.xinputrc]'
 end
 
