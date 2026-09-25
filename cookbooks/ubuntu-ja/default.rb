@@ -12,7 +12,7 @@ end
 # Check Architecture
 #
 
-unless node[:target][:architecture].match(/^(?:amd64|i386)$/)
+unless node[:target][:architecture].match(/^(?:amd64|i386|armhf|arm64)$/)
   return
 end
 
