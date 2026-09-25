@@ -188,6 +188,11 @@ cmds << '--foreign'
 cmds << suite
 cmds << target
 cmds << mirror
+if cmd == 'debootstrap' and dist == 'ubuntu'
+  # every ubuntu suite links to the gutsy script, but the host's debootstrap
+  # may predate the target suite and lack that link
+  cmds << '/usr/share/debootstrap/scripts/gutsy'
+end
 
 #
 # Run Debootstrap First Stage
