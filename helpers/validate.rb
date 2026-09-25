@@ -7,8 +7,6 @@ AVAILABLE_ROLES = [
   'minimal-bootstrap',
   'server',
   'desktop',
-  'server-nvidia',
-  'desktop-nvidia',
   'server-nvidia-cuda',
   'desktop-nvidia-cuda',
   'desktop-rtl8852au-nvidia-cuda',

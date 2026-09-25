@@ -43,10 +43,8 @@ set -eu
 # Package Selection
 # Value:
 # - server
-# - server-nvidia
 # - server-nvidia-cuda
 # - desktop
-# - desktop-nvidia
 # - desktop-nvidia-cuda
 # - desktop-rtl8852au-nvidia-cuda
 : "${PROFILE:="minimal-bootstrap"}"

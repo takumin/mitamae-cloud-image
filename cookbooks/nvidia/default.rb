@@ -4,7 +4,7 @@
 # Check Role
 #
 
-unless node[:target][:role].match?(/(?:-nvidia|-nvidia-legacy)$/)
+unless node[:target][:role].match?(/-nvidia-legacy$/)
   return
 end
 
@@ -39,12 +39,8 @@ include_recipe File.expand_path('../linux-headers', File.dirname(__FILE__))
 case node[:platform]
 when 'ubuntu'
   case node[:target][:role]
-  when 'desktop-nvidia'
-    package 'nvidia-driver-550'
   when 'desktop-nvidia-legacy'
     package 'nvidia-driver-470'
-  when 'server-nvidia'
-    package 'nvidia-headless-550-server'
   when 'server-nvidia-legacy'
     package 'nvidia-headless-470-server'
   else
@@ -52,14 +48,8 @@ when 'ubuntu'
   end
 when 'debian'
   case node[:target][:role]
-  when 'desktop-nvidia'
-    package 'nvidia-driver'
   when 'desktop-nvidia-legacy'
     package 'nvidia-tesla-470-driver'
-  when 'server-nvidia'
-    package 'nvidia-driver' do
-      options '--no-install-recommends'
-    end
   when 'server-nvidia-legacy'
     package 'nvidia-tesla-470-driver' do
       options '--no-install-recommends'
