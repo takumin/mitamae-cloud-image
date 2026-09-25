@@ -13,7 +13,7 @@ end
 #
 
 unless node[:target][:architecture].match?(/(?:amd64)$/)
-  MItamae.logger.error "nvidia: Unsupported architecture: #{node[:kernel][:machine]}"
+  MItamae.logger.error "nvidia-legacy: Unsupported architecture: #{node[:kernel][:machine]}"
   exit 1
 end
 
@@ -22,7 +22,7 @@ end
 #
 
 unless node[:platform].match?(/(?:debian|ubuntu)$/)
-  MItamae.logger.error "nvidia: Unsupported platform: #{node[:platform]}"
+  MItamae.logger.error "nvidia-legacy: Unsupported platform: #{node[:platform]}"
   exit 1
 end
 
