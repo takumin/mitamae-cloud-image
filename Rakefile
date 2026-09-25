@@ -28,8 +28,8 @@ SUITES = {
     'trixie',
   ],
   'ubuntu' => [
-    'jammy',
     'noble',
+    'resolute',
   ],
 }
 

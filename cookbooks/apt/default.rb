@@ -65,7 +65,7 @@ when :ubuntu
   node.validate! do
     {
       apt: {
-        suite:      match(/^(?:jammy|noble)$/),
+        suite:      match(/^(?:noble|resolute)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },
     }
