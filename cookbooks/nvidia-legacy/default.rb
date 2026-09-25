@@ -40,18 +40,18 @@ case node[:platform]
 when 'ubuntu'
   case node[:target][:role]
   when 'desktop-nvidia-legacy'
-    package 'nvidia-driver-470'
+    package 'nvidia-driver-580'
   when 'server-nvidia-legacy'
-    package 'nvidia-headless-470-server'
+    package 'nvidia-headless-580-server'
   else
     raise
   end
 when 'debian'
   case node[:target][:role]
   when 'desktop-nvidia-legacy'
-    package 'nvidia-tesla-470-driver'
+    package 'nvidia-driver'
   when 'server-nvidia-legacy'
-    package 'nvidia-tesla-470-driver' do
+    package 'nvidia-driver' do
       options '--no-install-recommends'
     end
   else
