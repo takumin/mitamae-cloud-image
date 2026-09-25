@@ -8,14 +8,10 @@ case node[:platform]
 when 'debian', 'ubuntu'
   # init/systemd
   package 'init'
-  if node[:platform].eql?('debian') and node[:platform_version].to_i >= 12
-    package 'systemd-resolved'
-    package 'systemd-oomd'
-  elsif node[:platform].eql?('ubuntu') and node[:platform_version].to_i >= 22
-    package 'systemd-oomd'
-  end
+  package 'systemd-resolved'
+  package 'systemd-oomd'
   # required systemd-hostnamed
-  package 'policykit-1'
+  package 'polkitd'
   # linux standard
   package 'lsb-release'
   # tuning
