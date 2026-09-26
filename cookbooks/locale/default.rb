@@ -9,8 +9,10 @@ node[:locale][:availables] ||= [
   'ja_JP.UTF-8 UTF-8',
   'en_US.UTF-8 UTF-8'
 ]
+# The kernel console cannot render CJK glyphs, so only desktops default to
+# Japanese; the other roles keep ja_JP.UTF-8 available for SSH sessions.
 node[:locale][:defaults]   ||= Hashie::Mash.new({
-  LANG: 'ja_JP.UTF-8',
+  LANG: node[:target][:role].match(/desktop/) ? 'ja_JP.UTF-8' : 'C.UTF-8',
 })
 
 #
@@ -26,9 +28,10 @@ end
 # Private Variables
 #
 
+# C.UTF-8 is built into glibc and needs no locale-gen entry.
 availables = node[:locale][:availables].map {|locale|
   locale.gsub(/\s+.*$/, '')
-}.uniq.sort
+}.push('C.UTF-8').uniq.sort
 
 #
 # Validate Variables
