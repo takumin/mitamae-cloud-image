@@ -39,3 +39,12 @@ if node[:platform].match?(/^debian$/) and node[:target][:suite].match?(/^trixie$
 else
   include_recipe 'package'
 end
+
+#
+# Hardware Video Acceleration
+#
+
+if node[:target][:role].match?(/^desktop-/)
+  package 'nvidia-vaapi-driver'
+  package 'vainfo'
+end
