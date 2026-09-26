@@ -87,6 +87,24 @@ file '/etc/modprobe.d/nvidia-blacklists-nouveau.conf' do
 end
 
 #
+# Module Options
+#
+
+# The installer leaves kernel mode setting off, which nvidia-vaapi-driver
+# and Wayland require; GDM also falls back to Xorg unless video memory is
+# preserved across suspend
+file '/etc/modprobe.d/nvidia-options.conf' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    'options nvidia-drm modeset=1',
+    'options nvidia NVreg_PreserveVideoMemoryAllocations=1',
+    '',
+  ].join("\n")
+end
+
+#
 # Download Installer
 #
 
