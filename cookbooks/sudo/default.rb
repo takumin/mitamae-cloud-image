@@ -13,6 +13,6 @@ package 'sudo'
 file '/etc/sudoers.d/no_passwd' do
   owner 'root'
   group 'root'
-  mode  '0644'
+  mode  '0440'
   content "%sudo ALL=(ALL:ALL) NOPASSWD: ALL\n"
 end
