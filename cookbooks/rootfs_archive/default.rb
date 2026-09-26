@@ -267,6 +267,8 @@ when 'raspberrypi', 'raspi'
       'kernel=vmlinuz',
       'initramfs initrd.img followkernel',
       'force_turbo=1',
+      'dtparam=i2c_arm=on',
+      'dtparam=spi=on',
       'dtoverlay=miniuart-bt',
       'dtoverlay=vc4-kms-v3d-pi4',
       'disable_overscan=1',
