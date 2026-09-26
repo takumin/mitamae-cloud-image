@@ -1,0 +1,3 @@
+SUBSYSTEM=="dma_heap", GROUP="video", MODE="0660"
+SUBSYSTEM=="dma_heap", KERNEL=="system", PROGRAM="/bin/grep -q iommu /proc/iomem", SYMLINK+="dma_heap/vidbuf_cached"
+SUBSYSTEM=="dma_heap", KERNEL=="linux,cma", SYMLINK+="dma_heap/vidbuf_cached", OPTIONS+="link_priority=-50"
