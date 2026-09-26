@@ -33,6 +33,20 @@ include_recipe node.platform
 end
 
 #
+# Kernel Modules
+#
+# /dev/i2c-* needs i2c-dev, which nothing loads automatically. spidev is
+# loaded by its modalias once dtparam=spi=on is set in config.txt.
+#
+
+file '/etc/modules-load.d/i2c-dev.conf' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content "i2c-dev\n"
+end
+
+#
 # Udev Rules
 #
 # Taken from raspberrypi-sys-mods (RPi-Distro/raspberrypi-sys-mods@7959bb7)
