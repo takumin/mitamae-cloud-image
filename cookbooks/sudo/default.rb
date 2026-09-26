@@ -14,5 +14,5 @@ file '/etc/sudoers.d/no_passwd' do
   owner 'root'
   group 'root'
   mode  '0644'
-  content '%sudo ALL=(ALL:ALL) NOPASSWD: ALL'
+  content "%sudo ALL=(ALL:ALL) NOPASSWD: ALL\n"
 end
