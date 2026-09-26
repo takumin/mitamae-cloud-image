@@ -42,9 +42,12 @@ node[:administrator][:groups] ||= [
   'cdrom',
   'dialout',
   'dip',
+  'gpio',
+  'i2c',
   'input',
   'plugdev',
   'render',
+  'spi',
   'staff',
   'sudo',
   'tty',
@@ -121,11 +124,13 @@ end
 # Join Groups
 #
 
-node[:group].keys.each do |k|
-  next unless node[:administrator][:groups].include?(node[:group][k][:name])
-  next if node[:group][k][:members].include?(node[:administrator][:username])
-
-  execute "adduser #{node[:administrator][:username]} #{node[:group][k][:name]}"
+# Check groups when the resources run, not when the recipes are loaded, so
+# that groups created by earlier cookbooks (such as raspberrypi) are joined.
+node[:administrator][:groups].each do |name|
+  execute "adduser #{node[:administrator][:username]} #{name}" do
+    only_if "getent group #{name}"
+    not_if  "id -nG #{node[:administrator][:username]} | tr ' ' '\\n' | grep -qx #{name}"
+  end
 end
 
 #
