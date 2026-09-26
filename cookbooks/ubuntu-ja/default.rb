@@ -20,28 +20,15 @@ end
 # Check Role
 #
 
-if node[:target][:role].match(/minimal/)
-  return
-end
-
-#
-# CLI Japanese Packages
-#
-
-package 'language-pack-ja'
-
-#
-# Check Platform
-#
-
 unless node[:target][:role].match(/desktop/)
   return
 end
 
 #
-# GUI Japanese Packages
+# Japanese Packages
 #
 
+package 'language-pack-ja'
 package 'language-pack-gnome-ja'
 package 'gnome-user-docs-ja'
 package 'fonts-noto-cjk-extra'
