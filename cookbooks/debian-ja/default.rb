@@ -20,28 +20,15 @@ end
 # Check Role
 #
 
-if node[:target][:role].match(/minimal/)
-  return
-end
-
-#
-# CLI Japanese Packages
-#
-
-package 'task-japanese'
-
-#
-# Check Platform
-#
-
 unless node[:target][:role].match(/desktop/)
   return
 end
 
 #
-# GUI Japanese Packages
+# Japanese Packages
 #
 
+package 'task-japanese'
 package 'task-japanese-desktop'
 
 #
