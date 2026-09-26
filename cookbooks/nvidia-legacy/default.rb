@@ -27,52 +27,15 @@ unless node[:platform].match?(/(?:debian|ubuntu)$/)
 end
 
 #
-# Required Packages
+# Install Driver
 #
 
-include_recipe File.expand_path('../linux-headers', File.dirname(__FILE__))
-
-#
-# Debconf
-#
-
-# The postinst compares the new driver with the nvidia/nouveau module
-# loaded on the build host (visible through /proc and lsmod in the chroot)
-# and raises an error-type debconf message on mismatch, which is
-# meaningless for an image; disable the check
-if node[:platform].match?(/^debian$/)
-  debconf 'nvidia-support' do
-    question 'nvidia-support/check-running-module-version'
-    vtype    'boolean'
-    value    'false'
-  end
-end
-
-#
-# Install Package
-#
-
-case node[:platform]
-when 'ubuntu'
-  case node[:target][:role]
-  when 'desktop-nvidia-legacy'
-    package 'nvidia-driver-580'
-  when 'server-nvidia-legacy'
-    package 'nvidia-headless-580-server'
-  else
-    raise
-  end
-when 'debian'
-  case node[:target][:role]
-  when 'desktop-nvidia-legacy'
-    package 'nvidia-driver'
-  when 'server-nvidia-legacy'
-    package 'nvidia-driver' do
-      options '--no-install-recommends'
-    end
-  else
-    raise
-  end
+# Debian ships no driver newer than 550, whose DKMS module fails to build
+# against the 7.x kernels in trixie-backports; install the 580 series,
+# the last one supporting Pascal GPUs such as the GTX 1080, from the
+# NVIDIA installer instead
+if node[:platform].match?(/^debian$/) and node[:target][:suite].match?(/^trixie$/) and node[:target][:kernel].match?(/-backports$/)
+  include_recipe 'installer'
 else
-  raise
+  include_recipe 'package'
 end
