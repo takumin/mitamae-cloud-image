@@ -59,6 +59,8 @@ package 'raspberrypi-archive-keyring'
 #
 
 package 'raspi-firmware'
-package 'raspi-utils-core'
 package 'bluez-firmware'
 package 'firmware-brcm80211'
+package 'raspberrypi-sys-mods' do
+  options '--no-install-recommends'
+end
