@@ -200,11 +200,11 @@ execute 'apt-get update'
 # Clean Cache Repository
 #
 
+# keep the binary package cache: without it every apt call reparses the
+# indexes, which takes tens of seconds under qemu-user
 contents = <<~__EOF__
-DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
-APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
-Dir::Cache::pkgcache "";
-Dir::Cache::srcpkgcache "";
+DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
+APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
 __EOF__
 
 file '/etc/apt/apt.conf.d/cache-clean' do
