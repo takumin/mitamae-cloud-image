@@ -33,6 +33,22 @@ end
 include_recipe File.expand_path('../linux-headers', File.dirname(__FILE__))
 
 #
+# Debconf
+#
+
+# The postinst compares the new driver with the nvidia/nouveau module
+# loaded on the build host (visible through /proc and lsmod in the chroot)
+# and raises an error-type debconf message on mismatch, which is
+# meaningless for an image; disable the check
+if node[:platform].match?(/^debian$/)
+  debconf 'nvidia-support' do
+    question 'nvidia-support/check-running-module-version'
+    vtype    'boolean'
+    value    'false'
+  end
+end
+
+#
 # Install Package
 #
 
