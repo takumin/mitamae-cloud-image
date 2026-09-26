@@ -155,6 +155,8 @@ end
 
 targets.each do |target|
   namespace target.values.join(':') do
+    chroot_dir = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
+
     task :initialize do
       setup_mitamae
       setup_profile(target)
@@ -167,7 +169,7 @@ targets.each do |target|
         './phases/initialize.rb',
       ].join(' ')
 
-      unless execution(cmd)
+      unless execution(cmd, chroot: chroot_dir)
         abort('failed command')
       end
     end
@@ -196,7 +198,7 @@ targets.each do |target|
         '/mitamae/phases/provision.rb',
       ].join(' ')
 
-      unless execution(cmd)
+      unless execution(cmd, chroot: chroot_dir)
         abort('failed command')
       end
 
@@ -214,7 +216,7 @@ targets.each do |target|
         './phases/finalize.rb',
       ].join(' ')
 
-      unless execution(cmd)
+      unless execution(cmd, chroot: chroot_dir)
         abort('failed command')
       end
 
@@ -346,7 +348,22 @@ def setup_mitamae
   end
 end
 
-def execution(cmd)
+# apt-get and dpkg ignore SIGINT while installing, so Ctrl-C leaves them
+# running in the chroot and keeps the target directory busy
+def kill_chroot_processes(dir)
+  script = 'for p in /proc/[0-9]*; do [ "$(readlink "$p/root")" = "$1" ] && echo "${p#/proc/}"; done'
+
+  %w{TERM KILL}.each do |signal|
+    20.times do
+      pids = Open3.capture2('sudo', 'sh', '-c', script, 'sh', File.expand_path(dir))[0].split
+      return if pids.empty?
+      system('sudo', 'kill', "-#{signal}", *pids, err: File::NULL)
+      sleep 0.5
+    end
+  end
+end
+
+def execution(cmd, chroot: nil)
   retval = false
 
   # https://ikm.hatenablog.jp/entry/2014/11/12/003925
@@ -364,6 +381,9 @@ def execution(cmd)
         break if stdout.eof? && stderr.eof?
       end
     rescue EOFError
+    rescue Interrupt
+      kill_chroot_processes(chroot) if chroot
+      raise
     end
 
     retval = wait_thr.value.success?
