@@ -4,7 +4,7 @@
 # Check Role
 #
 
-unless node[:target][:role].match?(/(?:minimal|proxmox-ve)/)
+unless node[:target][:role].match?(/(?:minimal|proxmox-ve)/) or ENV['ENABLE_ADMINISTRATOR'] == 'true'
   return
 end
 

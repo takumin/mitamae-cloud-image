@@ -52,7 +52,8 @@ export ARCH_PACMAN_MIRROR="https://ftp.jaist.ac.jp/pub/Linux/ArchLinux/"
 
 export TIMEZONE="Asia/Tokyo"
 
-# For minimal or proxmox-ve profile
+# For minimal or proxmox-ve profile (or any profile with ENABLE_ADMINISTRATOR="true")
+# export ENABLE_ADMINISTRATOR="true"
 # Generate password:
 # openssl passwd -6 -salt "$(cat /dev/urandom | tr -dc 'A-Za-z0-9' | fold -w 8 | head -n 1)"
 # export ADMIN_USERNAME="admin"
