@@ -166,6 +166,7 @@ cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/live/filesystem.squashfs"
 cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/live/filesystem.packages"
 
 # Generate cmdline.txt
+# ds=nocloud stays in dsmode=local on purpose: the seed is on the cidata partition and the USB may boot without a network.
 echo 'console=ttyAMA0,115200 console=tty1 boot=live ds=nocloud toram noeject nopersistence' > "${LIVEUSB}/cmdline.txt"
 
 ################################################################################

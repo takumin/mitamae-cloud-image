@@ -198,6 +198,7 @@ grub-install --target=x86_64-efi --recheck --boot-directory="${LIVEUSB}/boot" --
 UUID="$(blkid -p -s UUID -o value "${BOOTPT}")"
 
 # Grub Config
+# ds=nocloud stays in dsmode=local on purpose: the seed is on the cidata partition and the USB may boot without a network.
 cat > "${LIVEUSB}/boot/grub/grub.cfg" << __EOF__
 if [ x\$grub_platform = xpc ]; then
 	insmod vbe
