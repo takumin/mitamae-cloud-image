@@ -77,3 +77,24 @@ file '/etc/xdg/autostart/user-dirs-update-gtk.desktop' do
     content.gsub!(/^Exec=xdg-user-dirs-gtk-update$/, 'Exec=env LC_ALL=C xdg-user-dirs-gtk-update')
   end
 end
+
+# Newer xdg-user-dirs and xdg-user-dirs-gtk mark their autostart entries with
+# X-systemd-skip=true and run these user units instead, so the edits above no
+# longer take effect on systemd managed sessions.
+%w[xdg-user-dirs user-dirs-update-gtk].each do |unit|
+  directory "/etc/systemd/user/#{unit}.service.d" do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
+
+  file "/etc/systemd/user/#{unit}.service.d/locale.conf" do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      '[Service]',
+      'Environment=LC_ALL=C',
+    ].join("\n").concat("\n")
+  end
+end
