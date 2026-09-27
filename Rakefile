@@ -135,7 +135,7 @@ if ppa_nvidia_vgpu
     case distribution
     when 'debian'
       suite  = 'trixie'
-      kernel = 'generic'
+      kernel = 'generic-backports'
     when 'ubuntu'
       suite  = 'resolute'
       kernel = 'generic-hwe'
