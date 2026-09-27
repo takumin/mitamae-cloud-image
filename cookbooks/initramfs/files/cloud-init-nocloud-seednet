@@ -1,0 +1,49 @@
+#!/bin/sh
+# vim: set noet :
+
+[ "$1" = 'prereqs' ] && { exit 0; }
+
+cloud_init_nocloud_seednet() {(
+	if [ ! -d "${rootmnt}/etc/cloud/cloud.cfg.d" ]; then
+		return
+	fi
+
+	for cmdline in $(cat /proc/cmdline); do
+		case ${cmdline} in
+			ds=*)
+				datastore="${cmdline#ds=}"
+				;;
+			seednet=*)
+				seednet="${cmdline#seednet=}"
+				;;
+		esac
+	done
+
+	if [ -z "${datastore}" ] || [ -z "${seednet}" ]; then
+		return
+	fi
+
+	case "${datastore%%;*}" in
+		nocloud|nocloud-net)
+			;;
+		*)
+			return
+			;;
+	esac
+
+	seednet="$(echo "${seednet}" | sed -E "s/#HOSTNAME#/$(hostname -s)/; s/#DOMAINNAME#/$(hostname -d)/; s/#FQDN#/$(hostname -f)/;")"
+
+	# Cloud-Init before 24.1 runs a NoCloud http(s) seed in network mode and skips the init modules, so fetch it into the local seed directory instead.
+	seeddir="${rootmnt}/var/lib/cloud/seed/nocloud"
+	mkdir -p "${seeddir}"
+
+	for name in meta-data user-data vendor-data network-config; do
+		if ! wget -q -O "${seeddir}/${name}" "${seednet%/}/${name}"; then
+			rm -f "${seeddir}/${name}"
+		fi
+	done
+)}
+
+. /scripts/functions
+
+cloud_init_nocloud_seednet

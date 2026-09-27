@@ -73,14 +73,14 @@ else
 end
 
 #
-# Cloud-Init NoCloud Network Config
+# Cloud-Init NoCloud Seednet
 #
 
-remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-network-config' do
+remote_file '/etc/initramfs-tools/scripts/init-bottom/zzz-cloud-init-nocloud-seednet' do
   owner  'root'
   group  'root'
   mode   '0755'
-  source 'files/cloud-init-nocloud-network-config'
+  source 'files/cloud-init-nocloud-seednet'
 end
 
 #
