@@ -98,25 +98,6 @@ if node[:target][:suite].match?(/^resolute$/)
   end
 end
 
-file '/usr/share/glib-2.0/schemas/99_input-method.gschema.override' do
-  owner 'root'
-  group 'root'
-  mode  '0644'
-  content [
-    '[org.gnome.settings-daemon.plugins.keyboard]',
-    'active=false',
-  ].join("\n")
-  notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
-end
-
-#
-# Compile Glib Schemas
-#
-
-execute 'glib-compile-schemas /usr/share/glib-2.0/schemas' do
-  action :nothing
-end
-
 #
 # Home Directory Locale
 #
