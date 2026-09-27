@@ -40,3 +40,20 @@ end
 file '/etc/skel/examples.desktop' do
   action :delete
 end
+
+# Open folders in the list view by default
+file '/usr/share/glib-2.0/schemas/99_nautilus.gschema.override' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    '[org.gnome.nautilus.preferences]',
+    "default-folder-viewer='list-view'",
+  ].join("\n").concat("\n")
+  only_if 'test -f /usr/share/glib-2.0/schemas/org.gnome.nautilus.gschema.xml'
+  notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
+end
+
+execute 'glib-compile-schemas /usr/share/glib-2.0/schemas' do
+  action :nothing
+end
