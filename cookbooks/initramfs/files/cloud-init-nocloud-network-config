@@ -23,9 +23,13 @@ cloud_init_nocloud_network_config() {(
 		return
 	fi
 
-	if [ "${datastore%%;*}" != "nocloud-net" ]; then
-		return
-	fi
+	case "${datastore%%;*}" in
+		nocloud|nocloud-net)
+			;;
+		*)
+			return
+			;;
+	esac
 
 	OLDIFS="$IFS"
 	IFS=";"
