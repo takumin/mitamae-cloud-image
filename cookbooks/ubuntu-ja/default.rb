@@ -62,6 +62,42 @@ package 'fcitx5-mozc'
   end
 end
 
+# im-config 0.59 dropped Wayland support, so on the Wayland-only GNOME of
+# resolute it neither exports the IM variables nor launches fcitx5, and the
+# Ubuntu fcitx5 package ships no autostart entry of its own.
+if node[:target][:suite].match?(/^resolute$/)
+  file '/etc/environment.d/90-fcitx5.conf' do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      'XMODIFIERS=@im=fcitx',
+      'GTK_IM_MODULE=fcitx',
+      'QT_IM_MODULE=fcitx',
+      'SDL_IM_MODULE=fcitx',
+      '',
+    ].join("\n")
+  end
+
+  file '/etc/xdg/autostart/org.fcitx.Fcitx5.desktop' do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      '[Desktop Entry]',
+      'Name=Fcitx 5',
+      'Exec=/usr/bin/fcitx5',
+      'Icon=fcitx',
+      'Terminal=false',
+      'Type=Application',
+      'NoDisplay=true',
+      'X-GNOME-AutoRestart=false',
+      'X-GNOME-Autostart-Notify=false',
+      '',
+    ].join("\n")
+  end
+end
+
 file '/usr/share/glib-2.0/schemas/99_input-method.gschema.override' do
   owner 'root'
   group 'root'
