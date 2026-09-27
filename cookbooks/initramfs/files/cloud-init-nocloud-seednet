@@ -33,7 +33,9 @@ cloud_init_nocloud_seednet() {(
 
 	seednet="$(echo "${seednet}" | sed -E "s/#HOSTNAME#/$(hostname -s)/; s/#DOMAINNAME#/$(hostname -d)/; s/#FQDN#/$(hostname -f)/;")"
 
-	# Cloud-Init before 24.1 runs a NoCloud http(s) seed in network mode and skips the init modules, so fetch it into the local seed directory instead.
+	# Cloud-Init before 24.1 keeps dsmode=local for an http(s) ds=nocloud;s= and skips the init modules, so fetch the seed into the local seed directory instead.
+	# The boot entries pass ds=nocloud;dsmode=net so that the init modules still run after the network is up.
+	# TODO: Drop this script once Debian 12 is no longer supported and the boot entries use ds=nocloud;s= again.
 	seeddir="${rootmnt}/var/lib/cloud/seed/nocloud"
 	mkdir -p "${seeddir}"
 
