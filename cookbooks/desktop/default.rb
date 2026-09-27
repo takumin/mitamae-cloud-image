@@ -14,26 +14,16 @@ end
 
 include_recipe node.platform
 
-# Workaround: Manage all network interfaces with Network Manager
+# Ubuntu's network-manager ships /usr/lib/NetworkManager/conf.d/
+# 10-globally-managed-devices.conf, which restricts NetworkManager to wifi
+# and wwan devices and leaves wired interfaces unmanaged; mask it with an
+# empty file of the same name so that every interface is managed
 file '/etc/NetworkManager/conf.d/10-globally-managed-devices.conf' do
   owner   'root'
   group   'root'
   mode    '0644'
+  content ''
   only_if 'test -d /etc/NetworkManager/conf.d'
-end
-
-# Workaround: Explicitly enable Network Manager for netplan
-file '/etc/netplan/01-network-manager-all.yaml' do
-  owner   'root'
-  group   'root'
-  mode    '0600'
-  only_if 'test -d /etc/netplan'
-  content <<~__EOF__
-  # Workaround: Explicitly enable Network Manager
-  network:
-    version: 2
-    renderer: NetworkManager
-  __EOF__
 end
 
 # Remove Example Desktop Entry
