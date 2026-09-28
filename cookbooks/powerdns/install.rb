@@ -208,6 +208,10 @@ node.powerdns.config.authoritative.each do |key, val|
     contents << "#{key}=#{val.join(',')}"
   when Numeric, String
     contents << "#{key}=#{val.to_s}"
+  when TrueClass
+    contents << "#{key}=yes"
+  when FalseClass
+    contents << "#{key}=no"
   else
     raise
   end
@@ -248,6 +252,10 @@ node.powerdns.backend.keys.each do |backend|
       contents << "#{backend}-#{key}=#{val.join(',')}"
     when Numeric, String
       contents << "#{backend}-#{key}=#{val.to_s}"
+    when TrueClass
+      contents << "#{backend}-#{key}=yes"
+    when FalseClass
+      contents << "#{backend}-#{key}=no"
     else
       raise
     end
