@@ -4,7 +4,7 @@
 # Get Kernel Version Command
 #
 
-GET_KERNEL_VERSION = 'basename "$(find /lib/modules -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)"'
+GET_KERNEL_VERSION = 'basename "$(find /lib/modules -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)"'
 
 #
 # Cleanup Initramfs
