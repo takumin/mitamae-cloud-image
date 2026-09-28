@@ -8,7 +8,17 @@ any_network_interfaces() {(
 		return
 	fi
 
-	if grep "desktop" /proc/cmdline >/dev/null 2>&1; then
+	# Opt in with anynet on the kernel command line, so that a boot which has its own network config (a NoCloud network-config or NetworkManager on the desktop) keeps it
+	anynet=
+	for cmdline in $(cat /proc/cmdline); do
+		case ${cmdline} in
+			anynet)
+				anynet=1
+				;;
+		esac
+	done
+
+	if [ -z "${anynet}" ]; then
 		return
 	fi
 
