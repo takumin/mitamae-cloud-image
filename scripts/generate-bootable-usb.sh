@@ -198,7 +198,8 @@ grub-install --target=x86_64-efi --recheck --boot-directory="${LIVEUSB}/boot" --
 UUID="$(blkid -p -s UUID -o value "${BOOTPT}")"
 
 # Kernel Parameter
-# anynet runs DHCP on every wired interface, since the cidata seed has no network-config; the desktop profiles leave the network to NetworkManager.
+# anynet runs DHCP on every wired interface, since the cidata seed has no network-config; the desktop profiles
+# leave the network to NetworkManager.
 CMDLINE='boot=live ds=nocloud toram noeject nopersistence'
 case "${PROFILE}" in
 	desktop*) ;;
@@ -206,7 +207,8 @@ case "${PROFILE}" in
 esac
 
 # Grub Config
-# ds=nocloud stays in dsmode=local on purpose: the seed is on the cidata partition and the USB may boot without a network.
+# ds=nocloud stays in dsmode=local on purpose: the seed is on the cidata partition and the USB may boot
+# without a network.
 cat > "${LIVEUSB}/boot/grub/grub.cfg" << __EOF__
 if [ x\$grub_platform = xpc ]; then
 	insmod vbe

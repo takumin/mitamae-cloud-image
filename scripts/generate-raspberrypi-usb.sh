@@ -166,8 +166,10 @@ cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/live/filesystem.squashfs"
 cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/live/filesystem.packages"
 
 # Generate cmdline.txt
-# ds=nocloud stays in dsmode=local on purpose: the seed is on the cidata partition and the USB may boot without a network.
-# anynet runs DHCP on every wired interface, since the cidata seed has no network-config; the desktop profiles leave the network to NetworkManager.
+# ds=nocloud stays in dsmode=local on purpose: the seed is on the cidata partition and the USB may boot
+# without a network.
+# anynet runs DHCP on every wired interface, since the cidata seed has no network-config; the desktop profiles
+# leave the network to NetworkManager.
 CMDLINE='console=ttyAMA0,115200 console=tty1 boot=live ds=nocloud toram noeject nopersistence'
 case "${PROFILE}" in
 	desktop*) ;;
