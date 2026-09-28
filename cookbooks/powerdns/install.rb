@@ -89,6 +89,7 @@ end
 package 'dnsdist'
 package 'pdns-server'
 package 'pdns-recursor'
+package 'rsync' # restore the config from /srv
 
 #
 # Restore Configuration - PowerDNS
