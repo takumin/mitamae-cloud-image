@@ -151,6 +151,16 @@ if ppa_nvidia_vgpu
       'role'         => 'server-nvidia-vgpu',
     }
   end
+
+  SUITES['debian'].each do |suite|
+    targets << {
+      'distribution' => 'debian',
+      'suite'        => suite,
+      'kernel'       => 'proxmox',
+      'architecture' => 'amd64',
+      'role'         => 'proxmox-ve-nvidia-vgpu',
+    }
+  end
 end
 
 targets.each do |target|
