@@ -64,9 +64,6 @@ jobs:
     env:
       TARGET_NAME: ${{ matrix.target.name }}
       RELEASE_DIR: ${{ matrix.target.dir }}
-      INITRAMFS_COMPRESS: xz
-      ROOTFS_ARCHIVE_FORMAT_TARBALL: xz
-      ROOTFS_ARCHIVE_FORMAT_SQUASHFS: xz
       TARGET_DIRECTORY: /mnt/rootfs
     steps:
     #

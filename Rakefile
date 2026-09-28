@@ -151,6 +151,16 @@ if ppa_nvidia_vgpu
       'role'         => 'server-nvidia-vgpu',
     }
   end
+
+  SUITES['debian'].each do |suite|
+    targets << {
+      'distribution' => 'debian',
+      'suite'        => suite,
+      'kernel'       => 'proxmox',
+      'architecture' => 'amd64',
+      'role'         => 'proxmox-ve-nvidia-vgpu',
+    }
+  end
 end
 
 targets.each do |target|
@@ -175,14 +185,12 @@ targets.each do |target|
     end
 
     task :provision do
-      target_dir  = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
-
       cmd = [
         'sudo', 'rsync', '-a',
         '--exclude=".git/"',
         '--exclude="releases/"',
         "#{File.expand_path(__dir__)}/",
-        "#{File.join(target_dir, 'mitamae')}/"
+        "#{File.join(chroot_dir, 'mitamae')}/"
       ].join(' ')
 
       unless execution(cmd)
@@ -190,7 +198,7 @@ targets.each do |target|
       end
 
       cmd = [
-        'sudo', '-E', 'chroot', target_dir,
+        'sudo', '-E', 'chroot', chroot_dir,
         'mitamae', 'local',
         '-l', LOG_LEVEL,
         '-y', '/mitamae/.bin/profile.yaml',
@@ -202,7 +210,7 @@ targets.each do |target|
         abort('failed command')
       end
 
-      unless execution("sudo rm -fr #{File.join(target_dir, 'mitamae')}")
+      unless execution("sudo rm -fr #{File.join(chroot_dir, 'mitamae')}")
         abort('failed command')
       end
     end
@@ -292,7 +300,8 @@ end
 def setup_profile(target)
   dir = File.expand_path('.bin', __dir__)
   yaml = File.join(dir, 'profile.yaml')
-  data = { 'target' => target }
+  # Copy the target: the tasks build their paths from target.values, which must not gain the directory
+  data = { 'target' => target.dup }
   if target['kernel'].match(/raspi|raspberrypi/)
     data['autologin'] = {
       'miniuart-bt' => {

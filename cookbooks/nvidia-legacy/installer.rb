@@ -49,7 +49,7 @@ version   = node[:nvidia_legacy][:installer][:version]
 installer = "/tmp/NVIDIA-Linux-x86_64-#{version}.run"
 
 # The image ships a single kernel, which is not the running one
-kernel_version = '"$(basename "$(find /lib/modules -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)")"'
+kernel_version = '"$(basename "$(find /lib/modules -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)")"'
 
 #
 # Required Packages

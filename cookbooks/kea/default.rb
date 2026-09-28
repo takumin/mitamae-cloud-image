@@ -69,6 +69,7 @@ end
 #
 
 package 'isc-kea'
+package 'rsync' # restore the config from /srv
 
 #
 # Restore Configuration

@@ -11,6 +11,8 @@ when 'cloud', 'cloud-backports'
   node.linux_headers.packages << "linux-headers-cloud-#{node.target.architecture}"
 when 'rt', 'rt-backports'
   node.linux_headers.packages << "linux-headers-rt-#{node.target.architecture}"
+when 'proxmox'
+  node.linux_headers.packages << 'proxmox-default-headers'
 else
   raise
 end

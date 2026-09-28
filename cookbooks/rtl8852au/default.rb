@@ -55,7 +55,7 @@ package 'dkms'
 # Get Kernel Version
 #
 
-execute 'find /lib/modules -mindepth 1 -maxdepth 1 -printf "%f\n" > /tmp/kernel_version' do
+execute 'find /lib/modules -mindepth 1 -maxdepth 1 -printf "%f\n" | sort -V | tail -n 1 > /tmp/kernel_version' do
   not_if 'test -f /tmp/kernel_version'
 end
 
