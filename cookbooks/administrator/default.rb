@@ -138,7 +138,7 @@ end
 #
 
 node[:administrator][:ssh][:authorized_keys].each do |key|
-  key.chomp.strip
+  key = key.strip
   next if key.empty?
 
   authorized_keys << key
