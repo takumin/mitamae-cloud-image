@@ -32,6 +32,9 @@ any_network_interfaces() {(
 		echo "IPv6LinkLocalAddressGenerationMode=stable-privacy"
 		echo "LLMNR=no"
 		echo "MulticastDNS=yes"
+		echo ""
+		echo "[DHCPv4]"
+		echo "ClientIdentifier=mac"
 	} > "/run/systemd/network/99-ethernet.network"
 
 	{
