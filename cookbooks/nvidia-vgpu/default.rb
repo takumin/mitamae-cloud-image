@@ -71,10 +71,8 @@ apt_repository 'PPA NVIDIA vGPU Repository' do
     {
       :default_uri => ENV['APT_REPO_PPA_NVIDIA_VGPU_URL'],
       :options     => 'signed-by=/etc/apt/keyrings/nvidia-vgpu.gpg',
-      :suite       => '###platform_codename###',
-      :components  => [
-        'main',
-      ],
+      :suite       => 'stable',
+      :components  => ['main'],
     },
   ]
   notifies :run, 'execute[apt-get update]', :immediately
