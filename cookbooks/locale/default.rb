@@ -83,7 +83,7 @@ end
 node[:locale][:availables].each do |locale|
   file '/etc/locale.gen' do
     action :edit
-    not_if "grep -E '^#{locale}$' /etc/locale.gen"
+    not_if "grep -qxF '#{locale}' /etc/locale.gen"
     block do |content|
       content.gsub!(/^#?\s?#{Regexp.escape(locale)}[ \t]*$/, locale)
     end
