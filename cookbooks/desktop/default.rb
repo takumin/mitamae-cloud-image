@@ -26,6 +26,22 @@ file '/etc/NetworkManager/conf.d/10-globally-managed-devices.conf' do
   only_if 'test -d /etc/NetworkManager/conf.d'
 end
 
+# A network boot leaves the interfaces configured by the initramfs ipconfig, and NetworkManager assumes them
+# as external in-memory connections instead of activating the cloud-init ones, so each interface shows up
+# twice; activate the persistent connections on startup instead (the fetched rootfs lives in RAM, so
+# reconfiguring the boot interface is safe)
+file '/etc/NetworkManager/conf.d/90-no-keep-configuration.conf' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content [
+    '[device-90-no-keep-configuration]',
+    'match-device=type:ethernet',
+    'keep-configuration=no',
+  ].join("\n").concat("\n")
+  only_if 'test -d /etc/NetworkManager/conf.d'
+end
+
 # Remove Example Desktop Entry
 file '/etc/skel/examples.desktop' do
   action :delete
