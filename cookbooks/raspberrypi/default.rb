@@ -23,6 +23,12 @@ end
 include_recipe node.platform
 
 #
+# Bluetooth
+#
+
+package 'bluez'
+
+#
 # Device Groups
 #
 
