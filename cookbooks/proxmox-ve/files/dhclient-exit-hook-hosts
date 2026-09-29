@@ -1,0 +1,20 @@
+# vim: set ft=sh noet :
+
+# Proxmox VE needs the node name to resolve to a non-loopback address through /etc/hosts; without an
+# entry, nss-myhostname resolves it to a link-local address first, whose zone index openssl rejects
+# in the SAN of the node certificate, and pveproxy keeps failing to load it
+case "${reason}" in
+	BOUND|RENEW|REBIND|REBOOT)
+		if [ -n "${new_host_name}" ] && [ -n "${new_ip_address}" ]; then
+			hosts_entry="${new_ip_address}"
+			if [ -n "${new_domain_name}" ]; then
+				hosts_entry="${hosts_entry} ${new_host_name}.${new_domain_name%% *}"
+			fi
+			hosts_entry="${hosts_entry} ${new_host_name} # dhclient-exit-hook-hosts"
+			hosts_temp="$(mktemp)"
+			{ grep -v ' # dhclient-exit-hook-hosts$' /etc/hosts; echo "${hosts_entry}"; } > "${hosts_temp}"
+			cat "${hosts_temp}" > /etc/hosts
+			rm -f "${hosts_temp}"
+		fi
+		;;
+esac

@@ -190,6 +190,24 @@ package 'qemu-server'
 end
 
 #
+# Node Name Resolution
+#
+
+# dhclient-script sources the exit hooks, so the hook needs no shebang nor exec permission
+directory '/etc/dhcp/dhclient-exit-hooks.d' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+remote_file '/etc/dhcp/dhclient-exit-hooks.d/hosts' do
+  owner  'root'
+  group  'root'
+  mode   '0644'
+  source 'files/dhclient-exit-hook-hosts'
+end
+
+#
 # Unset Proxmox Install Mode
 #
 
