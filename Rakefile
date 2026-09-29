@@ -18,6 +18,15 @@ LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 # extremely slow for binaries built with branch protection
 ENV['QEMU_CPU'] ||= 'max,pauth-impdef=on'
 
+# sudo-rs (the default sudo since Ubuntu 25.10) ignores 'sudo -E', so pass
+# the variables the recipes read to the root processes by name instead
+PRESERVE_ENV_PATTERN = /\A(?:
+  (?:ADMIN|APT_REPO|ARCH|DISABLE|ENABLE)_.+ |
+  INITRAMFS_COMPRESS | OUTPUT_DIRECTORY | ROOTFS_ARCHIVE_FORMAT |
+  TARGET_DIRECTORY | TIMEZONE | QEMU_CPU |
+  (?i:(?:http|https|ftp|no)_proxy)
+)\z/x
+
 DISTRIBUTIONS = [
   'debian',
   'ubuntu',
@@ -172,7 +181,7 @@ targets.each do |target|
       setup_profile(target)
 
       cmd = [
-        'sudo', '-E',
+        'sudo', *sudo_preserve_env,
         './.bin/mitamae', 'local',
         '-l', LOG_LEVEL,
         '-y', './.bin/profile.yaml',
@@ -198,7 +207,7 @@ targets.each do |target|
       end
 
       cmd = [
-        'sudo', '-E', 'chroot', chroot_dir,
+        'sudo', *sudo_preserve_env, 'chroot', chroot_dir,
         'mitamae', 'local',
         '-l', LOG_LEVEL,
         '-y', '/mitamae/.bin/profile.yaml',
@@ -217,7 +226,7 @@ targets.each do |target|
 
     task :finalize do
       cmd = [
-        'sudo', '-E',
+        'sudo', *sudo_preserve_env,
         './.bin/mitamae', 'local',
         '-l', LOG_LEVEL,
         '-y', './.bin/profile.yaml',
@@ -368,6 +377,11 @@ def kill_chroot_processes(dir)
       sleep 0.5
     end
   end
+end
+
+def sudo_preserve_env
+  names = ENV.keys.grep(PRESERVE_ENV_PATTERN).sort
+  names.empty? ? [] : ["--preserve-env=#{names.join(',')}"]
 end
 
 def execution(cmd, chroot: nil)
