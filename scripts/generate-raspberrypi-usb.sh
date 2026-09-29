@@ -42,6 +42,8 @@ set -eu
 # Value:
 # - server
 # - desktop
+# - kodi
+# - kodi-car
 : "${PROFILE:="server"}"
 
 # CPU Architecture

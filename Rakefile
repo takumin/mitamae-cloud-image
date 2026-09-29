@@ -132,6 +132,14 @@ targets << {
   'role'         => 'kodi',
 }
 
+targets << {
+  'distribution' => 'debian',
+  'suite'        => PUBLISH_DEBIAN_SUITE,
+  'kernel'       => 'raspberrypi',
+  'architecture' => 'arm64',
+  'role'         => 'kodi-car',
+}
+
 ppa_nvidia_vgpu = true
 %w{
   APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID
