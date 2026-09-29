@@ -52,6 +52,11 @@ set -eu
 # - arm64
 : "${ARCH:="arm64"}"
 
+# Wi-Fi Access Point Credentials (kodi-car)
+# Written to wifi-ap.conf on the boot partition, where they are meant to be replaced for each device.
+: "${WIFI_AP_SSID:="kodi-car"}"
+: "${WIFI_AP_PASSPHRASE:="kodi-car-passphrase"}"
+
 ################################################################################
 # Local Variables
 ################################################################################
@@ -178,6 +183,11 @@ case "${PROFILE}" in
 	*) CMDLINE="${CMDLINE} anynet" ;;
 esac
 echo "${CMDLINE}" > "${LIVEUSB}/cmdline.txt"
+
+# Wi-Fi Access Point Credentials
+if [ "${PROFILE}" = "kodi-car" ]; then
+	printf 'ssid=%s\nwpa_passphrase=%s\n' "${WIFI_AP_SSID}" "${WIFI_AP_PASSPHRASE}" > "${LIVEUSB}/wifi-ap.conf"
+fi
 
 ################################################################################
 # Cloud-Init

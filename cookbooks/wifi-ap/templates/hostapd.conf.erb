@@ -1,0 +1,13 @@
+interface=<%= node[:wifi_ap][:interface] %>
+driver=nl80211
+country_code=<%= node[:wifi_ap][:country] %>
+ieee80211d=1
+hw_mode=<%= node[:wifi_ap][:hw_mode] %>
+channel=<%= node[:wifi_ap][:channel] %>
+ieee80211n=1
+wmm_enabled=1
+utf8_ssid=1
+auth_algs=1
+wpa=2
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP

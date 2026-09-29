@@ -1,0 +1,8 @@
+[Unit]
+Description=Wi-Fi access point credentials from the boot medium
+Before=hostapd@<%= node[:wifi_ap][:interface] %>.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/wifi-ap-config

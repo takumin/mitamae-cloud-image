@@ -1,0 +1,65 @@
+#!/bin/sh
+# vim: set noet :
+
+set -eu
+
+DEVICE='/dev/disk/by-label/<%= node[:wifi_ap][:credentials][:label] %>'
+CREDENTIALS='<%= node[:wifi_ap][:credentials][:path] %>'
+BASE='/etc/wifi-ap/hostapd.conf'
+OUTPUT='<%= @runtime_conf %>'
+
+rm -f "${OUTPUT}"
+
+# The boot medium is gone on a network boot, and the access point is not needed there.
+if ! udevadm wait --timeout=10 "${DEVICE}"; then
+	echo "${DEVICE} not found, the access point stays down" >&2
+	exit 0
+fi
+
+# toram releases the boot medium, and without it the medium is still mounted read-only.
+MOUNT="$(mktemp -d)"
+trap 'umount "${MOUNT}" 2>/dev/null || true; rmdir "${MOUNT}"' EXIT
+mount -t vfat -o ro,nodev,nosuid,noexec "${DEVICE}" "${MOUNT}"
+
+if [ ! -f "${MOUNT}/${CREDENTIALS}" ]; then
+	echo "${CREDENTIALS} not found on ${DEVICE}, the access point stays down" >&2
+	exit 0
+fi
+
+# Editors on Windows save CRLF line endings, and some prepend a BOM.
+CONTENT="$(sed -e '1s/^\xEF\xBB\xBF//' -e 's/\r$//' "${MOUNT}/${CREDENTIALS}")"
+
+SSID=
+PASSPHRASE=
+while IFS= read -r LINE; do
+	case "${LINE}" in
+		ssid=*)
+			SSID="${LINE#ssid=}"
+			;;
+		wpa_passphrase=*)
+			PASSPHRASE="${LINE#wpa_passphrase=}"
+			;;
+	esac
+done << __EOF__
+${CONTENT}
+__EOF__
+
+# dash counts bytes, which is what the SSID limit is in.
+if [ "${#SSID}" -lt 1 ] || [ "${#SSID}" -gt 32 ]; then
+	echo "ssid must be 1 to 32 bytes in ${CREDENTIALS}" >&2
+	exit 1
+fi
+
+if [ "${#PASSPHRASE}" -lt 8 ] || [ "${#PASSPHRASE}" -gt 63 ]; then
+	echo "wpa_passphrase must be 8 to 63 characters in ${CREDENTIALS}" >&2
+	exit 1
+fi
+
+mkdir -p "$(dirname "${OUTPUT}")"
+umask 077
+{
+	cat "${BASE}"
+	printf 'ssid=%s\n' "${SSID}"
+	printf 'wpa_passphrase=%s\n' "${PASSPHRASE}"
+} > "${OUTPUT}.tmp"
+mv "${OUTPUT}.tmp" "${OUTPUT}"

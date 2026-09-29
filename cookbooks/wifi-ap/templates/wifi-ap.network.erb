@@ -1,0 +1,18 @@
+[Match]
+Name=<%= node[:wifi_ap][:interface] %>
+
+[Link]
+RequiredForOnline=no
+
+[Network]
+Address=<%= node[:wifi_ap][:address] %>
+DHCPServer=yes
+
+[DHCPServer]
+PoolOffset=100
+PoolSize=100
+# Without a router or a DNS server, the clients keep their mobile data for the internet.
+EmitRouter=no
+EmitDNS=no
+EmitNTP=no
+EmitSIP=no
