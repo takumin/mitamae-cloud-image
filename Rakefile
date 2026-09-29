@@ -283,7 +283,7 @@ namespace :github do
 
         if v['distribution'].eql?('debian')
           if v['suite'].eql?(PUBLISH_DEBIAN_SUITE)
-            if v['kernel'].match?(/^((generic|cloud)-backports|raspberrypi)$/)
+            if v['kernel'].match?(/^((generic|cloud)-backports|raspberrypi|proxmox)$/)
               publish = true
             end
           end
