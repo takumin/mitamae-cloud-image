@@ -15,6 +15,7 @@ AVAILABLE_ROLES = [
   'server-nvidia-vgpu',
   'proxmox-ve',
   'proxmox-ve-nvidia-vgpu',
+  'kodi',
 ]
 
 node.validate! do

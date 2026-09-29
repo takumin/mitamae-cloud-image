@@ -1,0 +1,23 @@
+<%-
+  # Before the first run diverts it, the packaged file is still at its original path.
+  distrib = ::File.exist?(@distrib) ? ::File.read(@distrib) : ::File.read(@distrib.sub(/\.distrib$/, ''))
+  distrib = distrib[0, distrib.rindex('</settings>')]
+-%>
+<%= distrib -%>
+  <section id="interface">
+    <category id="skin">
+      <group id="1">
+        <setting id="lookandfeel.font">
+          <default><%= node[:kodi][:font] %></default>
+        </setting>
+      </group>
+    </category>
+    <category id="regional">
+      <group id="1">
+        <setting id="locale.language">
+          <default>resource.language.<%= node[:kodi][:language] %></default>
+        </setting>
+      </group>
+    </category>
+  </section>
+</settings>
