@@ -175,6 +175,21 @@ package 'pve-qemu-kvm'
 package 'qemu-server'
 
 #
+# Remove Packaged Enterprise Repository
+#
+
+# pve-manager ships the enterprise repository as a conffile, which duplicates the repository above
+# and fails every later apt-get update without a subscription
+%w{
+  /etc/apt/sources.list.d/pve-enterprise.list
+  /etc/apt/sources.list.d/pve-enterprise.sources
+}.each do |f|
+  file f do
+    action :delete
+  end
+end
+
+#
 # Unset Proxmox Install Mode
 #
 
