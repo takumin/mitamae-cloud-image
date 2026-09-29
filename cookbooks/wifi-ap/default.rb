@@ -33,10 +33,26 @@ node[:wifi_ap][:channel] ||= 6
 # Public Variables - Credentials
 #
 
-# The SSID and the passphrase are read from this file on the boot medium, so that they stay out of the image.
+node[:wifi_ap][:ssid]       ||= 'kodi-car'
+node[:wifi_ap][:passphrase] ||= 'kodi-car'
+
+# A file on the boot medium overrides the SSID and the passphrase in the image, so that they can be changed
+# from any PC.
 node[:wifi_ap][:credentials]         ||= Hashie::Mash.new
 node[:wifi_ap][:credentials][:label] ||= 'BOOT'
 node[:wifi_ap][:credentials][:path]  ||= 'wifi-ap.conf'
+
+#
+# Environment Variables
+#
+
+if ENV['WIFI_AP_SSID'].is_a?(String) and !ENV['WIFI_AP_SSID'].empty?
+  node[:wifi_ap][:ssid] = ENV['WIFI_AP_SSID']
+end
+
+if ENV['WIFI_AP_PASSPHRASE'].is_a?(String) and !ENV['WIFI_AP_PASSPHRASE'].empty?
+  node[:wifi_ap][:passphrase] = ENV['WIFI_AP_PASSPHRASE']
+end
 
 #
 # Validate Variables
@@ -50,6 +66,8 @@ node.validate! do
       country: match(/^[A-Z]{2}$/),
       hw_mode: match(/^[abg]$/),
       channel: integer,
+      ssid: match(/\A[^\r\n]{1,32}\z/),
+      passphrase: match(/\A[\x20-\x7e]{8,63}\z/),
       credentials: {
         label: match(/^[A-Za-z0-9_-]+$/),
         path: match(%r{^[A-Za-z0-9_./-]+$}),
@@ -108,8 +126,16 @@ template '/usr/local/sbin/wifi-ap-config' do
   variables runtime_conf: runtime_conf
 end
 
-# hostapd@.service skips the start while its configuration is missing or empty, which is the case without
-# the credentials file.
+# Readable only by root, since the image holds the passphrase.
+template '/etc/wifi-ap/credentials.conf' do
+  owner  'root'
+  group  'root'
+  mode   '0600'
+  source 'templates/credentials.conf.erb'
+end
+
+# hostapd@.service skips the start while its configuration is missing or empty, which is the case when the
+# credentials are invalid.
 link hostapd_conf do
   to    runtime_conf
   force true

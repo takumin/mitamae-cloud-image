@@ -21,7 +21,7 @@ ENV['QEMU_CPU'] ||= 'max,pauth-impdef=on'
 # sudo-rs (the default sudo since Ubuntu 25.10) ignores 'sudo -E', so pass
 # the variables the recipes read to the root processes by name instead
 PRESERVE_ENV_PATTERN = /\A(?:
-  (?:ADMIN|APT_REPO|ARCH|DISABLE|ENABLE)_.+ |
+  (?:ADMIN|APT_REPO|ARCH|DISABLE|ENABLE|WIFI_AP)_.+ |
   INITRAMFS_COMPRESS | OUTPUT_DIRECTORY | ROOTFS_ARCHIVE_FORMAT |
   TARGET_DIRECTORY | TIMEZONE | QEMU_CPU |
   (?i:(?:http|https|ftp|no)_proxy)

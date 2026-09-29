@@ -53,9 +53,9 @@ set -eu
 : "${ARCH:="arm64"}"
 
 # Wi-Fi Access Point Credentials (kodi-car)
-# Written to wifi-ap.conf on the boot partition, where they are meant to be replaced for each device.
-: "${WIFI_AP_SSID:="kodi-car"}"
-: "${WIFI_AP_PASSPHRASE:="kodi-car-passphrase"}"
+# Written to wifi-ap.conf on the boot partition, where each one set overrides the one in the image.
+: "${WIFI_AP_SSID:=""}"
+: "${WIFI_AP_PASSPHRASE:=""}"
 
 ################################################################################
 # Local Variables
@@ -185,8 +185,11 @@ esac
 echo "${CMDLINE}" > "${LIVEUSB}/cmdline.txt"
 
 # Wi-Fi Access Point Credentials
-if [ "${PROFILE}" = "kodi-car" ]; then
-	printf 'ssid=%s\nwpa_passphrase=%s\n' "${WIFI_AP_SSID}" "${WIFI_AP_PASSPHRASE}" > "${LIVEUSB}/wifi-ap.conf"
+if [ -n "${WIFI_AP_SSID}" ] || [ -n "${WIFI_AP_PASSPHRASE}" ]; then
+	{
+		[ -z "${WIFI_AP_SSID}" ] || printf 'ssid=%s\n' "${WIFI_AP_SSID}"
+		[ -z "${WIFI_AP_PASSPHRASE}" ] || printf 'wpa_passphrase=%s\n' "${WIFI_AP_PASSPHRASE}"
+	} > "${LIVEUSB}/wifi-ap.conf"
 fi
 
 ################################################################################
