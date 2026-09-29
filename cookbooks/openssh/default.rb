@@ -40,7 +40,9 @@ end
 # Check Role
 #
 
-unless node[:target][:role].match(/minimal/)
+# Roles without cloud-init need their own host key generation; the packaged sshd-keygen.service is
+# ConditionFirstBoot=yes, which never holds because the cleanup cookbook leaves /etc/machine-id empty
+unless node[:target][:role].match?(/(?:minimal|proxmox-ve)/)
   return
 end
 
