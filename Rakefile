@@ -319,10 +319,10 @@ def setup_profile(target)
   data = { 'target' => target.dup }
   if target['kernel'].eql?('raspberrypi')
     data['autologin'] = {
-      'miniuart-bt' => {
+      'serial' => {
         'service' => 'serial-getty',
         'getty'   => '/sbin/agetty',
-        'port'    => 'ttyAMA0',
+        'port'    => 'ttyS0',
         'user'    => 'root',
         'term'    => 'linux',
         'baud'    => [115200,38400,9600],

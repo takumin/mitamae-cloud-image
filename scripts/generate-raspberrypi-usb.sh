@@ -170,7 +170,7 @@ cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/live/filesystem.packages"
 # without a network.
 # anynet runs DHCP on every wired interface, since the cidata seed has no network-config; the desktop profiles
 # leave the network to NetworkManager.
-CMDLINE='console=ttyAMA0,115200 console=tty1 boot=live ds=nocloud toram noeject nopersistence'
+CMDLINE='console=ttyS0,115200 console=tty1 boot=live ds=nocloud toram noeject nopersistence'
 case "${PROFILE}" in
 	desktop*) ;;
 	*) CMDLINE="${CMDLINE} anynet" ;;

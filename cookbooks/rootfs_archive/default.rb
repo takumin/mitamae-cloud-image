@@ -266,10 +266,12 @@ when 'raspberrypi'
       'arm_64bit=1',
       'kernel=vmlinuz',
       'initramfs initrd.img followkernel',
+      # The mini UART baud rate follows the core clock, which force_turbo keeps fixed.
       'force_turbo=1',
+      # Bluetooth stays on the PL011: the mini UART's small FIFO overruns during the controller setup.
+      'enable_uart=1',
       'dtparam=i2c_arm=on',
       'dtparam=spi=on',
-      'dtoverlay=miniuart-bt',
       'dtoverlay=vc4-kms-v3d-pi4',
       'disable_overscan=1',
       'max_framebuffers=2',
@@ -278,7 +280,7 @@ when 'raspberrypi'
 
   file "#{output_dir}/cmdline.txt" do
     content [
-      'console=ttyAMA0,115200',
+      'console=ttyS0,115200',
       'console=tty1',
       'boot=live',
       'ip=dhcp',
