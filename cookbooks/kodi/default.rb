@@ -82,6 +82,13 @@ node[:kodi][:network_online] = !car if node[:kodi][:network_online].nil?
 node[:kodi][:remote] = car if node[:kodi][:remote].nil?
 
 #
+# Public Variables - Video Sources
+#
+
+# The persistent cookbook mounts the SRVDATA partition of the USB disk on /srv.
+node[:kodi][:video_sources] ||= car ? ['/srv/share/movie'] : []
+
+#
 # Validate Variables
 #
 
@@ -98,6 +105,7 @@ node.validate! do
       cec: boolean,
       network_online: boolean,
       remote: boolean,
+      video_sources: array_of(match(%r{^/.+[^/]$})),
     },
   }
 end
@@ -110,6 +118,7 @@ language_addon = "resource.language.#{node[:kodi][:language]}"
 kodi_home      = "#{node[:kodi][:directory][:path]}/.kodi"
 appliance_xml  = '/usr/share/kodi/system/settings/appliance.xml'
 cec_settings   = "#{kodi_home}/userdata/peripheral_data/cec_CEC_Adapter.xml"
+sources_xml    = "#{kodi_home}/userdata/sources.xml"
 
 #
 # Install Package
@@ -271,6 +280,27 @@ unless node[:kodi][:cec]
       </settings>
     __EOF__
     not_if "test -e #{cec_settings}"
+  end
+end
+
+#
+# Video Sources
+#
+
+unless node[:kodi][:video_sources].empty?
+  directory "#{kodi_home}/userdata" do
+    owner node[:kodi][:owner][:name]
+    group node[:kodi][:group][:name]
+    mode  '0755'
+  end
+
+  # Kodi rewrites the file when a source is edited, and fills in the other media types.
+  template sources_xml do
+    owner  node[:kodi][:owner][:name]
+    group  node[:kodi][:group][:name]
+    mode   '0644'
+    source 'templates/sources.xml.erb'
+    not_if "test -e #{sources_xml}"
   end
 end
 

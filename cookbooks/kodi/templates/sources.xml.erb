@@ -1,0 +1,12 @@
+<sources>
+    <video>
+        <default pathversion="1"></default>
+<%- node[:kodi][:video_sources].each do |path| -%>
+        <source>
+            <name><%= ::File.basename(path) %></name>
+            <path pathversion="1"><%= path %>/</path>
+            <allowsharing>true</allowsharing>
+        </source>
+<%- end -%>
+    </video>
+</sources>
