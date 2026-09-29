@@ -52,6 +52,12 @@ set -eu
 # - arm64
 : "${ARCH:="arm64"}"
 
+# Partition Initialize
+# Value:
+# - false: keep the partition table and SRVDATA, and rewrite only BOOT and CIDATA
+# - true:  wipe the disk and create every partition
+: "${INITIALIZE:="false"}"
+
 # Wi-Fi Access Point Credentials (kodi-car)
 # Written to wifi-ap.conf on the boot partition, where each one set overrides the one in the image.
 : "${WIFI_AP_SSID:=""}"
@@ -78,19 +84,36 @@ if [ "x${USB_NAME}" = "x" ]; then
 fi
 
 ################################################################################
+# Functions
+################################################################################
+
+# Print the partitions of the disk with the partition label
+find_partition() {
+	lsblk -nrpo NAME,PARTLABEL "${USB_PATH}" | awk -v label="$1" '$2 == label {print $1}'
+}
+
+# Unmount every mount point of the device
+unmount_device() {
+	awk -v dev="$1" '$1 == dev {print $2}' /proc/mounts | sort -r | xargs --no-run-if-empty umount
+}
+
+################################################################################
 # Required Packages
 ################################################################################
 
 # Install Require Packages
-dpkg -l | awk '{print $2}' | grep -qs '^gdisk$'      || apt-get -y install gdisk
-dpkg -l | awk '{print $2}' | grep -qs '^dosfstools$' || apt-get -y install dosfstools
+# Rewriting the existing partitions needs no extra package, so it also runs on the Raspberry Pi booted from
+# the disk.
+if [ "${INITIALIZE}" = "true" ]; then
+	dpkg -l | awk '{print $2}' | grep -qs '^gdisk$'      || apt-get -y install gdisk
+	dpkg -l | awk '{print $2}' | grep -qs '^dosfstools$' || apt-get -y install dosfstools
+	dpkg -l | awk '{print $2}' | grep -qs '^xfsprogs$'   || apt-get -y install xfsprogs
+	dpkg -l | awk '{print $2}' | grep -qs '^parted$'     || apt-get -y install parted
+fi
 
 ################################################################################
 # Cleanup
 ################################################################################
-
-# Unmount Disk Drive
-awk '{print $1}' /proc/mounts | grep -s "${USB_PATH}" | sort -r | xargs --no-run-if-empty umount
 
 # Unmount Working Directory
 awk '{print $2}' /proc/mounts | grep -s "${LIVEUSB}" | sort -r | xargs --no-run-if-empty umount
@@ -108,47 +131,67 @@ mkdir -p "${CIDATA}"
 # Partition
 ################################################################################
 
-# Clear Partition Table
-sgdisk -Z "${USB_PATH}"
+if [ "${INITIALIZE}" = "true" ]; then
+	# Unmount Disk Drive
+	awk '{print $1}' /proc/mounts | grep -s "${USB_PATH}" | sort -r | xargs --no-run-if-empty umount
 
-# Create GPT Partition Table
-sgdisk -o "${USB_PATH}"
+	# Clear Partition Table
+	sgdisk -Z "${USB_PATH}"
 
-# Create Raspberry Pi Boot Partition
-sgdisk -n 1::+4G  -c 1:"BOOT"    -t 1:0700 "${USB_PATH}"
+	# Create GPT Partition Table
+	sgdisk -o "${USB_PATH}"
 
-# Create Cloud-Init Data Partition
-sgdisk -n 2::+64M -c 2:"CIDATA"  -t 2:0700 "${USB_PATH}"
+	# Create Raspberry Pi Boot Partition
+	sgdisk -n 1::+4G  -c 1:"BOOT"    -t 1:0700 "${USB_PATH}"
 
-# Create USB Data Partition
-sgdisk -n 3::-1   -c 3:"USBDATA" -t 3:0700 "${USB_PATH}"
+	# Create Cloud-Init Data Partition
+	sgdisk -n 2::+64M -c 2:"CIDATA"  -t 2:0700 "${USB_PATH}"
 
-# Do Not Automount
-sgdisk -A 1:set:63 "${USB_PATH}"
-sgdisk -A 2:set:63 "${USB_PATH}"
+	# Create Site-specific Data Partition
+	# The persistent cookbook mounts it on /srv by the partition label.
+	sgdisk -n 3::-1   -c 3:"SRVDATA" -t 3:8306 "${USB_PATH}"
 
-# Wait Probe
-sleep 1
+	# Do Not Automount
+	sgdisk -A 1:set:63 "${USB_PATH}"
+	sgdisk -A 2:set:63 "${USB_PATH}"
 
-# Partition Probe
-partprobe -s
+	# Wait Probe
+	sleep 1
 
-# Wait Probe
-sleep 1
+	# Partition Probe
+	partprobe -s
+
+	# Wait Probe
+	udevadm settle
+fi
 
 # Get Real Path
-BOOTPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part1")"
-CIDATAPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part2")"
-USBDATAPT="$(realpath "/dev/disk/by-id/${USB_NAME}-part3")"
+BOOTPT="$(find_partition BOOT)"
+CIDATAPT="$(find_partition CIDATA)"
+SRVDATAPT="$(find_partition SRVDATA)"
+
+# Check Partition
+for LABEL in BOOT CIDATA SRVDATA; do
+	if [ "$(find_partition "${LABEL}" | wc -l)" -ne 1 ]; then
+		echo "${USB_PATH}: needs exactly one ${LABEL} partition, or INITIALIZE=true to wipe the disk" >&2
+		exit 1
+	fi
+done
 
 ################################################################################
 # Format
 ################################################################################
 
-# Format Partition
-mkfs.vfat -F 32 -n 'BOOT' -v "${BOOTPT}"
-mkfs.vfat -F 32 -n 'CIDATA' -v "${CIDATAPT}"
-mkfs.vfat -F 32 -n 'USBDATA' -v "${USBDATAPT}"
+if [ "${INITIALIZE}" = "true" ]; then
+	# Format Partition
+	mkfs.vfat -F 32 -n 'BOOT' -v "${BOOTPT}"
+	mkfs.vfat -F 32 -n 'CIDATA' -v "${CIDATAPT}"
+	mkfs.xfs -f -L 'SRVDATA' "${SRVDATAPT}"
+else
+	# SRVDATA stays mounted, and only the partitions to rewrite are released.
+	unmount_device "${BOOTPT}"
+	unmount_device "${CIDATAPT}"
+fi
 
 ################################################################################
 # Mount
@@ -157,6 +200,11 @@ mkfs.vfat -F 32 -n 'USBDATA' -v "${USBDATAPT}"
 # Mount Partition
 mount -t vfat -o codepage=932,iocharset=utf8 "${BOOTPT}" "${LIVEUSB}"
 mount -t vfat -o codepage=932,iocharset=utf8 "${CIDATAPT}" "${CIDATA}"
+
+# Clear Partition
+# The kept partitions are emptied instead of formatted, since the booted Raspberry Pi has no mkfs.vfat.
+find "${LIVEUSB}" -mindepth 1 -delete
+find "${CIDATA}" -mindepth 1 -delete
 
 ################################################################################
 # Files
