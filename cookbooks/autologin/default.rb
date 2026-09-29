@@ -99,6 +99,11 @@ end
 #
 
 node.autologin.values.each do |autologin|
+  # Kodi takes over the VT, so only the serial console logs in automatically
+  if node.target.role.match?(/kodi/) and autologin.service.eql?('getty')
+    next
+  end
+
   #
   # Build Command Options
   #

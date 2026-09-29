@@ -1,0 +1,21 @@
+[Unit]
+Description=Kodi Media Center
+Wants=network-online.target
+After=network-online.target systemd-user-sessions.service sound.target
+# Kodi reads input devices directly, so keystrokes would also reach a getty on the same VT.
+Conflicts=getty@<%= node[:kodi][:tty] %>.service
+After=getty@<%= node[:kodi][:tty] %>.service
+
+[Service]
+User=<%= node[:kodi][:owner][:name] %>
+Group=<%= node[:kodi][:group][:name] %>
+SupplementaryGroups=<%= node[:kodi][:supplementary_groups].join(' ') %>
+Environment=HOME=<%= node[:kodi][:directory][:path] %>
+TTYPath=/dev/<%= node[:kodi][:tty] %>
+Type=simple
+Restart=always
+RestartSec=5
+ExecStart=/usr/bin/kodi-standalone --windowing=gbm
+
+[Install]
+WantedBy=graphical.target
