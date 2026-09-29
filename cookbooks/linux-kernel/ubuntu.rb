@@ -9,7 +9,7 @@ when 'generic', 'virtual', 'lowlatency'
   node.linux_kernel.packages << "linux-image-#{node.target.kernel}"
 when 'generic-hwe', 'virtual-hwe', 'lowlatency-hwe'
   node.linux_kernel.packages << "linux-image-#{node.target.kernel}-#{node.platform_version}"
-when 'raspi'
+when 'raspberrypi'
   node.linux_kernel.packages << 'linux-image-raspi'
   node.linux_kernel.packages << 'linux-firmware-raspi'
 else

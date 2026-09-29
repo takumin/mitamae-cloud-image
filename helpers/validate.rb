@@ -33,7 +33,7 @@ when 'ubuntu'
   node.validate! do
     {
       target: {
-        kernel:     match(/^(?:(?:generic|virtual|lowlatency)(?:-hwe)?|raspi)$/),
+        kernel:     match(/^(?:(?:generic|virtual|lowlatency)(?:-hwe)?|raspberrypi)$/),
         suite:      match(/^(?:noble|resolute)$/),
         components: array_of(match(/^(?:main|restricted|universe|multiverse)$/)),
       },

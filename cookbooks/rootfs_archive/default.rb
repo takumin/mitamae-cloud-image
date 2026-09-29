@@ -19,7 +19,7 @@ else
 end
 
 case node.target.kernel
-when 'raspberrypi', 'raspi'
+when 'raspberrypi'
   # NOTE: Debian Official Kernel Unsupported Zstd SquashFS
   node[:rootfs_archive][:format] = 'gzip'
 end
@@ -260,7 +260,7 @@ end
 #
 
 case node[:target][:kernel]
-when 'raspberrypi', 'raspi'
+when 'raspberrypi'
   file "#{output_dir}/config.txt" do
     content [
       'arm_64bit=1',
@@ -304,7 +304,7 @@ when "debian-raspberrypi"
   end
 
   execute "cp -r #{target_dir}/boot/firmware/overlays #{output_dir}"
-when "ubuntu-raspi"
+when "ubuntu-raspberrypi"
   execute [
     "find '#{target_dir}/usr/lib/firmware' -mindepth 1 -maxdepth 1 -name '*-raspi'",
     "xargs -I {} find {}/device-tree/broadcom -type f",

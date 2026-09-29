@@ -27,7 +27,7 @@ when /^(?:generic|lowlatency)(?:-hwe)?$/
     # nouveau
     node.linux_firmware.packages << 'linux-firmware-nvidia-graphics' unless node.target.role.match?(/nvidia/)
   end
-when 'raspi'
+when 'raspberrypi'
   # linux-firmware-raspi installed by linux-kernel covers the on-board devices
   node.linux_firmware.packages << 'linux-firmware-minimal'
 when /^virtual(?:-hwe)?$/

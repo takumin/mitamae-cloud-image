@@ -12,7 +12,7 @@ end
 # Check Kernel
 #
 
-unless node[:target][:kernel].match(/^(?:raspberrypi|raspi)$/)
+unless node[:target][:kernel].eql?('raspberrypi')
   return
 end
 

@@ -22,7 +22,7 @@ package 'netplan.io' # require nocloud datasources
 # The Raspberry Pi OS build of cloud-init sets distro to raspberry-pi-os,
 # whose add_user renames the uid 1000 user with userconf-pi instead of
 # creating one, so no user or authorized_keys is created on these images
-if node[:target][:kernel].match?(/^(?:raspberrypi|raspi)$/)
+if node[:target][:kernel].eql?('raspberrypi')
   file '/etc/cloud/cloud.cfg.d/90_distro.cfg' do
     owner 'root'
     group 'root'

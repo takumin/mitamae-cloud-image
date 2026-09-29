@@ -56,7 +56,7 @@ KERNELS = {
     'generic-hwe',
     'virtual',
     'virtual-hwe',
-    'raspi',
+    'raspberrypi',
   ],
 }
 
@@ -97,7 +97,7 @@ DISTRIBUTIONS.each do |distribution|
     KERNELS[distribution].each do |kernel|
       ROLES[distribution].each do |role|
         ARCHITECTURES.each do |architecture|
-          next if architecture.match('amd64') and kernel.match(/raspi|raspberrypi/)
+          next if architecture.match('amd64') and kernel.eql?('raspberrypi')
           next if !architecture.match('amd64') and role.match(/nvidia/)
           next if !kernel.match(/generic/) and role.match(/nvidia/)
 
@@ -284,7 +284,7 @@ namespace :github do
 
         if v['distribution'].eql?('ubuntu')
           if v['suite'].eql?(PUBLISH_UBUNTU_SUITE)
-            if v['kernel'].match?(/^((generic|virtual)-hwe|raspi)$/)
+            if v['kernel'].match?(/^((generic|virtual)-hwe|raspberrypi)$/)
               publish = true
             end
           end
@@ -309,7 +309,7 @@ def setup_profile(target)
   yaml = File.join(dir, 'profile.yaml')
   # Copy the target: the tasks build their paths from target.values, which must not gain the directory
   data = { 'target' => target.dup }
-  if target['kernel'].match(/raspi|raspberrypi/)
+  if target['kernel'].eql?('raspberrypi')
     data['autologin'] = {
       'miniuart-bt' => {
         'service' => 'serial-getty',

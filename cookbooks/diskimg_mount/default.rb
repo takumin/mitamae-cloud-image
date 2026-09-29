@@ -4,7 +4,7 @@
 # Check Kernel
 #
 
-if node[:target][:kernel].match(/^(?:raspberrypi|raspi)$/)
+if node[:target][:kernel].eql?('raspberrypi')
   return
 end
 
