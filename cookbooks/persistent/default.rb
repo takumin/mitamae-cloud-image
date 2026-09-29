@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+#
+# Private Variables
+#
+
+# The car cuts the power without shutting down, so nothing is left unwritten if the videos are only read.
+options = node[:target][:role].eql?('kodi-car') ? 'ro' : 'defaults'
+
 file '/etc/systemd/system/srv.mount' do
   owner 'root'
   group 'root'
@@ -13,7 +20,7 @@ file '/etc/systemd/system/srv.mount' do
     What=/dev/disk/by-partlabel/SRVDATA
     Where=/srv
     Type=xfs
-    Options=defaults
+    Options=#{options}
 
     [Install]
     WantedBy=multi-user.target
