@@ -69,6 +69,16 @@ node[:kodi][:font]     ||= 'Arial'
 node[:kodi][:cec] = false if node[:kodi][:cec].nil?
 
 #
+# Public Variables - Car
+#
+
+car = node[:target][:role].eql?('kodi-car')
+
+# Media in the car is local, and without a wired link network-online.target only comes after the wait-online
+# timeout.
+node[:kodi][:network_online] = !car if node[:kodi][:network_online].nil?
+
+#
 # Validate Variables
 #
 
@@ -83,6 +93,7 @@ node.validate! do
       language: match(/^[a-z]+_[a-z]+$/),
       font: string,
       cec: boolean,
+      network_online: boolean,
     },
   }
 end

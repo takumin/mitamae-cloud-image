@@ -1,7 +1,10 @@
 [Unit]
 Description=Kodi Media Center
+<%- if node[:kodi][:network_online] -%>
 Wants=network-online.target
-After=network-online.target systemd-user-sessions.service sound.target
+After=network-online.target
+<%- end -%>
+After=systemd-user-sessions.service sound.target
 # Kodi reads input devices directly, so keystrokes would also reach a getty on the same VT.
 Conflicts=getty@<%= node[:kodi][:tty] %>.service
 After=getty@<%= node[:kodi][:tty] %>.service
