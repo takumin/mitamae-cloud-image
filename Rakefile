@@ -255,8 +255,6 @@ namespace :github do
     task :all do
       # NOTE: Unused NVIDIA Legacy Version
       targets.delete_if{|v| v['role'].include?('nvidia-legacy')}
-      # NOTE: Unused NVIDIA vGPU
-      targets.delete_if{|v| v['role'].include?('nvidia-vgpu')}
       # NOTE: Unused rtl8852au
       targets.delete_if{|v| v['role'].include?('rtl8852au')}
       # NOTE: Unused bootstrap
@@ -285,7 +283,7 @@ namespace :github do
 
         if v['distribution'].eql?('debian')
           if v['suite'].eql?(PUBLISH_DEBIAN_SUITE)
-            if v['kernel'].match?(/^((generic|cloud)-backports|raspberrypi)$/)
+            if v['kernel'].match?(/^((generic|cloud)-backports|raspberrypi|proxmox)$/)
               publish = true
             end
           end
