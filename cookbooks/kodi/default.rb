@@ -78,6 +78,9 @@ car = node[:target][:role].eql?('kodi-car')
 # timeout.
 node[:kodi][:network_online] = !car if node[:kodi][:network_online].nil?
 
+# The web server and JSON-RPC answer on every interface, and Avahi announces them for the remote apps.
+node[:kodi][:remote] = car if node[:kodi][:remote].nil?
+
 #
 # Validate Variables
 #
@@ -94,6 +97,7 @@ node.validate! do
       font: string,
       cec: boolean,
       network_online: boolean,
+      remote: boolean,
     },
   }
 end
@@ -139,6 +143,29 @@ package 'unzip'
 if node[:kodi][:language].start_with?('ja_')
   package 'fonts-noto-cjk' do
     options '--no-install-recommends'
+  end
+end
+
+# Kodi publishes its services through the Avahi daemon, and systemd-resolved would answer on the same port.
+if node[:kodi][:remote]
+  package 'avahi-daemon' do
+    options '--no-install-recommends'
+  end
+
+  directory '/etc/systemd/resolved.conf.d' do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
+
+  file '/etc/systemd/resolved.conf.d/kodi-mdns.conf' do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content <<~__EOF__
+      [Resolve]
+      MulticastDNS=no
+    __EOF__
   end
 end
 

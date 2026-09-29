@@ -20,4 +20,25 @@
       </group>
     </category>
   </section>
+<%- if node[:kodi][:remote] -%>
+  <section id="services">
+    <category id="control">
+      <group id="1">
+        <setting id="services.webserver">
+          <default>true</default>
+        </setting>
+        <!-- The web server refuses to start with authentication on and no password, and the access point
+             already limits who can reach it. -->
+        <setting id="services.webserverauthentication">
+          <default>false</default>
+        </setting>
+      </group>
+      <group id="2">
+        <setting id="services.esallinterfaces">
+          <default>true</default>
+        </setting>
+      </group>
+    </category>
+  </section>
+<%- end -%>
 </settings>
