@@ -80,6 +80,55 @@ file '/usr/share/glib-2.0/schemas/99_nautilus.gschema.override' do
   notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
 end
 
+# Prefer the dark style by default; libadwaita applications and GNOME Shell follow this key
+file '/usr/share/glib-2.0/schemas/99_gnome-desktop-interface.gschema.override' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    '[org.gnome.desktop.interface]',
+    "color-scheme='prefer-dark'",
+  ].join("\n").concat("\n")
+  only_if 'test -f /usr/share/glib-2.0/schemas/org.gnome.desktop.interface.gschema.xml'
+  notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
+end
+
+# GTK 3 applications ignore the color scheme and use the theme instead, so select the dark variant of the
+# theme as well; ubuntu-settings sets the theme in the section specific to the ubuntu desktop, which takes
+# precedence over the generic section, so override that same section
+file '/usr/share/glib-2.0/schemas/99_yaru-dark.gschema.override' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    '[org.gnome.desktop.interface:ubuntu]',
+    "gtk-theme='Yaru-dark'",
+  ].join("\n").concat("\n")
+  only_if [
+    'test -f /usr/share/glib-2.0/schemas/org.gnome.desktop.interface.gschema.xml',
+    'test -d /usr/share/themes/Yaru-dark',
+  ].join(' && ')
+  notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
+end
+
+# Without Yaru the upstream theme is used, whose dark variant is built into GTK 3; unlike Ubuntu's Settings,
+# upstream Settings only toggles the color scheme, so GTK 3 applications stay dark after switching to the
+# light style until the theme is changed back by hand
+file '/usr/share/glib-2.0/schemas/99_adwaita-dark.gschema.override' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    '[org.gnome.desktop.interface]',
+    "gtk-theme='Adwaita-dark'",
+  ].join("\n").concat("\n")
+  only_if [
+    'test -f /usr/share/glib-2.0/schemas/org.gnome.desktop.interface.gschema.xml',
+    'test ! -d /usr/share/themes/Yaru-dark',
+  ].join(' && ')
+  notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
+end
+
 # Never suspend automatically on inactivity while on AC power, but keep the default on battery so that an
 # idle laptop does not drain it; gnome-settings-daemon reads these defaults both in the user session and on
 # the GDM login screen, so a single override covers both
