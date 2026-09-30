@@ -42,6 +42,26 @@ file '/etc/NetworkManager/conf.d/90-no-keep-configuration.conf' do
   only_if 'test -d /etc/NetworkManager/conf.d'
 end
 
+# Keep suspend in RAM only; hibernation writes the whole memory to disk, which is slow on a HDD and wears
+# out an SSD, so forbid every sleep mode that involves it
+directory '/etc/systemd/sleep.conf.d' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+file '/etc/systemd/sleep.conf.d/90-suspend-to-ram-only.conf' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    '[Sleep]',
+    'AllowHibernation=no',
+    'AllowSuspendThenHibernate=no',
+    'AllowHybridSleep=no',
+  ].join("\n").concat("\n")
+end
+
 # Remove Example Desktop Entry
 file '/etc/skel/examples.desktop' do
   action :delete
