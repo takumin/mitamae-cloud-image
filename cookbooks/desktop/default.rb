@@ -95,6 +95,37 @@ file '/usr/share/glib-2.0/schemas/99_gnome-settings-daemon-power.gschema.overrid
   notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
 end
 
+# power-profiles-daemon always starts in the balanced profile unless its state file records a profile that
+# the user selected on the same drivers, so the file cannot be preseeded in a hardware-independent way;
+# select the performance profile over D-Bus instead while no profile has been chosen yet, which also saves
+# the state file so that a later choice by the user is kept (the legacy bus name is used as it is provided
+# by every version; the failure on hardware without the performance profile is ignored)
+file '/etc/systemd/system/power-profiles-default-performance.service' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content <<~__EOF__
+    [Unit]
+    Description=Select Performance Power Profile By Default
+    Wants=power-profiles-daemon.service
+    After=power-profiles-daemon.service
+    ConditionPathExists=!/var/lib/power-profiles-daemon/state.ini
+
+    [Service]
+    Type=oneshot
+    ExecStart=-/usr/bin/busctl set-property net.hadess.PowerProfiles /net/hadess/PowerProfiles net.hadess.PowerProfiles ActiveProfile s performance
+
+    [Install]
+    WantedBy=graphical.target
+  __EOF__
+  only_if 'test -f /usr/lib/systemd/system/power-profiles-daemon.service'
+end
+
+service 'power-profiles-default-performance.service' do
+  action :enable
+  only_if 'test -f /etc/systemd/system/power-profiles-default-performance.service'
+end
+
 execute 'glib-compile-schemas /usr/share/glib-2.0/schemas' do
   action :nothing
 end
