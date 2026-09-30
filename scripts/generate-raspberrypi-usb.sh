@@ -230,6 +230,10 @@ case "${PROFILE}" in
 	desktop*) ;;
 	*) CMDLINE="${CMDLINE} anynet" ;;
 esac
+# The car display runs at 480p, and Kodi keeps the mode the console was set to.
+case "${PROFILE}" in
+	kodi-car) CMDLINE="${CMDLINE} video=HDMI-A-1:720x480@60 video=HDMI-A-2:720x480@60" ;;
+esac
 echo "${CMDLINE}" > "${LIVEUSB}/cmdline.txt"
 
 # Wi-Fi Access Point Credentials

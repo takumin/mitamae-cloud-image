@@ -291,6 +291,11 @@ when 'raspberrypi'
       # TODO: Switch to ds=nocloud;s= and drop seednet= once Debian 12 is no longer supported.
       'ds=nocloud;dsmode=net',
       'seednet=http://boot.metal.internal/seed/#HOSTNAME#/default/',
+      # The car display runs at 480p, and Kodi keeps the mode the console was set to.
+      *(node[:target][:role].eql?('kodi-car') ? %w{
+        video=HDMI-A-1:720x480@60
+        video=HDMI-A-2:720x480@60
+      } : []),
     ].join(' ')
   end
 end
