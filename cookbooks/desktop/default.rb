@@ -80,6 +80,21 @@ file '/usr/share/glib-2.0/schemas/99_nautilus.gschema.override' do
   notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
 end
 
+# Never suspend automatically on inactivity while on AC power, but keep the default on battery so that an
+# idle laptop does not drain it; gnome-settings-daemon reads these defaults both in the user session and on
+# the GDM login screen, so a single override covers both
+file '/usr/share/glib-2.0/schemas/99_gnome-settings-daemon-power.gschema.override' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    '[org.gnome.settings-daemon.plugins.power]',
+    "sleep-inactive-ac-type='nothing'",
+  ].join("\n").concat("\n")
+  only_if 'test -f /usr/share/glib-2.0/schemas/org.gnome.settings-daemon.plugins.power.gschema.xml'
+  notifies :run, 'execute[glib-compile-schemas /usr/share/glib-2.0/schemas]'
+end
+
 execute 'glib-compile-schemas /usr/share/glib-2.0/schemas' do
   action :nothing
 end
