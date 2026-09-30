@@ -89,6 +89,16 @@ node[:kodi][:remote] = car if node[:kodi][:remote].nil?
 node[:kodi][:video_sources] ||= car ? ['/srv/share/movie'] : []
 
 #
+# Public Variables - Display Calibration
+#
+
+# Kodi takes every display mode for square pixels. The car display stretches 720x480 across a 16:9 screen, so
+# a pixel is (16/9) / (3/2) = 32/27 times as wide as it is high.
+node[:kodi][:calibration]               ||= Hashie::Mash.new
+node[:kodi][:calibration][:mode]        ||= car ? '720x480 @ 60.000000 Hz' : ''
+node[:kodi][:calibration][:pixel_ratio] ||= car ? '1.185185' : '1.000000'
+
+#
 # Validate Variables
 #
 
@@ -106,6 +116,10 @@ node.validate! do
       network_online: boolean,
       remote: boolean,
       video_sources: array_of(match(%r{^/.+[^/]$})),
+      calibration: {
+        mode: match(/^(|[0-9]+x[0-9]+i? @ [0-9]+\.[0-9]{6} Hz)$/),
+        pixel_ratio: match(/^[0-9]+\.[0-9]+$/),
+      },
     },
   }
 end
@@ -119,6 +133,7 @@ kodi_home      = "#{node[:kodi][:directory][:path]}/.kodi"
 appliance_xml  = '/usr/share/kodi/system/settings/appliance.xml'
 cec_settings   = "#{kodi_home}/userdata/peripheral_data/cec_CEC_Adapter.xml"
 sources_xml    = "#{kodi_home}/userdata/sources.xml"
+guisettings    = "#{kodi_home}/userdata/guisettings.xml"
 
 #
 # Install Package
@@ -301,6 +316,28 @@ unless node[:kodi][:video_sources].empty?
     mode   '0644'
     source 'templates/sources.xml.erb'
     not_if "test -e #{sources_xml}"
+  end
+end
+
+#
+# Display Calibration
+#
+
+unless node[:kodi][:calibration][:mode].empty?
+  directory "#{kodi_home}/userdata" do
+    owner node[:kodi][:owner][:name]
+    group node[:kodi][:group][:name]
+    mode  '0755'
+  end
+
+  # Kodi applies the calibration of the mode with the same description after listing the display modes, and
+  # writes back the whole file with the other settings when it exits.
+  template guisettings do
+    owner  node[:kodi][:owner][:name]
+    group  node[:kodi][:group][:name]
+    mode   '0644'
+    source 'templates/guisettings.xml.erb'
+    not_if "test -e #{guisettings}"
   end
 end
 

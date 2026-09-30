@@ -1,0 +1,20 @@
+<%-
+  width, height = node[:kodi][:calibration][:mode].scan(/[0-9]+/).first(2)
+-%>
+<settings version="2">
+    <resolutions>
+        <resolution>
+            <description><%= node[:kodi][:calibration][:mode] %></description>
+            <!-- A missing value reads as 0, which moves the subtitles to the top and clamps the right and
+                 bottom edges to the middle of the screen. -->
+            <subtitles><%= height %></subtitles>
+            <pixelratio><%= node[:kodi][:calibration][:pixel_ratio] %></pixelratio>
+            <overscan>
+                <left>0</left>
+                <top>0</top>
+                <right><%= width %></right>
+                <bottom><%= height %></bottom>
+            </overscan>
+        </resolution>
+    </resolutions>
+</settings>
