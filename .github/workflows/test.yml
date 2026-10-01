@@ -1,0 +1,33 @@
+---
+name: Test
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'Rakefile'
+    - 'lib/**'
+    - 'test/**'
+    - '.github/workflows/test.yml'
+  pull_request:
+    paths:
+    - 'Rakefile'
+    - 'lib/**'
+    - 'test/**'
+    - '.github/workflows/test.yml'
+permissions: {}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    name: Rakefile
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v7
+    - name: Test
+      run: rake test

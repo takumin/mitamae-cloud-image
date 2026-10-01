@@ -2,6 +2,14 @@
 
 generate cloud image from mitamae recipe
 
+# Test
+
+The build targets, commands and profile the Rakefile uses live in `lib/` and are tested with Minitest.
+
+```bash
+$ rake test
+```
+
 # Environment Variables
 
 ```bash
