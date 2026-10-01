@@ -284,6 +284,8 @@ namespace :github do
       targets.delete_if{|v| v['role'].include?('rtl8852au')}
       # NOTE: Unused bootstrap
       targets.delete_if{|v| v['role'].include?('bootstrap')}
+      # NOTE: Unpublished targets are kept for local builds only
+      targets.keep_if{|v| publish?(v)}
 
       puts JSON.dump(targets.map{|v|
         {
@@ -296,27 +298,22 @@ namespace :github do
 
     targets.map{|v|
       task "publish:#{v.values.join(':')}" do
-        publish = false
-
-        if v['distribution'].eql?('ubuntu')
-          if v['suite'].eql?(PUBLISH_UBUNTU_SUITE)
-            if v['kernel'].match?(/^((generic|virtual)-hwe|raspberrypi)$/)
-              publish = true
-            end
-          end
-        end
-
-        if v['distribution'].eql?('debian')
-          if v['suite'].eql?(PUBLISH_DEBIAN_SUITE)
-            if v['kernel'].match?(/^((generic|cloud)-backports|raspberrypi|proxmox)$/)
-              publish = true
-            end
-          end
-        end
-
-        puts "PUBLISH=#{publish}"
+        puts "PUBLISH=#{publish?(v)}"
       end
     }
+  end
+end
+
+def publish?(target)
+  case target['distribution']
+  when 'ubuntu'
+    target['suite'].eql?(PUBLISH_UBUNTU_SUITE) and
+      target['kernel'].match?(/^((generic|virtual)-hwe|raspberrypi)$/)
+  when 'debian'
+    target['suite'].eql?(PUBLISH_DEBIAN_SUITE) and
+      target['kernel'].match?(/^((generic|cloud)-backports|raspberrypi|proxmox)$/)
+  else
+    false
   end
 end
 
