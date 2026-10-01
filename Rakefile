@@ -1,16 +1,9 @@
 # frozen_string_literal: true
 
-require 'etc'
-require 'fileutils'
-require 'open-uri'
-require 'open3'
-require 'yaml'
 require 'json'
+require 'rake/testtask'
 
-PUBLISH_UBUNTU_SUITE = 'resolute'
-PUBLISH_DEBIAN_SUITE = 'trixie'
-
-MITAMAE_VERSION = 'v1.14.1'
+require_relative 'lib/mitamae_cloud_image'
 
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 
@@ -18,252 +11,43 @@ LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 # extremely slow for binaries built with branch protection
 ENV['QEMU_CPU'] ||= 'max,pauth-impdef=on'
 
-# sudo-rs (the default sudo since Ubuntu 25.10) ignores 'sudo -E', so pass
-# the variables the recipes read to the root processes by name instead
-PRESERVE_ENV_PATTERN = /\A(?:
-  (?:ADMIN|APT_REPO|ARCH|DISABLE|ENABLE|WIFI_AP)_.+ |
-  INITRAMFS_COMPRESS | OUTPUT_DIRECTORY | ROOTFS_ARCHIVE_FORMAT |
-  TARGET_DIRECTORY | TIMEZONE | QEMU_CPU |
-  (?i:(?:http|https|ftp|no)_proxy)
-)\z/x
+BIN_DIR = File.expand_path('.bin', __dir__)
 
-DISTRIBUTIONS = [
-  'debian',
-  'ubuntu',
-]
+def commands(chroot_dir)
+  MitamaeCloudImage::Commands.new(
+    root:         __dir__,
+    chroot_dir:   chroot_dir,
+    log_level:    LOG_LEVEL,
+    preserve_env: MitamaeCloudImage::Commands.sudo_preserve_env,
+  )
+end
 
-SUITES = {
-  'debian' => [
-    'bookworm',
-    'trixie',
-  ],
-  'ubuntu' => [
-    'noble',
-    'resolute',
-  ],
-}
-
-KERNELS = {
-  'debian' => [
-    'generic',
-    'generic-backports',
-    'cloud',
-    'cloud-backports',
-    'raspberrypi',
-  ],
-  'ubuntu' => [
-    'generic',
-    'generic-hwe',
-    'virtual',
-    'virtual-hwe',
-    'raspberrypi',
-  ],
-}
-
-ROLES = {
-  'debian' => [
-    'minimal',
-    'minimal-bootstrap',
-    'server',
-    'server-nvidia-cuda',
-    'server-nvidia-legacy',
-    'desktop',
-    'desktop-nvidia-cuda',
-    'desktop-nvidia-legacy',
-    'desktop-rtl8852au-nvidia-cuda',
-  ],
-  'ubuntu' => [
-    'minimal',
-    'minimal-bootstrap',
-    'server',
-    'server-nvidia-cuda',
-    'server-nvidia-legacy',
-    'desktop',
-    'desktop-nvidia-cuda',
-    'desktop-nvidia-legacy',
-    'desktop-rtl8852au-nvidia-cuda',
-  ],
-}
-
-ARCHITECTURES = [
-  'amd64',
-  'arm64',
-]
-
-targets = []
-
-DISTRIBUTIONS.each do |distribution|
-  SUITES[distribution].each do |suite|
-    KERNELS[distribution].each do |kernel|
-      ROLES[distribution].each do |role|
-        ARCHITECTURES.each do |architecture|
-          next if architecture.match('amd64') and kernel.eql?('raspberrypi')
-          next if !architecture.match('amd64') and role.match(/nvidia/)
-          next if !kernel.match(/generic/) and role.match(/nvidia/)
-
-          targets << {
-            'distribution' => distribution,
-            'suite'        => suite,
-            'kernel'       => kernel,
-            'architecture' => architecture,
-            'role'         => role,
-          }
-        end
-      end
-    end
+def run_steps(steps)
+  steps.each do |step|
+    abort('failed command') unless MitamaeCloudImage::Shell.run(step.command, chroot: step.chroot)
   end
 end
 
-SUITES['debian'].each do |suite|
-  targets << {
-    'distribution' => 'debian',
-    'suite'        => suite,
-    'kernel'       => 'proxmox',
-    'architecture' => 'amd64',
-    'role'         => 'proxmox-ve',
-  }
-end
-
-targets << {
-  'distribution' => 'debian',
-  'suite'        => PUBLISH_DEBIAN_SUITE,
-  'kernel'       => 'raspberrypi',
-  'architecture' => 'arm64',
-  'role'         => 'kodi',
-}
-
-targets << {
-  'distribution' => 'debian',
-  'suite'        => PUBLISH_DEBIAN_SUITE,
-  'kernel'       => 'raspberrypi',
-  'architecture' => 'arm64',
-  'role'         => 'kodi-car',
-}
-
-ppa_nvidia_vgpu = true
-%w{
-  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_UID
-  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_FINGER_PRINT
-  APT_REPO_PPA_NVIDIA_VGPU_KEYRING_URL
-  APT_REPO_PPA_NVIDIA_VGPU_URL
-}.each do |k|
-  if ENV.key?(k)
-    if ENV[k].empty?
-      ppa_nvidia_vgpu = false
-      break
-    end
-  end
-end
-
-if ppa_nvidia_vgpu
-  DISTRIBUTIONS.each do |distribution|
-    case distribution
-    when 'debian'
-      suite  = 'trixie'
-      kernel = 'generic-backports'
-    when 'ubuntu'
-      suite  = 'resolute'
-      kernel = 'generic-hwe'
-    else
-      next
-    end
-
-    targets << {
-      'distribution' => distribution,
-      'suite'        => suite,
-      'kernel'       => kernel,
-      'architecture' => 'amd64',
-      'role'         => 'server-nvidia-vgpu',
-    }
-  end
-
-  SUITES['debian'].each do |suite|
-    targets << {
-      'distribution' => 'debian',
-      'suite'        => suite,
-      'kernel'       => 'proxmox',
-      'architecture' => 'amd64',
-      'role'         => 'proxmox-ve-nvidia-vgpu',
-    }
-  end
-end
+targets = MitamaeCloudImage::Targets.all
 
 targets.each do |target|
-  namespace target.values.join(':') do
-    chroot_dir = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
+  namespace MitamaeCloudImage::Targets.name(target) do
+    chroot_dir = MitamaeCloudImage::Targets.chroot_dir(target)
 
     task :initialize do
-      setup_mitamae
-      setup_profile(target)
+      MitamaeCloudImage::Mitamae.install(File.join(BIN_DIR, 'mitamae'))
+      profile = MitamaeCloudImage::Profile.build(target, directory: chroot_dir)
+      MitamaeCloudImage::Profile.write(File.join(BIN_DIR, 'profile.yaml'), profile)
 
-      cmd = [
-        'sudo', *sudo_preserve_env,
-        './.bin/mitamae', 'local',
-        '-l', LOG_LEVEL,
-        '-y', './.bin/profile.yaml',
-        './phases/initialize.rb',
-      ].join(' ')
-
-      unless execution(cmd, chroot: chroot_dir)
-        abort('failed command')
-      end
+      run_steps(commands(chroot_dir).initialize_phase)
     end
 
     task :provision do
-      cmd = [
-        'sudo', 'rsync', '-a',
-        '--exclude=".git/"',
-        '--exclude="releases/"',
-        "#{File.expand_path(__dir__)}/",
-        "#{File.join(chroot_dir, 'mitamae')}/"
-      ].join(' ')
-
-      unless execution(cmd)
-        abort('failed command')
-      end
-
-      cmd = [
-        'sudo', *sudo_preserve_env, 'chroot', chroot_dir,
-        'mitamae', 'local',
-        '-l', LOG_LEVEL,
-        '-y', '/mitamae/.bin/profile.yaml',
-        '--plugins=/mitamae/plugins',
-        '/mitamae/phases/provision.rb',
-      ].join(' ')
-
-      unless execution(cmd, chroot: chroot_dir)
-        abort('failed command')
-      end
-
-      unless execution("sudo rm -fr #{File.join(chroot_dir, 'mitamae')}")
-        abort('failed command')
-      end
+      run_steps(commands(chroot_dir).provision_phase)
     end
 
     task :finalize do
-      cmd = [
-        'sudo', *sudo_preserve_env,
-        './.bin/mitamae', 'local',
-        '-l', LOG_LEVEL,
-        '-y', './.bin/profile.yaml',
-        './phases/finalize.rb',
-      ].join(' ')
-
-      unless execution(cmd, chroot: chroot_dir)
-        abort('failed command')
-      end
-
-      unless execution("find #{File.expand_path(File.join(__dir__, 'releases'))} -type d | xargs sudo chmod 0755")
-        abort('failed command')
-      end
-
-      unless execution("find #{File.expand_path(File.join(__dir__, 'releases'))} -type f | xargs sudo chmod 0644")
-        abort('failed command')
-      end
-
-      unless execution("sudo chown -R $(id -u):$(id -g) #{File.expand_path(File.join(__dir__, 'releases'))}")
-        abort('failed command')
-      end
+      run_steps(commands(chroot_dir).finalize_phase)
     end
 
     desc target.values.join(' ')
@@ -278,150 +62,19 @@ end
 namespace :github do
   namespace :actions do
     task :all do
-      # NOTE: Unused NVIDIA Legacy Version
-      targets.delete_if{|v| v['role'].include?('nvidia-legacy')}
-      # NOTE: Unused rtl8852au
-      targets.delete_if{|v| v['role'].include?('rtl8852au')}
-      # NOTE: Unused bootstrap
-      targets.delete_if{|v| v['role'].include?('bootstrap')}
-      # NOTE: Unpublished targets are kept for local builds only
-      targets.keep_if{|v| publish?(v)}
-
-      puts JSON.dump(targets.map{|v|
-        {
-          name:   v.values.join(':'),
-          dir:    v.values.join('/'),
-          runner: v['architecture'].eql?('arm64') ? 'ubuntu-26.04-arm' : 'ubuntu-26.04',
-        }
-      })
+      puts JSON.dump(MitamaeCloudImage::Targets.github_actions_matrix(targets))
     end
 
-    targets.map{|v|
-      task "publish:#{v.values.join(':')}" do
-        puts "PUBLISH=#{publish?(v)}"
-      end
-    }
-  end
-end
-
-def publish?(target)
-  case target['distribution']
-  when 'ubuntu'
-    target['suite'].eql?(PUBLISH_UBUNTU_SUITE) and
-      target['kernel'].match?(/^((generic|virtual)-hwe|raspberrypi)$/)
-  when 'debian'
-    target['suite'].eql?(PUBLISH_DEBIAN_SUITE) and
-      target['kernel'].match?(/^((generic|cloud)-backports|raspberrypi|proxmox)$/)
-  else
-    false
-  end
-end
-
-def setup_profile(target)
-  dir = File.expand_path('.bin', __dir__)
-  yaml = File.join(dir, 'profile.yaml')
-  # Copy the target: the tasks build their paths from target.values, which must not gain the directory
-  data = { 'target' => target.dup }
-  if target['kernel'].eql?('raspberrypi')
-    data['autologin'] = {
-      'serial' => {
-        'service' => 'serial-getty',
-        'getty'   => '/sbin/agetty',
-        'port'    => 'ttyS0',
-        'user'    => 'root',
-        'term'    => 'linux',
-        'baud'    => [115200,38400,9600],
-        'opts'    => ['--keep-baud', '--flow-control'],
-      }
-    }
-  end
-  data['target']['directory'] = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
-  File.open(yaml, 'w') do |file|
-    YAML.dump(data, file)
-  end
-end
-
-def setup_mitamae
-  dir = File.expand_path('.bin', __dir__)
-  bin = File.join(dir, 'mitamae')
-  url = "https://github.com/itamae-kitchen/mitamae/releases/download/#{MITAMAE_VERSION}/mitamae-#{Etc.uname[:machine]}-linux"
-
-  unless Dir.exist?(dir)
-    Dir.mkdir(dir)
-  end
-
-  if File.exist?(bin)
-    if FileTest.executable?(bin)
-      begin
-        unless `#{bin} version`.match(MITAMAE_VERSION)
-          File.delete(bin)
-        end
-      rescue
-        File.delete(bin)
-      end
-    else
-      File.delete(bin)
-    end
-  end
-
-  unless File.exist?(bin)
-    File.open(bin, 'wb') do |file|
-      URI.open(url) do |data|
-        file.puts data.read
+    targets.each do |target|
+      task "publish:#{MitamaeCloudImage::Targets.name(target)}" do
+        puts "PUBLISH=#{MitamaeCloudImage::Targets.publish?(target)}"
       end
     end
   end
-
-  unless FileTest.executable?(bin)
-    FileUtils.chmod(0755, bin)
-  end
 end
 
-# apt-get and dpkg ignore SIGINT while installing, so Ctrl-C leaves them
-# running in the chroot and keeps the target directory busy
-def kill_chroot_processes(dir)
-  script = 'for p in /proc/[0-9]*; do [ "$(readlink "$p/root")" = "$1" ] && echo "${p#/proc/}"; done'
-
-  %w{TERM KILL}.each do |signal|
-    20.times do
-      pids = Open3.capture2('sudo', 'sh', '-c', script, 'sh', File.expand_path(dir))[0].split
-      return if pids.empty?
-      system('sudo', 'kill', "-#{signal}", *pids, err: File::NULL)
-      sleep 0.5
-    end
-  end
-end
-
-def sudo_preserve_env
-  names = ENV.keys.grep(PRESERVE_ENV_PATTERN).sort
-  names.empty? ? [] : ["--preserve-env=#{names.join(',')}"]
-end
-
-def execution(cmd, chroot: nil)
-  retval = false
-
-  # https://ikm.hatenablog.jp/entry/2014/11/12/003925
-  Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
-    stdin.close_write
-
-    begin
-      loop do
-        IO.select([stdout, stderr]).flatten.compact.each do |io|
-          io.each do |line|
-            next if line.nil? || line.empty?
-            puts line
-          end
-        end
-        break if stdout.eof? && stderr.eof?
-      end
-    rescue EOFError
-    rescue Interrupt
-      kill_chroot_processes(chroot) if chroot
-      raise
-    end
-
-    retval = wait_thr.value.success?
-  end
-
-  return retval
+Rake::TestTask.new do |t|
+  t.libs << 'lib'
+  t.test_files = FileList['test/**/*_test.rb']
+  t.warning = true
 end
