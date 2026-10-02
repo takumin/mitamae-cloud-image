@@ -50,7 +50,7 @@ end
 # Generate Host Keys Service
 #
 
-contents = <<__EOF__
+contents = <<~__EOF__
 [Unit]
 Description=Generate SSH Host Keys During Boot
 Before=ssh.service
