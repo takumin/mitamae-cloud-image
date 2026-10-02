@@ -58,6 +58,12 @@ set -eu
 # - true:  wipe the disk and create every partition
 : "${INITIALIZE:="false"}"
 
+# Video Output
+# Value:
+# - hdmi:      the HDMI ports
+# - composite: the NTSC-J 480i on the 3.5mm jack, along with the analog audio
+: "${VIDEO_OUTPUT:="hdmi"}"
+
 # Wi-Fi Access Point Credentials (kodi-car)
 # Written to wifi-ap.conf on the boot partition, where each one set overrides the one in the image.
 : "${WIFI_AP_SSID:=""}"
@@ -82,6 +88,12 @@ if [ "x${USB_NAME}" = "x" ]; then
   # Error...
   exit 1
 fi
+
+# Check Video Output
+case "${VIDEO_OUTPUT}" in
+	hdmi|composite) ;;
+	*) echo "Unknown VIDEO_OUTPUT: ${VIDEO_OUTPUT}" >&2; exit 1 ;;
+esac
 
 ################################################################################
 # Functions
@@ -213,6 +225,15 @@ find "${CIDATA}" -mindepth 1 -delete
 # Sync Release Files
 rsync -rlptDhv --exclude 'packages.manifest' --exclude 'rootfs.*' --progress "${DESTDIR}/" "${LIVEUSB}/"
 
+# Composite Output
+# The Raspberry Pi 4 keeps the composite output off unless enable_tvout=1. The HDMI ports are removed, so
+# that Kodi picks the composite connector and ALSA the analog audio as the default card.
+# dtparam=audio=on has to come before the vc4 overlay, where the same name switches the HDMI audio.
+if [ "${VIDEO_OUTPUT}" = "composite" ]; then
+	sed -i -e 's/^dtoverlay=vc4-kms-v3d-pi4$/enable_tvout=1\ndtparam=audio=on\n&,composite,nohdmi/' "${LIVEUSB}/config.txt"
+	grep -qs '^dtoverlay=vc4-kms-v3d-pi4,composite,nohdmi$' "${LIVEUSB}/config.txt"
+fi
+
 # Live Boot Directory
 mkdir -p "${LIVEUSB}/live"
 
@@ -231,9 +252,14 @@ case "${PROFILE}" in
 	*) CMDLINE="${CMDLINE} anynet" ;;
 esac
 # The car display runs at 480p, and Kodi keeps the mode the console was set to.
-case "${PROFILE}" in
-	kodi-car) CMDLINE="${CMDLINE} video=HDMI-A-1:720x480@60 video=HDMI-A-2:720x480@60" ;;
-esac
+# The composite output is shrunk by the margins, since the display overscans the analog picture.
+if [ "${VIDEO_OUTPUT}" = "composite" ]; then
+	CMDLINE="${CMDLINE} video=Composite-1:720x480@60ie,tv_mode=NTSC-J,margin_left=24,margin_right=24,margin_top=8,margin_bottom=16"
+else
+	case "${PROFILE}" in
+		kodi-car) CMDLINE="${CMDLINE} video=HDMI-A-1:720x480@60 video=HDMI-A-2:720x480@60" ;;
+	esac
+fi
 echo "${CMDLINE}" > "${LIVEUSB}/cmdline.txt"
 
 # Wi-Fi Access Point Credentials
