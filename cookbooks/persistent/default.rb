@@ -39,7 +39,6 @@ file '/etc/systemd/system/srv.automount' do
 
     [Automount]
     Where=/srv
-    TimeoutIdleSec=300
 
     [Install]
     WantedBy=multi-user.target
