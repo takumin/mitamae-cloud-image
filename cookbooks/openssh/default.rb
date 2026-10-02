@@ -37,6 +37,70 @@ end
 end
 
 #
+# Cipher Preference
+#
+
+# The client's order picks the cipher, so sshd can only prefer ChaCha20-Poly1305 by dropping AES-GCM.
+# Raspberry Pi 4 and older lack the ARMv8 AES instructions, and the image is shared with the Raspberry Pi 5,
+# which has them, so the drop-in is written on boot from /proc/cpuinfo. AES-CTR stays for clients without
+# ChaCha20-Poly1305, such as Paramiko, libssh2 and FIPS mode.
+if node[:target][:kernel].eql?('raspberrypi')
+  contents = <<~__EOF__
+    #!/bin/sh
+
+    set -eu
+
+    CONF='/etc/ssh/sshd_config.d/10-cipher-preference.conf'
+
+    if grep -qw aes /proc/cpuinfo; then
+      rm -f "${CONF}"
+    else
+      echo 'Ciphers -aes*-gcm@openssh.com' > "${CONF}.tmp"
+      mv -f "${CONF}.tmp" "${CONF}"
+    fi
+  __EOF__
+
+  directory '/usr/local/libexec' do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
+
+  file '/usr/local/libexec/ssh-cipher-preference' do
+    owner   'root'
+    group   'root'
+    mode    '0755'
+    content contents
+  end
+
+  contents = <<~__EOF__
+    [Unit]
+    Description=Prefer ChaCha20-Poly1305 for SSH Without AES Instructions
+    Before=ssh.service ssh.socket
+    After=local-fs.target
+
+    [Service]
+    Type=oneshot
+    RemainAfterExit=yes
+    ExecStart=/usr/local/libexec/ssh-cipher-preference
+
+    [Install]
+    WantedBy=multi-user.target
+  __EOF__
+
+  file '/etc/systemd/system/ssh-cipher-preference.service' do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content contents
+  end
+
+  service 'ssh-cipher-preference.service' do
+    action :enable
+  end
+end
+
+#
 # Check Role
 #
 
