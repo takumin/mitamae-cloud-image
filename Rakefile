@@ -278,8 +278,6 @@ end
 namespace :github do
   namespace :actions do
     task :all do
-      # NOTE: Unused NVIDIA Legacy Version
-      targets.delete_if{|v| v['role'].include?('nvidia-legacy')}
       # NOTE: Unused rtl8852au
       targets.delete_if{|v| v['role'].include?('rtl8852au')}
       # NOTE: Unused bootstrap
