@@ -94,8 +94,9 @@ node[:kodi][:video_sources] ||= car ? ['/srv/share/movie'] : []
 
 # Kodi takes every display mode for square pixels. The car display stretches 720x480 across a 16:9 screen, so
 # a pixel is (16/9) / (3/2) = 32/27 times as wide as it is high.
+# The car display takes either the 480p of HDMI through a converter or the NTSC 480i of the composite output.
 node[:kodi][:calibration]               ||= Hashie::Mash.new
-node[:kodi][:calibration][:mode]        ||= car ? '720x480 @ 60.000000 Hz' : ''
+node[:kodi][:calibration][:modes]       ||= car ? ['720x480 @ 60.000000 Hz', '720x480i @ 60.000000 Hz'] : []
 node[:kodi][:calibration][:pixel_ratio] ||= car ? '1.185185' : '1.000000'
 
 #
@@ -117,7 +118,7 @@ node.validate! do
       remote: boolean,
       video_sources: array_of(match(%r{^/.+[^/]$})),
       calibration: {
-        mode: match(/^(|[0-9]+x[0-9]+i? @ [0-9]+\.[0-9]{6} Hz)$/),
+        modes: array_of(match(/^[0-9]+x[0-9]+i? @ [0-9]+\.[0-9]{6} Hz$/)),
         pixel_ratio: match(/^[0-9]+\.[0-9]+$/),
       },
     },
@@ -323,7 +324,7 @@ end
 # Display Calibration
 #
 
-unless node[:kodi][:calibration][:mode].empty?
+unless node[:kodi][:calibration][:modes].empty?
   directory "#{kodi_home}/userdata" do
     owner node[:kodi][:owner][:name]
     group node[:kodi][:group][:name]
