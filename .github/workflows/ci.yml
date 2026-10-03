@@ -172,6 +172,7 @@ jobs:
       run: >-
         rclone sync -v
         --config /dev/null
+        --checksum
         --retries 10
         --retries-sleep "$(( ( RANDOM % 60 )  + 1 ))s"
         --low-level-retries 10
@@ -180,9 +181,9 @@ jobs:
         --stats-one-line
         "releases/${RELEASE_DIR}"
         ":s3:mitamae-cloud-image/${RELEASE_DIR}"
-    # The sync step trusts the size and the modification time, so a broken
-    # object never gets uploaded again. Compare the bytes and upload the
-    # mismatched files again until they match.
+    # The MD5 of a multipart object is the one rclone computed before the
+    # upload, so the sync step keeps a broken object as it is. Compare the
+    # bytes and upload the mismatched files again until they match.
     - name: Verify
       if: env.PUBLISH_SYNC == 'true'
       env:
