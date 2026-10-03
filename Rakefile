@@ -7,7 +7,6 @@ require 'open3'
 require 'yaml'
 require 'json'
 
-PUBLISH_UBUNTU_SUITE = 'resolute'
 PUBLISH_DEBIAN_SUITE = 'trixie'
 
 MITAMAE_VERSION = 'v1.14.1'
@@ -303,10 +302,8 @@ namespace :github do
 end
 
 def publish?(target)
+  # NOTE: Ubuntu targets are no longer published to save the object storage
   case target['distribution']
-  when 'ubuntu'
-    target['suite'].eql?(PUBLISH_UBUNTU_SUITE) and
-      target['kernel'].match?(/^((generic|virtual)-hwe|raspberrypi)$/)
   when 'debian'
     target['suite'].eql?(PUBLISH_DEBIAN_SUITE) and
       target['kernel'].match?(/^((generic|cloud)-backports|raspberrypi|proxmox)$/)
