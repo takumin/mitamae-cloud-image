@@ -172,9 +172,9 @@ jobs:
       run: >-
         rclone sync -v
         --config /dev/null
-        --retries 360
-        --retries-sleep "$(( ( RANDOM % 300 )  + 1 ))s"
-        --low-level-retries 30
+        --retries 10
+        --retries-sleep "$(( ( RANDOM % 60 )  + 1 ))s"
+        --low-level-retries 10
         --stats 3s
         --stats-file-name-length 0
         --stats-one-line
