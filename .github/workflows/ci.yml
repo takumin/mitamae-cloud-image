@@ -65,6 +65,8 @@ jobs:
       TARGET_NAME: ${{ matrix.target.name }}
       RELEASE_DIR: ${{ matrix.target.dir }}
       TARGET_DIRECTORY: /mnt/rootfs
+      # The tarball doubles the object storage usage, and nothing fetches it
+      DISABLE_TARBALL: 'true'
     steps:
     #
     # Environment Variables
