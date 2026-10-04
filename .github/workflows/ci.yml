@@ -181,40 +181,70 @@ jobs:
         --stats-one-line
         "releases/${RELEASE_DIR}"
         ":s3:mitamae-cloud-image/${RELEASE_DIR}"
-    # The MD5 of a multipart object is the one rclone computed before the
-    # upload, so the sync step keeps a broken object as it is. Compare the
-    # bytes and upload the mismatched files again until they match.
+  # The sync step compares a multipart object by the MD5 that rclone computed
+  # before the upload, so it keeps an object broken on the storage side. Fetch
+  # every published file from the public URL and check it against SHA256SUMS.
+  # A broken object cannot be uploaded again here, so delete it together with
+  # the packages manifest, and the next run uploads it again.
+  verify:
+    if: ${{ !cancelled() }}
+    needs: [matrix, build-and-publish]
+    name: Verify ${{ matrix.target.name }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions: {}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.matrix.outputs.targets) }}
+    env:
+      RELEASE_DIR: ${{ matrix.target.dir }}
+    steps:
     - name: Verify
-      if: env.PUBLISH_SYNC == 'true'
+      env:
+        S3_BUCKET_URL: ${{ secrets.S3_BUCKET_URL }}
+      run: |
+        URL="${S3_BUCKET_URL}/${RELEASE_DIR}"
+        cd "${RUNNER_TEMP}"
+        : > broken.txt
+        if ! wget -q --tries=5 --waitretry=10 --retry-on-http-error=500,502,503,504 -O SHA256SUMS "${URL}/SHA256SUMS"; then
+          echo "::error::SHA256SUMS is missing"
+          exit 1
+        fi
+        while read -r sum name; do
+          if wget -q --tries=5 --waitretry=10 --retry-on-http-error=500,502,503,504 -O file "${URL}/${name}" &&
+              echo "${sum}  file" | sha256sum --check --status; then
+            echo "OK: ${name}"
+          else
+            echo "::error::Broken or missing: ${name}"
+            echo "${name}" >> broken.txt
+          fi
+          rm -f file
+        done < SHA256SUMS
+        test ! -s broken.txt
+    - name: Setup rclone
+      if: failure()
+      run: curl https://rclone.org/install.sh | sudo bash
+    - name: Delete
+      if: failure()
       env:
         RCLONE_S3_PROVIDER: ${{ secrets.S3_PROVIDER }}
         RCLONE_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT_URL }}
         RCLONE_S3_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         RCLONE_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
-        SRC="releases/${RELEASE_DIR}"
         DST=":s3:mitamae-cloud-image/${RELEASE_DIR}"
-        for attempt in 1 2 3; do
-          if rclone check --config /dev/null --download --one-way \
-              --differ /tmp/differ.txt --missing-on-dst /tmp/missing.txt \
-              "${SRC}" "${DST}"; then
-            exit 0
-          fi
-          echo "::warning::Verification failed (attempt ${attempt}), uploading the mismatched files again"
-          cat /tmp/differ.txt /tmp/missing.txt | sort -u > /tmp/reupload.txt
-          cat /tmp/reupload.txt
-          rclone copy -v --config /dev/null --ignore-times \
-            --retries 10 --low-level-retries 10 \
-            --files-from /tmp/reupload.txt \
-            "${SRC}" "${DST}" || true
-        done
-        exit 1
+        touch "${RUNNER_TEMP}/broken.txt"
+        while read -r name; do
+          rclone deletefile -v --config /dev/null "${DST}/${name}" || true
+        done < "${RUNNER_TEMP}/broken.txt"
+        rclone deletefile -v --config /dev/null "${DST}/packages.manifest" || true
   # Aborted uploads leave their parts behind, and the parts take the storage
   # until they are removed. The concurrency group runs one workflow at a time,
   # so every pending upload is stale once all the matrix jobs are done.
   cleanup:
     if: always()
-    needs: build-and-publish
+    needs: [build-and-publish, verify]
     name: Cleanup multipart uploads
     runs-on: ubuntu-26.04
     timeout-minutes: 5
