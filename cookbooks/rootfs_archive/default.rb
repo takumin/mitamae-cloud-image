@@ -237,7 +237,17 @@ if ENV['DISABLE_CPIO'] != 'true'
       raise
     end
 
-    execute "find . \\( -type f -o -type l \\) -a -not \\( -name 'vmlinuz*' -o -name 'initrd.img*' \\) -a -printf '%P\\n' | cpio -o | #{cmd} > #{output_dir}/rootfs.cpio.img" do
+    # The kernel unpacks only the newc format, and runs /init from it unless rdinit= says otherwise.
+    # The /init symlink goes in a second archive appended to the first, so the target stays untouched.
+    execute [
+      '{',
+      "find . -mindepth 1 -not \\( -name 'vmlinuz*' -o -name 'initrd.img*' \\) -printf '%P\\n' | cpio -o -H newc --quiet;",
+      'init_dir=$(mktemp -d);',
+      'ln -s /sbin/init "${init_dir}/init";',
+      '(cd "${init_dir}" && echo init | cpio -o -H newc --quiet);',
+      'rm -rf "${init_dir}";',
+      "} | #{cmd} > #{output_dir}/rootfs.cpio.img",
+    ].join(' ') do
       cwd target_dir
       not_if "test -f #{output_dir}/rootfs.cpio.img"
     end
