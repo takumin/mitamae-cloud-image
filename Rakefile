@@ -287,9 +287,11 @@ namespace :github do
 
       puts JSON.dump(targets.map{|v|
         {
-          name:   v.values.join(':'),
-          dir:    v.values.join('/'),
-          runner: v['architecture'].eql?('arm64') ? 'ubuntu-26.04-arm' : 'ubuntu-26.04',
+          name:     v.values.join(':'),
+          dir:      v.values.join('/'),
+          # Artifact names cannot contain ':' or '/'
+          artifact: v.values.join('_'),
+          runner:   v['architecture'].eql?('arm64') ? 'ubuntu-26.04-arm' : 'ubuntu-26.04',
         }
       })
     end

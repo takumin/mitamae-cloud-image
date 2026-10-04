@@ -50,7 +50,7 @@ jobs:
     - name: Setup matrix
       id: matrix
       run: echo "targets=$(rake github:actions:all)" >> "$GITHUB_OUTPUT"
-  build-and-publish:
+  build:
     needs: matrix
     name: ${{ matrix.target.name }}
     runs-on: ${{ matrix.target.runner }}
@@ -154,97 +154,145 @@ jobs:
       if: env.PUBLISH == 'true'
       run: diff -u /tmp/packages.manifest "releases/${RELEASE_DIR}/packages.manifest" || echo 'PUBLISH_SYNC=true' >> "$GITHUB_ENV"
     #
-    # Setup Rclone
+    # Upload Artifact
     #
-    - name: Setup rclone
+    - name: Check Local Files
       if: env.PUBLISH_SYNC == 'true'
-      run: curl https://rclone.org/install.sh | sudo bash
-    #
-    # Publish S3
-    #
-    - name: Publish
+      working-directory: releases/${{ matrix.target.dir }}
+      run: sha256sum --check --strict SHA256SUMS
+    - name: Upload Artifact
       if: env.PUBLISH_SYNC == 'true'
-      env:
-        RCLONE_S3_PROVIDER: ${{ secrets.S3_PROVIDER }}
-        RCLONE_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT_URL }}
-        RCLONE_S3_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        RCLONE_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: >-
-        rclone sync -v
-        --config /dev/null
-        --checksum
-        --retries 10
-        --retries-sleep "$(( ( RANDOM % 60 )  + 1 ))s"
-        --low-level-retries 10
-        --stats 3s
-        --stats-file-name-length 0
-        --stats-one-line
-        "releases/${RELEASE_DIR}"
-        ":s3:mitamae-cloud-image/${RELEASE_DIR}"
-  # The sync step compares a multipart object by the MD5 that rclone computed
-  # before the upload, so it keeps an object broken on the storage side. Fetch
-  # every published file from the public URL and check it against SHA256SUMS.
-  # A broken object cannot be uploaded again here, so delete it together with
-  # the packages manifest, and the next run uploads it again.
-  verify:
+      uses: actions/upload-artifact@v7
+      with:
+        name: ${{ matrix.target.artifact }}
+        path: releases/${{ matrix.target.dir }}
+        if-no-files-found: error
+        retention-days: 1
+        # The images are compressed already
+        compression-level: 0
+        overwrite: true
+  # The sync compares a multipart object by the MD5 that rclone computed before
+  # the upload, so it keeps an object broken on the storage side. Read every
+  # object back from the storage, check it against SHA256SUMS, and upload the
+  # broken ones again until all of them match. The packages manifest goes up
+  # last: the build job publishes when it differs, so the next run retries a
+  # release that did not complete.
+  publish:
     if: ${{ !cancelled() }}
-    needs: [matrix, build-and-publish]
-    name: Verify ${{ matrix.target.name }}
+    needs: [matrix, build]
+    name: Publish ${{ matrix.target.name }}
     runs-on: ubuntu-26.04
-    timeout-minutes: 15
-    permissions: {}
+    timeout-minutes: 60
+    permissions:
+      actions: read
     strategy:
       fail-fast: false
       matrix:
         target: ${{ fromJson(needs.matrix.outputs.targets) }}
     env:
       RELEASE_DIR: ${{ matrix.target.dir }}
+      ARTIFACT_NAME: ${{ matrix.target.artifact }}
+      PUBLISH_ATTEMPTS: 3
     steps:
-    - name: Verify
+    # The build job uploads the artifact only when the release has to be published
+    - name: Check Artifact
+      id: artifact
       env:
-        S3_BUCKET_URL: ${{ secrets.S3_BUCKET_URL }}
+        GH_TOKEN: ${{ github.token }}
       run: |
-        URL="${S3_BUCKET_URL}/${RELEASE_DIR}"
-        cd "${RUNNER_TEMP}"
-        : > broken.txt
-        if ! wget -q --tries=5 --waitretry=10 --retry-on-http-error=500,502,503,504 -O SHA256SUMS "${URL}/SHA256SUMS"; then
-          echo "::error::SHA256SUMS is missing"
-          exit 1
+        count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=${ARTIFACT_NAME}" \
+          --jq '[.artifacts[] | select(.expired | not)] | length')"
+        if [ "${count}" -gt 0 ]; then
+          echo 'found=true' >> "$GITHUB_OUTPUT"
+        else
+          echo 'Nothing to publish'
         fi
-        while read -r sum name; do
-          if wget -q --tries=5 --waitretry=10 --retry-on-http-error=500,502,503,504 -O file "${URL}/${name}" &&
-              echo "${sum}  file" | sha256sum --check --status; then
-            echo "OK: ${name}"
-          else
-            echo "::error::Broken or missing: ${name}"
-            echo "${name}" >> broken.txt
-          fi
-          rm -f file
-        done < SHA256SUMS
-        test ! -s broken.txt
+    - name: Download Artifact
+      if: steps.artifact.outputs.found == 'true'
+      uses: actions/download-artifact@v8
+      with:
+        name: ${{ matrix.target.artifact }}
+        path: ${{ runner.temp }}/release
+    - name: Check Local Files
+      if: steps.artifact.outputs.found == 'true'
+      working-directory: ${{ runner.temp }}/release
+      run: sha256sum --check --strict SHA256SUMS
     - name: Setup rclone
-      if: failure()
+      if: steps.artifact.outputs.found == 'true'
       run: curl https://rclone.org/install.sh | sudo bash
-    - name: Delete
-      if: failure()
+    - name: Publish
+      if: steps.artifact.outputs.found == 'true'
+      working-directory: ${{ runner.temp }}/release
       env:
+        RCLONE_CONFIG: /dev/null
         RCLONE_S3_PROVIDER: ${{ secrets.S3_PROVIDER }}
         RCLONE_S3_ENDPOINT: ${{ secrets.S3_ENDPOINT_URL }}
         RCLONE_S3_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         RCLONE_S3_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
         DST=":s3:mitamae-cloud-image/${RELEASE_DIR}"
-        touch "${RUNNER_TEMP}/broken.txt"
-        while read -r name; do
-          rclone deletefile -v --config /dev/null "${DST}/${name}" || true
-        done < "${RUNNER_TEMP}/broken.txt"
-        rclone deletefile -v --config /dev/null "${DST}/packages.manifest" || true
+        EXPECTED="${RUNNER_TEMP}/expected"
+        { cat SHA256SUMS; sha256sum SHA256SUMS; } > "${EXPECTED}"
+
+        # Succeeds when the object on the storage matches the local file
+        verify() {
+          local want got
+          want="$(awk -v name="$1" '$2 == name { print $1 }' "${EXPECTED}")"
+          got="$(rclone cat --low-level-retries 10 "${DST}/$1" | sha256sum | cut -d' ' -f1)" || return 1
+          [ -n "${want}" ] && [ "${want}" = "${got}" ]
+        }
+
+        for attempt in $(seq "${PUBLISH_ATTEMPTS}"); do
+          echo "::group::Upload (attempt ${attempt}/${PUBLISH_ATTEMPTS})"
+          rclone sync -v \
+            --checksum \
+            --exclude packages.manifest \
+            --retries 10 \
+            --retries-sleep "$(( ( RANDOM % 60 )  + 1 ))s" \
+            --low-level-retries 10 \
+            --stats 3s \
+            --stats-file-name-length 0 \
+            --stats-one-line \
+            . "${DST}" || echo '::warning::rclone sync failed'
+          echo '::endgroup::'
+
+          broken=()
+          while read -r _ name; do
+            [ "${name}" = packages.manifest ] && continue
+            if verify "${name}" < /dev/null; then
+              echo "OK: ${name}"
+            else
+              echo "::warning::Broken or missing: ${name}"
+              broken+=("${name}")
+            fi
+          done < "${EXPECTED}"
+
+          if [ "${#broken[@]}" -eq 0 ]; then
+            if rclone copyto -v --checksum packages.manifest "${DST}/packages.manifest" &&
+                verify packages.manifest; then
+              echo 'OK: packages.manifest'
+              exit 0
+            fi
+            echo '::warning::Broken or missing: packages.manifest'
+            broken=(packages.manifest)
+          fi
+
+          # The sync keeps an object whose stored MD5 matches, so delete the
+          # broken ones to upload them again
+          for name in "${broken[@]}"; do
+            rclone deletefile -v "${DST}/${name}" || true
+          done
+        done
+
+        echo "::error::The published files did not match after ${PUBLISH_ATTEMPTS} attempts"
+        rclone deletefile -v "${DST}/packages.manifest" || true
+        exit 1
   # Aborted uploads leave their parts behind, and the parts take the storage
   # until they are removed. The concurrency group runs one workflow at a time,
   # so every pending upload is stale once all the matrix jobs are done.
   cleanup:
     if: always()
-    needs: [build-and-publish, verify]
+    needs: [build, publish]
     name: Cleanup multipart uploads
     runs-on: ubuntu-26.04
     timeout-minutes: 5
@@ -265,7 +313,7 @@ jobs:
         -o max-age=0
   actions-timeline:
     if: always()
-    needs: [matrix, build-and-publish]
+    needs: [matrix, build, publish]
     runs-on: ubuntu-26.04
     timeout-minutes: 3
     permissions:
