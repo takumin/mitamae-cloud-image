@@ -33,6 +33,30 @@ if node[:target][:kernel].eql?('raspberrypi')
       '',
     ].join("\n")
   end
+
+  # The Raspberry Pi OS cloud.cfg also drops apt_pipelining and apt_configure
+  # from the config stage, so the apt config in the user-data is ignored; a
+  # module list replaces the whole list, so redeclare it with both restored
+  # before ntp, which installs its package with the configured sources
+  file '/etc/cloud/cloud.cfg.d/90_config_modules.cfg' do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      'cloud_config_modules:',
+      '  - ssh_import_id',
+      '  - keyboard',
+      '  - locale',
+      '  - apt_pipelining',
+      '  - apt_configure',
+      '  - ntp',
+      '  - timezone',
+      '  - raspberry_pi',
+      '  - disable_ec2_metadata',
+      '  - runcmd',
+      '',
+    ].join("\n")
+  end
 end
 
 #
