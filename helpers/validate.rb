@@ -26,6 +26,7 @@ node.validate! do
       architecture: match(/^(?:i386|amd64|armhf|arm64)$/),
       role:         match(/^(?:#{AVAILABLE_ROLES.join('|')})$/),
       directory:    string,
+      tmpfs:        boolean,
     },
   }
 end

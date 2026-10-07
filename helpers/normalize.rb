@@ -23,6 +23,7 @@ end
 node.reverse_merge!({
   target: {
     components: components,
-    directory:  "/tmp/#{target_name.join('-')}",
+    directory:  "/var/lib/mitamae-cloud-image/#{target_name.join('-')}",
+    tmpfs:      ENV['DISABLE_TARGET_TMPFS'] != 'true',
   },
 })

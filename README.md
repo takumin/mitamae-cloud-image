@@ -61,6 +61,12 @@ export TIMEZONE="Asia/Tokyo"
 # export ADMIN_PASSWORD=""
 # export ADMIN_SSH_AUTHORIZED_KEYS=""
 
+# Build directory (default: /var/lib/mitamae-cloud-image/[TARGET])
+# export TARGET_DIRECTORY="/var/lib/mitamae-cloud-image/rootfs"
+# The build directory is a tmpfs (default size: half of the memory)
+# export TARGET_TMPFS_SIZE="8G"
+# export DISABLE_TARGET_TMPFS="true"
+
 # export ROOTFS_ARCHIVE_FORMAT="xz"
 
 # export DISABLE_SQUASHFS="true"

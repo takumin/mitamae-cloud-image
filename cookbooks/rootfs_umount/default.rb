@@ -38,9 +38,12 @@ execute [
 
 #
 # Workaround: Arch Linux: https://bugs.archlinux.org/task/46169
+# The tmpfs is kept until the rootfs is archived
 #
 
-node[:rootfs_umount][:umounts].unshift(node[:rootfs_umount][:target_dir])
+unless node[:target][:tmpfs]
+  node[:rootfs_umount][:umounts].unshift(node[:rootfs_umount][:target_dir])
+end
 
 #
 # Unmount Target Directory

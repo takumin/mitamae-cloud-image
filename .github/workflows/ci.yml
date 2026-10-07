@@ -64,7 +64,6 @@ jobs:
     env:
       TARGET_NAME: ${{ matrix.target.name }}
       RELEASE_DIR: ${{ matrix.target.dir }}
-      TARGET_DIRECTORY: /mnt/rootfs
       # The tarball doubles the object storage usage, and nothing fetches it
       DISABLE_TARBALL: 'true'
     steps:
@@ -103,9 +102,6 @@ jobs:
       with:
         submodules: true
         fetch-depth: 1
-    # /tmp on ubuntu-26.04 runners is mounted with nodev, which breaks debootstrap
-    - name: Mount Target Directory
-      run: sudo mount -t tmpfs -o size=8G tmpfs /mnt
     - name: Initialize
       id: initialize
       run: rake "${TARGET_NAME}:initialize"

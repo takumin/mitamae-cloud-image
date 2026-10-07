@@ -41,13 +41,16 @@ node[:rootfs_mount][:mounts]     ||= [
 
 #
 # Workaround: Arch Linux: https://bugs.archlinux.org/task/46169
+# The tmpfs already makes the target directory a mount point
 #
 
-node[:rootfs_mount][:mounts].unshift({
-  :target  => node[:rootfs_mount][:target_dir],
-  :device  => node[:rootfs_mount][:target_dir],
-  :options => ['bind'],
-})
+unless node[:target][:tmpfs]
+  node[:rootfs_mount][:mounts].unshift({
+    :target  => node[:rootfs_mount][:target_dir],
+    :device  => node[:rootfs_mount][:target_dir],
+    :options => ['bind'],
+  })
+end
 
 #
 # Validate Variables

@@ -14,6 +14,14 @@ MITAMAE_VERSION = 'v2.0.3'
 
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 
+# /tmp is mounted with nosuid and nodev since Ubuntu 26.04, which breaks the
+# rootfs, so the targets are built under this directory on a tmpfs instead
+TARGET_BASE_DIRECTORY = '/var/lib/mitamae-cloud-image'
+
+def target_directory(target)
+  ENV['TARGET_DIRECTORY'] || File.join(TARGET_BASE_DIRECTORY, target.values.join('-'))
+end
+
 # qemu-user emulates pointer authentication with QARMA5 by default, which is
 # extremely slow for binaries built with branch protection
 ENV['QEMU_CPU'] ||= 'max,pauth-impdef=on'
@@ -23,7 +31,7 @@ ENV['QEMU_CPU'] ||= 'max,pauth-impdef=on'
 PRESERVE_ENV_PATTERN = /\A(?:
   (?:ADMIN|APT_REPO|ARCH|DISABLE|ENABLE|WIFI_AP)_.+ |
   INITRAMFS_COMPRESS | OUTPUT_DIRECTORY | ROOTFS_ARCHIVE_FORMAT |
-  TARGET_DIRECTORY | TIMEZONE | QEMU_CPU |
+  TARGET_DIRECTORY | TARGET_TMPFS_SIZE | TIMEZONE | QEMU_CPU |
   (?i:(?:http|https|ftp|no)_proxy)
 )\z/x
 
@@ -190,7 +198,7 @@ end
 
 targets.each do |target|
   namespace target.values.join(':') do
-    chroot_dir = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
+    chroot_dir = target_directory(target)
 
     task :initialize do
       setup_mitamae
@@ -335,7 +343,7 @@ def setup_profile(target)
       }
     }
   end
-  data['target']['directory'] = ENV['TARGET_DIRECTORY'] || "/tmp/#{target.values.join('-')}"
+  data['target']['directory'] = target_directory(target)
   File.open(yaml, 'w') do |file|
     YAML.dump(data, file)
   end
