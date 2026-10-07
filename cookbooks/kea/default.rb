@@ -47,7 +47,7 @@ end
 #
 
 apt_repository 'ISC Kea Repository' do
-  path '/etc/apt/sources.list.d/isc-kea.list'
+  path '/etc/apt/sources.list.d/isc-kea.sources'
   entry [
     {
       :uri        => AptMirror.uri("https://dl.cloudsmith.io/public/isc/kea-3-2/deb/#{node.platform}", ENV['APT_REPO_URL_ISC_KEA_' + node.platform.upcase]),

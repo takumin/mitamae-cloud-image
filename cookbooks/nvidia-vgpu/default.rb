@@ -66,7 +66,7 @@ end
 #
 
 apt_repository 'PPA NVIDIA vGPU Repository' do
-  path '/etc/apt/sources.list.d/nvidia-vgpu.list'
+  path '/etc/apt/sources.list.d/nvidia-vgpu.sources'
   entry [
     {
       :uri        => ENV['APT_REPO_PPA_NVIDIA_VGPU_URL'],

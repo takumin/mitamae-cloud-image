@@ -130,7 +130,7 @@ end
 #
 
 apt_repository 'Proxmox VE Repository' do
-  path '/etc/apt/sources.list.d/proxmox-ve.list'
+  path '/etc/apt/sources.list.d/proxmox-ve.sources'
   entry [
     {
       :uri        => AptMirror.uri(apt_origin_url, apt_mirror_url),

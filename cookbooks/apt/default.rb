@@ -152,13 +152,19 @@ end
 # Apt Repository
 #
 
-apt_repository '/etc/apt/sources.list' do
+apt_repository 'Official Repository' do
+  path "/etc/apt/sources.list.d/#{node[:apt][:distribution]}.sources"
   header [
     '#',
     '# Official Repository',
     '#',
   ]
   entry entry
+end
+
+# debootstrap writes the one-line sources.list, which duplicates the deb822 sources above
+file '/etc/apt/sources.list' do
+  action :delete
 end
 
 #

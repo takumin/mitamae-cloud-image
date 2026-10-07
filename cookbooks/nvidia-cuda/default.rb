@@ -160,7 +160,7 @@ end
 # Apt Repository
 #
 
-apt_repository '/etc/apt/sources.list.d/nvidia-cuda.list' do
+apt_repository '/etc/apt/sources.list.d/nvidia-cuda.sources' do
   header [
     '#',
     '# NVIDIA CUDA Repository',

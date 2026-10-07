@@ -24,7 +24,7 @@ end
 #
 
 apt_repository 'PPA Ubuntu Mozilla Team Repository' do
-  path '/etc/apt/sources.list.d/ppa-ubuntu-mozilla-team.list'
+  path '/etc/apt/sources.list.d/ppa-ubuntu-mozilla-team.sources'
   entry [
     {
       :uri        => AptMirror.uri('https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu', ENV['APT_REPO_URL_PPA_MOZILLA_TEAM']),

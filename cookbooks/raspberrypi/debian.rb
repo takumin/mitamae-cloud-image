@@ -22,7 +22,7 @@ end
 #
 
 apt_repository 'Raspberry Pi OS Repository' do
-  path '/etc/apt/sources.list.d/raspberrypi.list'
+  path '/etc/apt/sources.list.d/raspberrypi.sources'
   header [
     '#',
     '# Raspberry Pi OS Repository',

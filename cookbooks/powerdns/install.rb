@@ -47,7 +47,7 @@ end
 #
 
 apt_repository 'PowerDNS Repository' do
-  path '/etc/apt/sources.list.d/powerdns.list'
+  path '/etc/apt/sources.list.d/powerdns.sources'
   entry [
     {
       :uri        => AptMirror.uri("http://repo.powerdns.com/#{node.platform}", ENV['APT_REPO_URL_POWERDNS_' + node.platform.upcase]),
