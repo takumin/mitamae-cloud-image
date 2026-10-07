@@ -10,7 +10,7 @@ require 'json'
 PUBLISH_UBUNTU_SUITE = 'resolute'
 PUBLISH_DEBIAN_SUITE = 'trixie'
 
-MITAMAE_VERSION = 'v1.14.1'
+MITAMAE_VERSION = 'v2.0.3'
 
 LOG_LEVEL = ENV['LOG_LEVEL'] || 'info'
 
