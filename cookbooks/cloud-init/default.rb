@@ -57,6 +57,38 @@ if node[:target][:kernel].eql?('raspberrypi')
       '',
     ].join("\n")
   end
+
+  # The Raspberry Pi OS cloud.cfg also lists netplan_nm_patch in the final
+  # stage, whose module ships in rpi-cloud-init-mods and is not installed, so
+  # every boot ends degraded; redeclare the list without it
+  file '/etc/cloud/cloud.cfg.d/90_final_modules.cfg' do
+    owner 'root'
+    group 'root'
+    mode  '0644'
+    content [
+      'cloud_final_modules:',
+      '  - package_update_upgrade_install',
+      '  - write_files_deferred',
+      '  - puppet',
+      '  - chef',
+      '  - ansible',
+      '  - mcollective',
+      '  - salt_minion',
+      '  - reset_rmc',
+      '  - scripts_vendor',
+      '  - scripts_per_once',
+      '  - scripts_per_boot',
+      '  - scripts_per_instance',
+      '  - scripts_user',
+      '  - ssh_authkey_fingerprints',
+      '  - keys_to_console',
+      '  - install_hotplug',
+      '  - phone_home',
+      '  - final_message',
+      '  - power_state_change',
+      '',
+    ].join("\n")
+  end
 end
 
 #
