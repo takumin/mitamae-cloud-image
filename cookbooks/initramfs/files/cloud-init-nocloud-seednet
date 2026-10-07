@@ -45,6 +45,11 @@ cloud_init_nocloud_seednet() {(
 			rm -f "${seeddir}/${name}"
 		fi
 	done
+
+	# klibc ipconfig leaves /run/net-*.conf for ip=dhcp, which Cloud-Init prefers over the datasource network config
+	if [ -s "${seeddir}/network-config" ]; then
+		rm -f /run/net-*.conf /run/net6-*.conf
+	fi
 )}
 
 . /scripts/functions
