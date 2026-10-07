@@ -91,27 +91,32 @@ when :debian
   default_security_uri = 'http://deb.debian.org/debian-security'
   mirror_uri           = node[:apt][:debian_mirror]
   mirror_security_uri  = node[:apt][:debian_security_mirror]
+  signed_by            = '/usr/share/keyrings/debian-archive-keyring.gpg'
 
   entry = [
     {
       :uri        => AptMirror.uri(default_uri, mirror_uri),
       :suite      => "#{node[:apt][:suite]}",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
     {
       :uri        => AptMirror.uri(default_uri, mirror_uri),
       :suite      => "#{node[:apt][:suite]}-updates",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
     {
       :uri        => AptMirror.uri(default_uri, mirror_uri),
       :suite      => "#{node[:apt][:suite]}-backports",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
     {
       :uri        => AptMirror.uri(default_security_uri, mirror_security_uri),
       :suite      => "#{node[:apt][:suite]}-security",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
   ]
 when :ubuntu
@@ -124,26 +129,32 @@ when :ubuntu
     mirror_uri  = node[:apt][:ubuntu_ports_mirror]
   end
 
+  signed_by = '/usr/share/keyrings/ubuntu-archive-keyring.gpg'
+
   entry = [
     {
       :uri        => AptMirror.uri(default_uri, mirror_uri),
       :suite      => "#{node[:apt][:suite]}",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
     {
       :uri        => AptMirror.uri(default_uri, mirror_uri),
       :suite      => "#{node[:apt][:suite]}-updates",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
     {
       :uri        => AptMirror.uri(default_uri, mirror_uri),
       :suite      => "#{node[:apt][:suite]}-backports",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
     {
       :uri        => AptMirror.uri(default_uri, mirror_uri),
       :suite      => "#{node[:apt][:suite]}-security",
       :components => node[:apt][:components],
+      :signed_by  => signed_by,
     },
   ]
 end
