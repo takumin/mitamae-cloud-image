@@ -47,8 +47,16 @@ cloud_init_nocloud_seednet() {(
 	done
 
 	# klibc ipconfig leaves /run/net-*.conf for ip=dhcp, which Cloud-Init prefers over the datasource network config
+	# Cloud-Init also refuses to rename an interface that still has the address, so flush it as well
 	if [ -s "${seeddir}/network-config" ]; then
-		rm -f /run/net-*.conf /run/net6-*.conf
+		for conf in /run/net-*.conf /run/net6-*.conf; do
+			[ -f "${conf}" ] || continue
+			device="$(. "${conf}" && echo "${DEVICE}")"
+			if [ -n "${device}" ]; then
+				ip addr flush dev "${device}" || true
+			fi
+			rm -f "${conf}"
+		done
 	fi
 )}
 
