@@ -32,3 +32,27 @@ file '/etc/systemd/timesyncd.conf' do
     content.gsub!(/^#?ConnectionRetrySec=.*/, 'ConnectionRetrySec=1')
   end
 end
+
+#
+# systemd-timesyncd wait sync
+#
+
+service 'systemd-time-wait-sync.service' do
+  action :enable
+end
+
+directory '/etc/systemd/system/systemd-time-wait-sync.service.d' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+file '/etc/systemd/system/systemd-time-wait-sync.service.d/timeout.conf' do
+  owner 'root'
+  group 'root'
+  mode  '0644'
+  content [
+    '[Service]',
+    'TimeoutStartSec=30',
+  ].join("\n").concat("\n")
+end
