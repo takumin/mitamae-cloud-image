@@ -7,6 +7,7 @@ node[:phase] = :provision
 #
 include_recipe File.expand_path('../../helpers/normalize', __FILE__)
 include_recipe File.expand_path('../../helpers/validate', __FILE__)
+include_recipe File.expand_path('../../helpers/apt_mirror', __FILE__)
 #
 # Recipes
 #

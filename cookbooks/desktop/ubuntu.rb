@@ -27,11 +27,10 @@ apt_repository 'PPA Ubuntu Mozilla Team Repository' do
   path '/etc/apt/sources.list.d/ppa-ubuntu-mozilla-team.list'
   entry [
     {
-      :default_uri => 'https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu',
-      :mirror_uri  => "#{ENV['APT_REPO_URL_PPA_MOZILLA_TEAM']}",
-      :options     => 'signed-by=/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc',
-      :suite       => '###platform_codename###',
-      :components  => [
+      :uri        => AptMirror.uri('https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu', ENV['APT_REPO_URL_PPA_MOZILLA_TEAM']),
+      :signed_by  => '/etc/apt/keyrings/ppa-ubuntu-mozilla-team.gpg.asc',
+      :suite      => '###platform_codename###',
+      :components => [
         'main',
       ],
     },

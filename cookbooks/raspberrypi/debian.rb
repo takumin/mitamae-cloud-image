@@ -30,11 +30,10 @@ apt_repository 'Raspberry Pi OS Repository' do
   ]
   entry [
     {
-      :default_uri => 'http://archive.raspberrypi.org/debian',
-      :mirror_uri  => "#{ENV['APT_REPO_URL_RASPBERRYPI']}",
-      :suite       => '###platform_codename###',
-      :options     => 'signed-by=/usr/share/keyrings/raspberrypi-archive-keyring.gpg',
-      :components  => ['main'],
+      :uri        => AptMirror.uri('http://archive.raspberrypi.org/debian', ENV['APT_REPO_URL_RASPBERRYPI']),
+      :suite      => '###platform_codename###',
+      :signed_by  => '/usr/share/keyrings/raspberrypi-archive-keyring.gpg',
+      :components => ['main'],
     },
   ]
   notifies :run, 'execute[apt-get update]', :immediately

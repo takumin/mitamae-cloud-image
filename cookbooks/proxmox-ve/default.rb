@@ -133,11 +133,10 @@ apt_repository 'Proxmox VE Repository' do
   path '/etc/apt/sources.list.d/proxmox-ve.list'
   entry [
     {
-      :default_uri => apt_origin_url,
-      :mirror_uri  => apt_mirror_url,
-      :options     => "signed-by=#{keyring_path}",
-      :suite       => node[:target][:suite],
-      :components  => apt_components,
+      :uri        => AptMirror.uri(apt_origin_url, apt_mirror_url),
+      :signed_by  => keyring_path,
+      :suite      => node[:target][:suite],
+      :components => apt_components,
     },
   ]
   notifies :run, 'execute[apt-get update]', :immediately

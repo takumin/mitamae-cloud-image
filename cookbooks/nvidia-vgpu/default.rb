@@ -69,10 +69,10 @@ apt_repository 'PPA NVIDIA vGPU Repository' do
   path '/etc/apt/sources.list.d/nvidia-vgpu.list'
   entry [
     {
-      :default_uri => ENV['APT_REPO_PPA_NVIDIA_VGPU_URL'],
-      :options     => 'signed-by=/etc/apt/keyrings/nvidia-vgpu.gpg',
-      :suite       => 'stable',
-      :components  => ['main'],
+      :uri        => ENV['APT_REPO_PPA_NVIDIA_VGPU_URL'],
+      :signed_by  => '/etc/apt/keyrings/nvidia-vgpu.gpg',
+      :suite      => 'stable',
+      :components => ['main'],
     },
   ]
   notifies :run, 'execute[apt-get update]', :immediately

@@ -168,10 +168,9 @@ apt_repository '/etc/apt/sources.list.d/nvidia-cuda.list' do
   ]
   entry [
     {
-      :default_uri => nvidia_cuda_origin,
-      :mirror_uri  => nvidia_cuda_mirror,
-      :options     => 'signed-by=/etc/apt/keyrings/nvidia-cuda.gpg.asc',
-      :suite       => '/',
+      :uri       => AptMirror.uri(nvidia_cuda_origin, nvidia_cuda_mirror),
+      :signed_by => '/etc/apt/keyrings/nvidia-cuda.gpg.asc',
+      :suite     => '/',
     },
   ]
   notifies :run, 'execute[apt-get update]', :immediately

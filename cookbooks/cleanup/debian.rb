@@ -46,9 +46,10 @@ execute 'apt-get -y clean'
 #
 
 # The build-time mirrors (APT_REPO_URL_*) are only reachable from the build
-# host, so rewrite every apt_repository declared so far to its default_uri;
-# the root recipes are not attached to the recipe root until all of them are
-# compiled, so walk the tree down from the top of the current recipe
+# host, so rewrite every apt_repository declared so far to the default uris
+# recorded by AptMirror; the root recipes are not attached to the recipe root
+# until all of them are compiled, so walk the tree down from the top of the
+# current recipe
 collect_apt_repositories = lambda do |nodes|
   nodes.flat_map do |child|
     case child
@@ -67,14 +68,14 @@ top_recipe = top_recipe.parent while top_recipe.parent.is_a?(::MItamae::Recipe)
 
 collect_apt_repositories.call(top_recipe.children).each do |repository|
   next unless Array(repository.attributes.action).include?(:create)
-  next unless repository.attributes.entry.any? { |repo| repo.mirror_uri.to_s.match?(/^(?:file|https?):\/\//) }
+  next unless repository.attributes.entry.any? { |repo| AptMirror.default_uri(repo.uri) }
 
   apt_repository repository.resource_name do
     path   repository.attributes.path
     header repository.attributes.header if repository.attributes.header
     footer repository.attributes.footer if repository.attributes.footer
     entry  repository.attributes.entry.map { |repo|
-      repo.each_with_object({}) { |(k, v), h| h[k] = v unless k.to_s.match?(/^(?:mirror_)?uri$/) }
+      repo.each_with_object({}) { |(k, v), h| h[k] = k.to_s.eql?('uri') ? AptMirror.default_uri(v) || v : v }
     }
   end
 end

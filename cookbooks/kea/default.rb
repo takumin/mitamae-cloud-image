@@ -50,11 +50,10 @@ apt_repository 'ISC Kea Repository' do
   path '/etc/apt/sources.list.d/isc-kea.list'
   entry [
     {
-      :default_uri => "https://dl.cloudsmith.io/public/isc/kea-3-2/deb/#{node.platform}",
-      :mirror_uri  => ENV['APT_REPO_URL_ISC_KEA_' + node.platform.upcase],
-      :options     => 'signed-by=/etc/apt/keyrings/isc-kea.asc',
-      :suite       => '###platform_codename###',
-      :components  => ['main'],
+      :uri        => AptMirror.uri("https://dl.cloudsmith.io/public/isc/kea-3-2/deb/#{node.platform}", ENV['APT_REPO_URL_ISC_KEA_' + node.platform.upcase]),
+      :signed_by  => '/etc/apt/keyrings/isc-kea.asc',
+      :suite      => '###platform_codename###',
+      :components => ['main'],
     },
   ]
   notifies :run, 'execute[apt-get update]', :immediately

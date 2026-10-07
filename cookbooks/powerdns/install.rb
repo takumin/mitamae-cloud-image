@@ -50,25 +50,22 @@ apt_repository 'PowerDNS Repository' do
   path '/etc/apt/sources.list.d/powerdns.list'
   entry [
     {
-      :default_uri => "http://repo.powerdns.com/#{node.platform}",
-      :mirror_uri  => ENV['APT_REPO_URL_POWERDNS_' + node.platform.upcase],
-      :options     => 'signed-by=/etc/apt/keyrings/powerdns.asc',
-      :suite       => '###platform_codename###-auth-51',
-      :components  => ['main'],
+      :uri        => AptMirror.uri("http://repo.powerdns.com/#{node.platform}", ENV['APT_REPO_URL_POWERDNS_' + node.platform.upcase]),
+      :signed_by  => '/etc/apt/keyrings/powerdns.asc',
+      :suite      => '###platform_codename###-auth-51',
+      :components => ['main'],
     },
     {
-      :default_uri => "http://repo.powerdns.com/#{node.platform}",
-      :mirror_uri  => ENV['APT_REPO_URL_POWERDNS_' + node.platform.upcase],
-      :options     => 'signed-by=/etc/apt/keyrings/powerdns.asc',
-      :suite       => '###platform_codename###-rec-54',
-      :components  => ['main'],
+      :uri        => AptMirror.uri("http://repo.powerdns.com/#{node.platform}", ENV['APT_REPO_URL_POWERDNS_' + node.platform.upcase]),
+      :signed_by  => '/etc/apt/keyrings/powerdns.asc',
+      :suite      => '###platform_codename###-rec-54',
+      :components => ['main'],
     },
     {
-      :default_uri => "http://repo.powerdns.com/#{node.platform}",
-      :mirror_uri  => ENV['APT_REPO_URL_POWERDNS_' + node.platform.upcase],
-      :options     => 'signed-by=/etc/apt/keyrings/powerdns.asc',
-      :suite       => '###platform_codename###-dnsdist-21',
-      :components  => ['main'],
+      :uri        => AptMirror.uri("http://repo.powerdns.com/#{node.platform}", ENV['APT_REPO_URL_POWERDNS_' + node.platform.upcase]),
+      :signed_by  => '/etc/apt/keyrings/powerdns.asc',
+      :suite      => '###platform_codename###-dnsdist-21',
+      :components => ['main'],
     },
   ]
   notifies :run, 'execute[apt-get update]', :immediately
