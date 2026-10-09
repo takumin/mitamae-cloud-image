@@ -280,8 +280,8 @@ when 'raspberrypi'
       'force_turbo=1',
       # Bluetooth stays on the PL011: the mini UART's small FIFO overruns during the controller setup.
       'enable_uart=1',
-      'dtparam=i2c_arm=on',
       'dtparam=spi=on',
+      'dtoverlay=tpm-slb9670',
       'dtoverlay=vc4-kms-v3d-pi4',
       'disable_overscan=1',
       'max_framebuffers=2',
