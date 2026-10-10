@@ -231,6 +231,9 @@ jobs:
         DST=":s3:mitamae-cloud-image/${RELEASE_DIR}"
         EXPECTED="${RUNNER_TEMP}/expected"
         { cat SHA256SUMS; sha256sum SHA256SUMS; } > "${EXPECTED}"
+        # Every release overwrites the same keys, so a cache must not serve
+        # an image that does not match SHA256SUMS
+        HEADERS=(--header-upload 'Cache-Control: no-cache')
 
         # Succeeds when the object on the storage matches the local file
         verify() {
@@ -243,6 +246,7 @@ jobs:
         for attempt in $(seq "${PUBLISH_ATTEMPTS}"); do
           echo "::group::Upload (attempt ${attempt}/${PUBLISH_ATTEMPTS})"
           rclone sync -v \
+            "${HEADERS[@]}" \
             --checksum \
             --exclude packages.manifest \
             --retries 10 \
@@ -266,7 +270,7 @@ jobs:
           done < "${EXPECTED}"
 
           if [ "${#broken[@]}" -eq 0 ]; then
-            if rclone copyto -v --checksum packages.manifest "${DST}/packages.manifest" &&
+            if rclone copyto -v "${HEADERS[@]}" --checksum packages.manifest "${DST}/packages.manifest" &&
                 verify packages.manifest; then
               echo 'OK: packages.manifest'
               exit 0
