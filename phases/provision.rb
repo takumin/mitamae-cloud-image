@@ -11,6 +11,7 @@ include_recipe File.expand_path('../../helpers/apt_mirror', __FILE__)
 #
 # Recipes
 #
+include_recipe File.expand_path('../../cookbooks/slim', __FILE__)
 include_recipe File.expand_path('../../cookbooks/apt', __FILE__)
 include_recipe File.expand_path('../../cookbooks/pacman', __FILE__)
 include_recipe File.expand_path('../../cookbooks/curl', __FILE__)
