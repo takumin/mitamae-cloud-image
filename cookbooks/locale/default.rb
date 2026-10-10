@@ -69,7 +69,8 @@ end
 case node[:platform]
 when 'debian', 'ubuntu'
   package 'locales'
-  package 'locales-all'
+  # locales-all ships every locale prebuilt, while the minimal role generates only its own
+  package 'locales-all' unless node[:target][:role].match?(/minimal/)
 when 'arch'
   # nothing...
 else
