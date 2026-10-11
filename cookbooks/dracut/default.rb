@@ -179,6 +179,8 @@ end
 
 # The image boots on any machine and takes the root from the kernel command line, so nothing of the build
 # host goes into the initrd.
+# The NVIDIA drivers load from the root; with their GSP firmware the initrd grew from about 100M to 270M,
+# which no longer fit the build tmpfs of the desktop-nvidia-legacy role.
 omit_network = %w{connman network-legacy network-manager systemd-networkd} - [node[:dracut][:network]]
 add_modules  = ['mitamae-live', node[:dracut][:network]]
 add_modules << 'systemd-resolved' if node[:dracut][:network].eql?('systemd-networkd')
@@ -193,5 +195,6 @@ file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
     compress="#{node[:dracut][:compress]}"
     add_dracutmodules+=" #{add_modules.join(' ')} "
     omit_dracutmodules+=" #{omit_network.join(' ')} "
+    omit_drivers+=" nvidia.* "
   __EOF__
 end
