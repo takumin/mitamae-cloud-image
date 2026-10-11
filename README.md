@@ -99,5 +99,5 @@ root=live:UUID=<boot partition> rd.live.ram=1 ds=nocloud
 
 The images add the following parameters:
 
-- `seednet=<url>`: Fetch the NoCloud seed (`meta-data`, `user-data`, `vendor-data` and `network-config`) in the initrd, for Cloud-Init before 24.1 (Debian 12), which skips the init modules with an http(s) `ds=nocloud;s=`. `#HOSTNAME#`, `#DOMAINNAME#` and `#FQDN#` in the URL are replaced with the names from DHCP. Use it with `ds=nocloud;dsmode=net`.
+- `seednet=<url>`: Fetch the NoCloud seed (`meta-data`, `user-data`, `vendor-data` and `network-config`) in the initrd, for Cloud-Init before 24.1 (Debian 12), which skips the init modules with an http(s) `ds=nocloud;s=`. `#HOSTNAME#`, `#DOMAINNAME#` and `#FQDN#` in the URL are replaced with the names from DHCP. Use it with `ds=nocloud;dsmode=net` and a network boot (`root=live:http(s)://`), which brings up the network in the initrd.
 - `anynet`: Run DHCP on every wired interface of the live root, instead of the network config of Cloud-Init.

@@ -14,7 +14,6 @@ depends() {
 install() {
 	inst_multiple ip sed
 
-	inst_hook cmdline 90 "${moddir}/parse-seednet.sh"
 	inst_hook pre-pivot 90 "${moddir}/cloud-init-nocloud-seednet.sh"
 	inst_hook pre-pivot 91 "${moddir}/live-disable-resize-rootfs.sh"
 	inst_hook cleanup 90 "${moddir}/live-network.sh"

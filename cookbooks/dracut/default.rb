@@ -169,7 +169,6 @@ end
 
 %w{
   module-setup.sh
-  parse-seednet.sh
   cloud-init-nocloud-seednet.sh
   live-disable-resize-rootfs.sh
   live-network.sh
