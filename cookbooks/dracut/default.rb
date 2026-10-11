@@ -134,6 +134,21 @@ else
 end
 
 #
+# Workaround: Stray Call In livenet
+#
+
+# dracut 106 and 107 call get_url_handler before sourcing url-lib.sh, which prints
+# "get_url_handler: command not found" on every boot; the call on the next lines works.
+# https://github.com/dracut-ng/dracut-ng/blob/106/modules.d/90livenet/parse-livenet.sh#L6
+file '/usr/lib/dracut/modules.d/90livenet/parse-livenet.sh' do
+  action :edit
+  block do |content|
+    content.gsub!(/^get_url_handler\n/, '')
+  end
+  only_if 'test -f /usr/lib/dracut/modules.d/90livenet/parse-livenet.sh'
+end
+
+#
 # Dracut Module
 #
 
