@@ -14,7 +14,7 @@ drop_initrd_network() {(
 
 	# Cloud-Init refuses to rename an interface that still has the address, so release the addresses for the
 	# NoCloud network-config; systemd-networkd in the initrd keeps them when it stops, and would add them
-	# back while it runs. network-legacy has stopped dhclient in an earlier cleanup hook.
+	# back while it runs.
 	if [ -n "${DRACUT_SYSTEMD:-}" ]; then
 		systemctl stop systemd-networkd.socket systemd-networkd.service 2> /dev/null || true
 	fi

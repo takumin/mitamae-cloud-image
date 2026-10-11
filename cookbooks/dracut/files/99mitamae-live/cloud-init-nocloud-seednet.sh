@@ -24,7 +24,7 @@ cloud_init_nocloud_seednet() {(
 	esac
 
 	# systemd-networkd sets no host name without systemd-hostnamed, which the initrd lacks, so read it from
-	# the lease; dhclient in network-legacy sets the FQDN as the host name.
+	# the lease.
 	hostname=
 	domainname=
 	for lease in /run/systemd/netif/leases/*; do

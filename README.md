@@ -36,6 +36,7 @@ export APT_REPO_URL_ISC_KEA_UBUNTU="http://${APT_MIRROR_HOST}/isc-kea-32x-ubuntu
 # Apt Cacher List
 
 export APT_REPO_URL_PPA_MOZILLA_TEAM="http://${APT_CACHER_HOST}/ppa-mozilla-team"
+export APT_REPO_URL_PPA_DRACUT_NG="http://${APT_CACHER_HOST}/ppa-dracut-ng"
 
 export APT_REPO_URL_PROXMOX_VE_ENTERPRISE="http://${APT_CACHER_HOST}/proxmox-ve-enterprise"
 export APT_REPO_URL_PROXMOX_VE_COMMUNITY="http://${APT_CACHER_HOST}/proxmox-ve-community"

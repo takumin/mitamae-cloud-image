@@ -21,18 +21,6 @@ node[:dracut] ||= Hashie::Mash.new
 node[:dracut][:compress] ||= 'zstd'
 
 #
-# Public Variables - Network Module
-#
-
-# dracut 060 in Ubuntu 24.04 has no hooks that bring up a live root over systemd-networkd, so it keeps the
-# dhclient based network-legacy module.
-if "#{node[:target][:distribution]}-#{node[:target][:suite]}".eql?('ubuntu-noble')
-  node[:dracut][:network] ||= 'network-legacy'
-else
-  node[:dracut][:network] ||= 'systemd-networkd'
-end
-
-#
 # Environment Variables
 #
 
@@ -48,7 +36,6 @@ node.validate! do
   {
     dracut: {
       compress: match(/^(?:gzip|lz4|xz|zstd)$/),
-      network:  match(/^(?:systemd-networkd|network-legacy)$/),
     },
   }
 end
@@ -75,18 +62,63 @@ file '/etc/apt/preferences.d/dracut' do
   __EOF__
 end
 
-# dracut 059 in Debian 12 has the same gap as Ubuntu 24.04, which the backported dracut fills.
-if "#{node[:target][:distribution]}-#{node[:target][:suite]}".eql?('debian-bookworm')
-  file '/etc/apt/preferences.d/dracut-backports' do
-    owner   'root'
-    group   'root'
-    mode    '0644'
-    content <<~__EOF__
-      Package: dracut dracut-*
-      Pin: release o=Debian Backports
-      Pin-Priority: 500
-    __EOF__
-  end
+# dracut 059 in Debian 12 and 060 in Ubuntu 24.04 have no hooks that bring up a live root over systemd-networkd,
+# and 106 and 107 print "get_url_handler: command not found" from livenet on every boot, so every suite takes the
+# same current dracut from the PPA.
+file '/etc/apt/preferences.d/dracut-ng' do
+  owner   'root'
+  group   'root'
+  mode    '0644'
+  content <<~__EOF__
+    Package: dracut dracut-*
+    Pin: release o=takumi.tmfam.com
+    Pin-Priority: 600
+  __EOF__
+end
+
+# The previous build restored from its squashfs still has the pin to the backported dracut.
+file '/etc/apt/preferences.d/dracut-backports' do
+  action :delete
+end
+
+#
+# Apt Keyring
+#
+
+directory '/etc/apt/keyrings' do
+  owner 'root'
+  group 'root'
+  mode  '0755'
+end
+
+gpg_keyring '/etc/apt/keyrings/ppa-dracut-ng.asc' do
+  fingerprint 'C40C435F426247AFCD899D6752B8A990FCB52DAB'
+  user_id     'Takumi Takahashi <takumiiinn@gmail.com>'
+  url         'https://takumi.tmfam.com/ppa-dracut-ng/public.gpg.asc'
+  owner       'root'
+  group       'root'
+  mode        '0644'
+end
+
+#
+# Apt Repository
+#
+
+apt_repository 'dracut-ng Repository' do
+  path '/etc/apt/sources.list.d/ppa-dracut-ng.sources'
+  entry [
+    {
+      :uri        => AptMirror.uri('https://takumi.tmfam.com/ppa-dracut-ng', ENV['APT_REPO_URL_PPA_DRACUT_NG']),
+      :signed_by  => '/etc/apt/keyrings/ppa-dracut-ng.asc',
+      :suite      => '###platform_codename###',
+      :components => ['main'],
+    },
+  ]
+  notifies :run, 'execute[apt-get update]', :immediately
+end
+
+execute 'apt-get update' do
+  action :nothing
 end
 
 #
@@ -94,31 +126,23 @@ end
 #
 
 # The recommends (lvm2, mdadm, cryptsetup and so on) add nothing to a live root.
-%w{dracut dracut-network}.each do |pkg|
-  package pkg do
-    options '--no-install-recommends'
-  end
+# The package resource leaves the dracut of the previous build restored from its squashfs as it is, so install the
+# candidate from the PPA whenever the installed version differs.
+dracut_packages = %w{dracut dracut-network}
+dracut_current  = dracut_packages.map do |pkg|
+  "test \"$(dpkg-query -W -f '${Version}' #{pkg} 2>/dev/null)\" = \"$(LC_ALL=C apt-cache policy #{pkg} | sed -n 's/^ *Candidate: //p')\""
 end
 
-# Newer dracut ships the live modules in dracut-core, which provides dracut-live instead.
-package 'dracut-live' do
-  options '--no-install-recommends'
-  not_if "dpkg-query -W -f '${Provides}\\n' dracut-core | grep -qw dracut-live"
+execute "apt-get -y --no-install-recommends install #{dracut_packages.join(' ')}" do
+  not_if dracut_current.join(' && ')
 end
 
 # The url-lib module fetches the live root and the NoCloud seed with curl.
 package 'curl'
 
-case node[:dracut][:network]
-when 'network-legacy'
-  package 'isc-dhcp-client'
-when 'systemd-networkd'
-  # The initrd resolves the host names in the URLs through systemd-resolved, since systemd-networkd writes
-  # no resolv.conf; the minimal cookbook installs it for the root as well.
-  package 'systemd-resolved'
-else
-  raise
-end
+# The initrd resolves the host names in the URLs through systemd-resolved, since systemd-networkd writes no
+# resolv.conf; the minimal cookbook installs it for the root as well.
+package 'systemd-resolved'
 
 case node[:dracut][:compress]
 when 'gzip'
@@ -131,21 +155,6 @@ when 'zstd'
   package 'zstd'
 else
   raise
-end
-
-#
-# Workaround: Stray Call In livenet
-#
-
-# dracut 106 and 107 call get_url_handler before sourcing url-lib.sh, which prints
-# "get_url_handler: command not found" on every boot; the call on the next lines works.
-# https://github.com/dracut-ng/dracut-ng/blob/106/modules.d/90livenet/parse-livenet.sh#L6
-file '/usr/lib/dracut/modules.d/90livenet/parse-livenet.sh' do
-  action :edit
-  block do |content|
-    content.gsub!(/^get_url_handler\n/, '')
-  end
-  only_if 'test -f /usr/lib/dracut/modules.d/90livenet/parse-livenet.sh'
 end
 
 #
@@ -181,10 +190,6 @@ end
 # host goes into the initrd.
 # The NVIDIA drivers load from the root; with their GSP firmware the initrd grew from about 100M to 270M,
 # which no longer fit the build tmpfs of the desktop-nvidia-legacy role.
-omit_network = %w{connman network-legacy network-manager systemd-networkd} - [node[:dracut][:network]]
-add_modules  = ['mitamae-live', node[:dracut][:network]]
-add_modules << 'systemd-resolved' if node[:dracut][:network].eql?('systemd-networkd')
-
 file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
   owner   'root'
   group   'root'
@@ -193,8 +198,8 @@ file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
     hostonly="no"
     hostonly_cmdline="no"
     compress="#{node[:dracut][:compress]}"
-    add_dracutmodules+=" #{add_modules.join(' ')} "
-    omit_dracutmodules+=" #{omit_network.join(' ')} "
+    add_dracutmodules+=" mitamae-live systemd-networkd systemd-resolved "
+    omit_dracutmodules+=" connman network-manager "
     omit_drivers+=" nvidia.* "
   __EOF__
 end
