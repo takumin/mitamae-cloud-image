@@ -185,6 +185,9 @@ jobs:
       actions: read
     strategy:
       fail-fast: false
+      # The storage answers 429 when every release goes up at once, as after a
+      # change that touches all the images
+      max-parallel: 8
       matrix:
         target: ${{ fromJson(needs.matrix.outputs.targets) }}
     env:
@@ -235,12 +238,25 @@ jobs:
         # an image that does not match SHA256SUMS
         HEADERS=(--header-upload 'Cache-Control: no-cache')
 
-        # Succeeds when the object on the storage matches the local file
+        # Succeeds when the object on the storage matches the local file, and
+        # fails with 1 when it is missing or differs. A read that the storage
+        # refuses, as on its rate limit, says nothing about the object, so it
+        # is read again and fails with 2 when it never comes through
         verify() {
-          local want got
+          local want got rc try
           want="$(awk -v name="$1" '$2 == name { print $1 }' "${EXPECTED}")"
-          got="$(rclone cat --low-level-retries 10 "${DST}/$1" | sha256sum | cut -d' ' -f1)" || return 1
-          [ -n "${want}" ] && [ "${want}" = "${got}" ]
+          [ -n "${want}" ] || return 1
+          for try in 1 2 3 4; do
+            [ "${try}" -gt 1 ] && sleep "$(( try * 20 ))"
+            rc=0
+            got="$(set -o pipefail; rclone cat --low-level-retries 10 "${DST}/$1" | sha256sum | cut -d' ' -f1)" || rc=$?
+            case "${rc}" in
+              0) [ "${want}" = "${got}" ]; return ;;
+              # Directory or file not found
+              3|4) return 1 ;;
+            esac
+          done
+          return 2
         }
 
         for attempt in $(seq "${PUBLISH_ATTEMPTS}"); do
@@ -259,17 +275,19 @@ jobs:
           echo '::endgroup::'
 
           broken=()
+          unread=()
           while read -r _ name; do
             [ "${name}" = packages.manifest ] && continue
-            if verify "${name}" < /dev/null; then
-              echo "OK: ${name}"
-            else
-              echo "::warning::Broken or missing: ${name}"
-              broken+=("${name}")
-            fi
+            rc=0
+            verify "${name}" < /dev/null || rc=$?
+            case "${rc}" in
+              0) echo "OK: ${name}" ;;
+              1) echo "::warning::Broken or missing: ${name}"; broken+=("${name}") ;;
+              *) echo "::warning::Could not read: ${name}"; unread+=("${name}") ;;
+            esac
           done < "${EXPECTED}"
 
-          if [ "${#broken[@]}" -eq 0 ]; then
+          if [ "${#broken[@]}" -eq 0 ] && [ "${#unread[@]}" -eq 0 ]; then
             if rclone copyto -v "${HEADERS[@]}" --checksum packages.manifest "${DST}/packages.manifest" &&
                 verify packages.manifest; then
               echo 'OK: packages.manifest'
