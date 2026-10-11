@@ -173,7 +173,8 @@ end
 # Network
 #
 
-# Sorts before 99-wireless.network, which the initramfs writes for every wireless interface.
+# Sorts before 99-wireless.network, which anynet on the kernel command line has the initrd write for every
+# wireless interface.
 template '/etc/systemd/network/10-wifi-ap.network' do
   owner  'root'
   group  'root'

@@ -68,6 +68,7 @@ export TIMEZONE="Asia/Tokyo"
 # export DISABLE_TARGET_TMPFS="true"
 
 # export ROOTFS_ARCHIVE_FORMAT="xz"
+# export DRACUT_COMPRESS="zstd"
 
 # export DISABLE_SQUASHFS="true"
 # export DISABLE_TARBALL="true"
@@ -76,3 +77,26 @@ export TIMEZONE="Asia/Tokyo"
 
 # export LOG_LEVEL="debug"
 ```
+
+# Boot Parameters
+
+The images boot `rootfs.squashfs` as a live root with the dmsquash-live and livenet modules of dracut,
+and run it on an overlay in memory.
+
+Network boot fetches the squashfs over HTTP, running DHCP in the initrd without `ip=`
+(which systemd-network-generator would also apply to every interface of the live root):
+
+```
+root=live:http://boot.example.internal/rootfs.squashfs ds=nocloud;s=http://boot.example.internal/seed/
+```
+
+USB boot (`scripts/generate-bootable-usb.sh`) reads `LiveOS/squashfs.img` on the boot partition and copies it into memory:
+
+```
+root=live:UUID=<boot partition> rd.live.ram=1 ds=nocloud
+```
+
+The images add the following parameters:
+
+- `seednet=<url>`: Fetch the NoCloud seed (`meta-data`, `user-data`, `vendor-data` and `network-config`) in the initrd, for Cloud-Init before 24.1 (Debian 12), which skips the init modules with an http(s) `ds=nocloud;s=`. `#HOSTNAME#`, `#DOMAINNAME#` and `#FQDN#` in the URL are replaced with the names from DHCP. Use it with `ds=nocloud;dsmode=net`.
+- `anynet`: Run DHCP on every wired interface of the live root, instead of the network config of Cloud-Init.

@@ -16,7 +16,7 @@ execute 'find /boot -type f -name "initrd.img-*" | xargs rm -f'
 # Create Initramfs
 #
 
-execute "update-initramfs -c -k \"$(#{GET_KERNEL_VERSION})\"" do
+execute "dracut --force \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\" \"$(#{GET_KERNEL_VERSION})\"" do
   not_if "test -f \"/boot/initrd.img-$(#{GET_KERNEL_VERSION})\""
 end
 
