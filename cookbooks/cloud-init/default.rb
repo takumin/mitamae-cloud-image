@@ -96,9 +96,9 @@ end
 #
 
 if node[:target][:role].match?(/desktop/)
-  # Desktop images manage every interface with NetworkManager, but network
-  # boot hands cloud-init a network config (the ip= DHCP lease from the
-  # initramfs or the NoCloud seed network-config), and rendering it through
+  # Desktop images manage every interface with NetworkManager, but cloud-init
+  # writes a network config (the NoCloud seed network-config,
+  # or DHCP on the first connected interface without one), and rendering it through
   # systemd-networkd (also netplan's default backend) leaves those interfaces unmanaged by
   # NetworkManager, so they are missing from the GUI; cloud-init's own
   # network-manager renderer drops netplan keys such as dhcp4-overrides, so

@@ -26,9 +26,9 @@ file '/etc/NetworkManager/conf.d/10-globally-managed-devices.conf' do
   only_if 'test -d /etc/NetworkManager/conf.d'
 end
 
-# A network boot leaves the interfaces configured by the initramfs ipconfig, and NetworkManager assumes them
-# as external in-memory connections instead of activating the cloud-init ones, so each interface shows up
-# twice; activate the persistent connections on startup instead (the fetched rootfs lives in RAM, so
+# A network boot leaves the addresses the initrd got by DHCP on the interfaces, and NetworkManager assumes
+# them as external in-memory connections instead of activating the cloud-init ones, so each interface shows
+# up twice; activate the persistent connections on startup instead (the fetched rootfs lives in RAM, so
 # reconfiguring the boot interface is safe)
 file '/etc/NetworkManager/conf.d/90-no-keep-configuration.conf' do
   owner   'root'

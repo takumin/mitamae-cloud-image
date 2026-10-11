@@ -292,11 +292,12 @@ when 'raspberrypi'
     content [
       'console=ttyS0,115200',
       'console=tty1',
-      'boot=live',
-      'ip=dhcp',
-      'fetch=http://boot.metal.internal/rpi/rootfs.squashfs',
-      # Cloud-Init 22.4.2 (Debian 12) skips the init modules with an http(s) ds=nocloud;s=, so the initramfs
-      # hook fetches seednet= into the local seed dir.
+      # dracut fetches the squashfs into memory and runs the root on an overlay of it.
+      # It runs DHCP for the URL by itself, and ip= is left out: systemd-network-generator in the root would
+      # configure every interface from it as well.
+      'root=live:http://boot.metal.internal/rpi/rootfs.squashfs',
+      # Cloud-Init 22.4.2 (Debian 12) skips the init modules with an http(s) ds=nocloud;s=, so the initrd
+      # fetches seednet= into the local seed dir.
       # dsmode=net runs the init modules after the network is up, like the other netboot entries.
       # TODO: Switch to ds=nocloud;s= and drop seednet= once Debian 12 is no longer supported.
       'ds=nocloud;dsmode=net',

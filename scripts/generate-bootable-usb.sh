@@ -167,24 +167,25 @@ mount -t vfat -o codepage=932,iocharset=utf8 "${CIDATAPT}" "${CIDATA}"
 ################################################################################
 
 # Require Directory
+# dracut looks for LiveOS/squashfs.img on the live device by default.
 mkdir -p "${LIVEUSB}/boot"
-mkdir -p "${LIVEUSB}/live"
+mkdir -p "${LIVEUSB}/LiveOS"
 
 ################################################################################
 # Files
 ################################################################################
 
 # Kernel
-cp "${DESTDIR}/vmlinuz" "${LIVEUSB}/live/vmlinuz"
+cp "${DESTDIR}/vmlinuz" "${LIVEUSB}/boot/vmlinuz"
 
 # Initramfs
-cp "${DESTDIR}/initrd.img" "${LIVEUSB}/live/initrd.img"
+cp "${DESTDIR}/initrd.img" "${LIVEUSB}/boot/initrd.img"
 
 # Rootfs
-cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/live/filesystem.squashfs"
+cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/LiveOS/squashfs.img"
 
 # Packages
-cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/live/filesystem.packages"
+cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/LiveOS/packages.manifest"
 
 ################################################################################
 # Grub
@@ -198,9 +199,10 @@ grub-install --target=x86_64-efi --recheck --boot-directory="${LIVEUSB}/boot" --
 UUID="$(blkid -p -s UUID -o value "${BOOTPT}")"
 
 # Kernel Parameter
+# rd.live.ram copies the squashfs into memory, so the USB can be removed or rewritten after the boot.
 # anynet runs DHCP on every wired interface, since the cidata seed has no network-config; the desktop profiles
 # leave the network to NetworkManager.
-CMDLINE='boot=live ds=nocloud toram noeject nopersistence'
+CMDLINE="root=live:UUID=${UUID} rd.live.ram=1 ds=nocloud"
 case "${PROFILE}" in
 	desktop*) ;;
 	*) CMDLINE="${CMDLINE} anynet" ;;
@@ -243,8 +245,8 @@ set timeout=0
 
 menuentry 'live' {
 	search --no-floppy --fs-uuid --set=root ${UUID}
-	linux /live/vmlinuz ${CMDLINE}
-	initrd /live/initrd.img
+	linux /boot/vmlinuz ${CMDLINE}
+	initrd /boot/initrd.img
 }
 __EOF__
 

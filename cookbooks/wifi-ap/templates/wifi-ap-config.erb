@@ -37,7 +37,7 @@ read_credentials "${DEFAULTS}"
 
 # A network boot has no boot medium, and keeps the credentials in the image.
 if udevadm wait --timeout=10 "${DEVICE}"; then
-	# toram releases the boot medium after the copy, so mount it again here.
+	# Mount the boot medium on its own, rather than relying on dracut to leave it mounted after rd.live.ram.
 	MOUNT="$(mktemp -d)"
 	trap 'umount "${MOUNT}" 2>/dev/null || true; rmdir "${MOUNT}"' EXIT
 	if mount -t vfat -o ro,nodev,nosuid,noexec "${DEVICE}" "${MOUNT}" && [ -f "${MOUNT}/${CREDENTIALS}" ]; then

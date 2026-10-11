@@ -235,18 +235,24 @@ if [ "${VIDEO_OUTPUT}" = "composite" ]; then
 fi
 
 # Live Boot Directory
-mkdir -p "${LIVEUSB}/live"
+# dracut looks for LiveOS/squashfs.img on the live device by default.
+mkdir -p "${LIVEUSB}/LiveOS"
 
 # Copy to Rootfs Files
-cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/live/filesystem.squashfs"
-cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/live/filesystem.packages"
+cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/LiveOS/squashfs.img"
+cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/LiveOS/packages.manifest"
+
+# Get UUID
+UUID="$(blkid -p -s UUID -o value "${BOOTPT}")"
 
 # Generate cmdline.txt
 # ds=nocloud stays in dsmode=local on purpose: the seed is on the cidata partition and the USB may boot
 # without a network.
+# rd.live.ram copies the squashfs into memory, so that this script can rewrite the boot partition from the
+# Raspberry Pi booted from it.
 # anynet runs DHCP on every wired interface, since the cidata seed has no network-config; the desktop profiles
 # leave the network to NetworkManager.
-CMDLINE='console=ttyS0,115200 console=tty1 boot=live ds=nocloud toram noeject nopersistence'
+CMDLINE="console=ttyS0,115200 console=tty1 root=live:UUID=${UUID} rd.live.ram=1 ds=nocloud"
 case "${PROFILE}" in
 	desktop*) ;;
 	*) CMDLINE="${CMDLINE} anynet" ;;

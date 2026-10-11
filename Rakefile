@@ -30,7 +30,7 @@ ENV['QEMU_CPU'] ||= 'max,pauth-impdef=on'
 # the variables the recipes read to the root processes by name instead
 PRESERVE_ENV_PATTERN = /\A(?:
   (?:ADMIN|APT_REPO|ARCH|DISABLE|ENABLE|WIFI_AP)_.+ |
-  INITRAMFS_COMPRESS | OUTPUT_DIRECTORY | ROOTFS_ARCHIVE_FORMAT |
+  DRACUT_COMPRESS | OUTPUT_DIRECTORY | ROOTFS_ARCHIVE_FORMAT |
   TARGET_DIRECTORY | TARGET_TMPFS_SIZE | TIMEZONE | QEMU_CPU |
   (?i:(?:http|https|ftp|no)_proxy)
 )\z/x
