@@ -15,7 +15,6 @@ install() {
 	inst_multiple ip sed
 
 	inst_hook pre-pivot 90 "${moddir}/cloud-init-nocloud-seednet.sh"
-	inst_hook pre-pivot 91 "${moddir}/live-disable-resize-rootfs.sh"
 	inst_hook cleanup 90 "${moddir}/live-network.sh"
 
 	# systemd-networkd-wait-online waits for every interface by default, and dracut configures every one of

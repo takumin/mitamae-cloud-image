@@ -44,7 +44,19 @@ end
 # Private Variables
 #
 
-modules_dir = '/usr/lib/dracut/modules.d/99mitamae-live'
+modules_dir = '/usr/lib/dracut/modules.d'
+
+modules = {
+  '99mitamae-live' => %w{
+    module-setup.sh
+    cloud-init-nocloud-seednet.sh
+    live-network.sh
+  },
+  '99live-disable-resize-rootfs' => %w{
+    module-setup.sh
+    live-disable-resize-rootfs.sh
+  },
+}
 
 #
 # Apt Preferences
@@ -161,24 +173,26 @@ end
 # Dracut Module
 #
 
-directory modules_dir do
-  owner 'root'
-  group 'root'
-  mode  '0755'
+modules.each do |dir, names|
+  directory "#{modules_dir}/#{dir}" do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
+
+  names.each do |name|
+    remote_file "#{modules_dir}/#{dir}/#{name}" do
+      owner  'root'
+      group  'root'
+      mode   '0755'
+      source "files/#{dir}/#{name}"
+    end
+  end
 end
 
-%w{
-  module-setup.sh
-  cloud-init-nocloud-seednet.sh
-  live-disable-resize-rootfs.sh
-  live-network.sh
-}.each do |name|
-  remote_file "#{modules_dir}/#{name}" do
-    owner  'root'
-    group  'root'
-    mode   '0755'
-    source "files/99mitamae-live/#{name}"
-  end
+# The previous build restored from its squashfs still has the hook in the mitamae-live module.
+file "#{modules_dir}/99mitamae-live/live-disable-resize-rootfs.sh" do
+  action :delete
 end
 
 #
@@ -197,7 +211,7 @@ file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
     hostonly="no"
     hostonly_cmdline="no"
     compress="#{node[:dracut][:compress]}"
-    add_dracutmodules+=" mitamae-live systemd-networkd systemd-resolved "
+    add_dracutmodules+=" mitamae-live live-disable-resize-rootfs systemd-networkd systemd-resolved "
     omit_dracutmodules+=" connman network-manager "
     omit_drivers+=" nvidia.* "
   __EOF__
