@@ -100,4 +100,4 @@ root=live:UUID=<boot partition> rd.live.ram=1 ds=nocloud
 The images add the following parameters:
 
 - `seednet.url=<url>`: [seednet](https://github.com/takumin/seednet) fetches the NoCloud seed (`meta-data` and `user-data`, and `vendor-data` and `network-config` if the seed has them) in the initrd, brings up the network of the initrd and of the live root from its `network-config`, and hands the seed to Cloud-Init in `/var/lib/cloud/seed/nocloud`. `{hostname}`, `{domainname}` and `{fqdn}` in the URL are the names from DHCP. The URL is the directory of the seed and ends in `/`; a seed that is not there stops the boot in the initrd. Use it with `ds=nocloud`, and `ds=nocloud;dsmode=net` for Cloud-Init before 24.1 (Debian 12), which skips the init modules otherwise.
-- `anynet`: Run DHCP on every wired interface of the live root, instead of the network config of Cloud-Init.
+- `anynet`: Run DHCP on every wired interface of the live root, instead of the network config of Cloud-Init. It does nothing where seednet brought up the network of the initrd from a `network-config`.

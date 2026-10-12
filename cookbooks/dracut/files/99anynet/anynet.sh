@@ -15,6 +15,12 @@ any_network_interfaces() {(
 		return
 	fi
 
+	# seednet removes only its own files and the catch-all of dracut, so these would bring up the interfaces
+	# that the NoCloud network-config leaves alone and override the RequiredForOnline it gives.
+	if [ -e /run/seednet/source ]; then
+		return
+	fi
+
 	if [ -d "${NEWROOT}/etc/cloud/cloud.cfg.d" ]; then
 		{
 			echo "disable_network_activation: true"
