@@ -51,6 +51,10 @@ modules = {
     module-setup.sh
     anynet.sh
   },
+  '99live-drop-initrd-network' => %w{
+    module-setup.sh
+    live-drop-initrd-network.sh
+  },
   '99live-disable-resize-rootfs' => %w{
     module-setup.sh
     live-disable-resize-rootfs.sh
@@ -210,7 +214,7 @@ file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
     hostonly="no"
     hostonly_cmdline="no"
     compress="#{node[:dracut][:compress]}"
-    add_dracutmodules+=" anynet live-disable-resize-rootfs seednet systemd-networkd systemd-resolved "
+    add_dracutmodules+=" anynet live-drop-initrd-network live-disable-resize-rootfs seednet systemd-networkd systemd-resolved "
     omit_dracutmodules+=" connman network-manager "
     omit_drivers+=" nvidia.* "
   __EOF__
