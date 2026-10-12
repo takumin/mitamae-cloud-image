@@ -296,12 +296,12 @@ when 'raspberrypi'
       # It runs DHCP for the URL by itself, and ip= is left out: systemd-network-generator in the root would
       # configure every interface from it as well.
       'root=live:http://boot.metal.internal/rpi/rootfs.squashfs',
-      # Cloud-Init 22.4.2 (Debian 12) skips the init modules with an http(s) ds=nocloud;s=, so the initrd
-      # fetches seednet= into the local seed dir.
+      # seednet fetches the NoCloud seed of the host name that DHCP gives in the initrd, brings up the network
+      # from its network-config, and hands the seed to Cloud-Init in the local seed dir, since Cloud-Init 22.4.2
+      # (Debian 12) skips the init modules with an http(s) ds=nocloud;s=.
       # dsmode=net runs the init modules after the network is up, like the other netboot entries.
-      # TODO: Switch to ds=nocloud;s= and drop seednet= once Debian 12 is no longer supported.
       'ds=nocloud;dsmode=net',
-      'seednet=http://boot.metal.internal/seed/#HOSTNAME#/default/',
+      'seednet.url=http://boot.metal.internal/seed/{hostname}/default/',
       # The car display runs at 480p, and Kodi keeps the mode the console was set to.
       *(node[:target][:role].eql?('kodi-car') ? %w{
         video=HDMI-A-1:720x480@60

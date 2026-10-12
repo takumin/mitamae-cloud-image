@@ -3,27 +3,16 @@
 
 command -v getarg > /dev/null || . /lib/dracut-lib.sh
 
-# The root keeps /run, so the network config the initrd wrote there would configure the root as well.
+# The root keeps /run, so the network config the initrd wrote there would configure the root as well: the
+# catch-all DHCP of dracut, and what systemd-network-generator writes for ip=. Where seednet brought up the
+# network from a NoCloud network-config, it has removed the catch-all and the root keeps its files, which
+# seednet.service writes again for the root.
 drop_initrd_network() {(
-	# systemd-network-generator writes one for ip=, and dracut its default for every interface.
-	rm -f /run/systemd/network/*.network
-
-	if [ ! -s "${NEWROOT}/var/lib/cloud/seed/nocloud/network-config" ]; then
+	if [ -e /run/seednet/source ]; then
 		return
 	fi
 
-	# Cloud-Init refuses to rename an interface that still has the address, so release the addresses for the
-	# NoCloud network-config; systemd-networkd in the initrd keeps them when it stops, and would add them
-	# back while it runs.
-	if [ -n "${DRACUT_SYSTEMD:-}" ]; then
-		systemctl stop systemd-networkd.socket systemd-networkd.service 2> /dev/null || true
-	fi
-
-	for path in /sys/class/net/*; do
-		device="${path##*/}"
-		[ "${device}" = 'lo' ] && continue
-		ip addr flush dev "${device}" || true
-	done
+	rm -f /run/systemd/network/*.network
 )}
 
 any_network_interfaces() {(

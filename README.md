@@ -88,7 +88,7 @@ Network boot fetches the squashfs over HTTP, running DHCP in the initrd without 
 (which systemd-network-generator would also apply to every interface of the live root):
 
 ```
-root=live:http://boot.example.internal/rootfs.squashfs ds=nocloud;s=http://boot.example.internal/seed/
+root=live:http://boot.example.internal/rootfs.squashfs seednet.url=http://boot.example.internal/seed/{hostname}/ ds=nocloud
 ```
 
 USB boot (`scripts/generate-bootable-usb.sh`) reads `LiveOS/squashfs.img` on the boot partition and copies it into memory:
@@ -99,5 +99,5 @@ root=live:UUID=<boot partition> rd.live.ram=1 ds=nocloud
 
 The images add the following parameters:
 
-- `seednet=<url>`: Fetch the NoCloud seed (`meta-data`, `user-data`, `vendor-data` and `network-config`) in the initrd, for Cloud-Init before 24.1 (Debian 12), which skips the init modules with an http(s) `ds=nocloud;s=`. `#HOSTNAME#`, `#DOMAINNAME#` and `#FQDN#` in the URL are replaced with the names from DHCP. Use it with `ds=nocloud;dsmode=net` and a network boot (`root=live:http(s)://`), which brings up the network in the initrd.
+- `seednet.url=<url>`: [seednet](https://github.com/takumin/seednet) fetches the NoCloud seed (`meta-data` and `user-data`, and `vendor-data` and `network-config` if the seed has them) in the initrd, brings up the network of the initrd and of the live root from its `network-config`, and hands the seed to Cloud-Init in `/var/lib/cloud/seed/nocloud`. `{hostname}`, `{domainname}` and `{fqdn}` in the URL are the names from DHCP. The URL is the directory of the seed and ends in `/`; a seed that is not there stops the boot in the initrd. Use it with `ds=nocloud`, and `ds=nocloud;dsmode=net` for Cloud-Init before 24.1 (Debian 12), which skips the init modules otherwise.
 - `anynet`: Run DHCP on every wired interface of the live root, instead of the network config of Cloud-Init.

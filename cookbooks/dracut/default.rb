@@ -49,7 +49,6 @@ modules_dir = '/usr/lib/dracut/modules.d'
 modules = {
   '99mitamae-live' => %w{
     module-setup.sh
-    cloud-init-nocloud-seednet.sh
     live-network.sh
   },
   '99live-disable-resize-rootfs' => %w{
@@ -149,7 +148,7 @@ execute "apt-get -y --no-install-recommends install #{dracut_packages.join(' ')}
   not_if dracut_current.join(' && ')
 end
 
-# The url-lib module fetches the live root and the NoCloud seed with curl.
+# The url-lib module fetches the live root with curl.
 package 'curl'
 
 # The initrd resolves the host names in the URLs through systemd-resolved, since systemd-networkd writes no
@@ -190,9 +189,12 @@ modules.each do |dir, names|
   end
 end
 
-# The previous build restored from its squashfs still has the hook in the mitamae-live module.
-file "#{modules_dir}/99mitamae-live/live-disable-resize-rootfs.sh" do
-  action :delete
+# The previous build restored from its squashfs still has these hooks in the mitamae-live module; seednet fetches the
+# NoCloud seed now.
+%w{live-disable-resize-rootfs.sh cloud-init-nocloud-seednet.sh}.each do |name|
+  file "#{modules_dir}/99mitamae-live/#{name}" do
+    action :delete
+  end
 end
 
 #
@@ -211,7 +213,7 @@ file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
     hostonly="no"
     hostonly_cmdline="no"
     compress="#{node[:dracut][:compress]}"
-    add_dracutmodules+=" mitamae-live live-disable-resize-rootfs systemd-networkd systemd-resolved "
+    add_dracutmodules+=" mitamae-live live-disable-resize-rootfs seednet systemd-networkd systemd-resolved "
     omit_dracutmodules+=" connman network-manager "
     omit_drivers+=" nvidia.* "
   __EOF__
