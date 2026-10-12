@@ -12,5 +12,5 @@ depends() {
 }
 
 install() {
-	inst_hook cleanup 90 "${moddir}/live-network.sh"
+	inst_hook cleanup 90 "${moddir}/anynet.sh"
 }
