@@ -75,9 +75,24 @@ export TIMEZONE="Asia/Tokyo"
 # export DISABLE_TARBALL="true"
 # export DISABLE_CPIO="true"
 # export DISABLE_SHA256SUMS="true"
+# export DISABLE_SEIROFILE="true"
 
 # export LOG_LEVEL="debug"
 ```
+
+# Virtual Machine
+
+The amd64 builds other than the Raspberry Pi ones also write a `Seirofile` next to the images,
+which boots them as a live machine on [seiro](https://github.com/takumin/seiro):
+
+```sh
+cd releases/debian/trixie/cloud-backports/amd64/server
+seiro up
+seiro ssh server
+```
+
+The roles with Cloud-Init create the user `ops` with `~/.ssh/authorized_keys`.
+The `minimal` and `proxmox-ve` roles have no Cloud-Init and bring up the network with `anynet`; log in on `seiro console` as the administrator of `ENABLE_ADMINISTRATOR`.
 
 # Boot Parameters
 
