@@ -206,6 +206,11 @@ end
 # host goes into the initrd.
 # The NVIDIA drivers load from the root; with their GSP firmware the initrd grew from about 100M to 270M,
 # which no longer fit the build tmpfs of the desktop-nvidia-legacy role.
+# Without hostonly dracut leaves /etc/modprobe.d out, so the nouveau blacklist of the NVIDIA roles never
+# reaches the initrd and nouveau grabs the GPU before the root is mounted; keep it out of the initrd too.
+omit_drivers = %w[nvidia.*]
+omit_drivers << 'nouveau' if node[:target][:role].match?(/-nvidia-/)
+
 file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
   owner   'root'
   group   'root'
@@ -216,6 +221,6 @@ file '/etc/dracut.conf.d/90-mitamae-cloud-image.conf' do
     compress="#{node[:dracut][:compress]}"
     add_dracutmodules+=" anynet live-drop-initrd-network live-disable-resize-rootfs seednet systemd-networkd systemd-resolved "
     omit_dracutmodules+=" connman network-manager "
-    omit_drivers+=" nvidia.* "
+    omit_drivers+=" #{omit_drivers.join(' ')} "
   __EOF__
 end
