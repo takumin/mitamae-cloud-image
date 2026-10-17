@@ -292,6 +292,12 @@ namespace :github do
       targets.delete_if{|v| v['role'].include?('bootstrap')}
       # NOTE: Unpublished targets are kept for local builds only
       targets.keep_if{|v| publish?(v)}
+      # NOTE: Rebuild only the targets that match one of the glob patterns
+      patterns = ENV.fetch('TARGET_PATTERNS', '').split(/[\s,]+/).reject(&:empty?)
+      unless patterns.empty?
+        targets.keep_if{|v| patterns.any?{|p| File.fnmatch?(p, v.values.join(':'))}}
+        abort "No targets match: #{patterns.join(' ')}" if targets.empty?
+      end
 
       puts JSON.dump(targets.map{|v|
         {

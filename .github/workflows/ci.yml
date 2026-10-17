@@ -18,6 +18,16 @@ on:
         options:
         - info
         - debug
+      targets:
+        description: 'Glob patterns of the targets to build, such as ubuntu:resolute:*:amd64:server (empty for all)'
+        required: false
+        default: ''
+        type: string
+      force:
+        description: 'Publish even when the packages manifest has not changed'
+        required: false
+        default: false
+        type: boolean
 permissions: {}
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -49,6 +59,8 @@ jobs:
         } >> "$GITHUB_ENV"
     - name: Setup matrix
       id: matrix
+      env:
+        TARGET_PATTERNS: ${{ inputs.targets }}
       run: echo "targets=$(rake github:actions:all)" >> "$GITHUB_OUTPUT"
   build:
     needs: matrix
@@ -151,6 +163,9 @@ jobs:
     - name: Check Difference
       if: env.PUBLISH == 'true'
       run: diff -u /tmp/packages.manifest "releases/${RELEASE_DIR}/packages.manifest" || echo 'PUBLISH_SYNC=true' >> "$GITHUB_ENV"
+    - name: Force Publish
+      if: env.PUBLISH == 'true' && inputs.force
+      run: echo 'PUBLISH_SYNC=true' >> "$GITHUB_ENV"
     #
     # Upload Artifact
     #
