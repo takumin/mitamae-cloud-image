@@ -26,7 +26,7 @@ on:
       force:
         description: 'Publish even when the packages manifest has not changed'
         required: false
-        default: false
+        default: true
         type: boolean
 permissions: {}
 concurrency:
