@@ -294,7 +294,7 @@ namespace :github do
       targets.keep_if{|v| publish?(v)}
       # NOTE: Rebuild only the targets that match one of the glob patterns
       patterns = ENV.fetch('TARGET_PATTERNS', '').split(/[\s,]+/).reject(&:empty?)
-      unless patterns.empty?
+      unless patterns.empty? or patterns.include?('all')
         targets.keep_if{|v| patterns.any?{|p| File.fnmatch?(p, v.values.join(':'))}}
         abort "No targets match: #{patterns.join(' ')}" if targets.empty?
       end

@@ -19,9 +19,8 @@ on:
         - info
         - debug
       targets:
-        description: 'Glob patterns of the targets to build, such as ubuntu:resolute:*:amd64:server (empty for all)'
-        required: false
-        default: ''
+        description: 'Glob patterns of the targets to build, such as ubuntu:resolute:*:amd64:server, or all'
+        required: true
         type: string
       force:
         description: 'Publish even when the packages manifest has not changed'
@@ -61,7 +60,15 @@ jobs:
       id: matrix
       env:
         TARGET_PATTERNS: ${{ inputs.targets }}
-      run: echo "targets=$(rake github:actions:all)" >> "$GITHUB_OUTPUT"
+      run: |
+        # A manual run rebuilds every target only when asked with 'all'
+        if [ "${GITHUB_EVENT_NAME}" = workflow_dispatch ] && [ -z "${TARGET_PATTERNS//[[:space:],]/}" ]; then
+          echo '::error::Give the targets to build, or all'
+          exit 1
+        fi
+        # Fails the step when the patterns match no target
+        targets="$(rake github:actions:all)"
+        echo "targets=${targets}" >> "$GITHUB_OUTPUT"
   build:
     needs: matrix
     name: ${{ matrix.target.name }}
