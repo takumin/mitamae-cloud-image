@@ -76,6 +76,7 @@ export TIMEZONE="Asia/Tokyo"
 # export DISABLE_CPIO="true"
 # export DISABLE_SHA256SUMS="true"
 # export DISABLE_SEIROFILE="true"
+# export DISABLE_ISO="true"
 
 # export LOG_LEVEL="debug"
 ```
@@ -116,3 +117,10 @@ The images add the following parameters:
 
 - `seednet.url=<url>`: [seednet](https://github.com/takumin/seednet) fetches the NoCloud seed (`meta-data` and `user-data`, and `vendor-data` and `network-config` if the seed has them) in the initrd, brings up the network of the initrd and of the live root from its `network-config`, and hands the seed to Cloud-Init in `/var/lib/cloud/seed/nocloud`. `{hostname}`, `{domainname}` and `{fqdn}` in the URL are the names from DHCP. The URL is the directory of the seed and ends in `/`; a seed that is not there stops the boot in the initrd. Use it with `ds=nocloud`, and `ds=nocloud;dsmode=net` for Cloud-Init before 24.1 (Debian 12), which skips the init modules otherwise.
 - `anynet`: Run DHCP on every wired interface of the live root, instead of the network config of Cloud-Init. It does nothing where seednet brought up the network of the initrd from a `network-config`.
+
+# ISO Image
+
+The amd64 `server` builds with the kernels for virtual machines (`cloud` on Debian, `virtual` on Ubuntu) also write `live.iso`, which boots the same live root as the bootable USB from a CD-ROM,
+for a VPS that installs a new server from an ISO image.
+The squashfs goes into the ISO as it is, so the ISO outgrows it only by the kernel, the initrd and GRUB (about 12M).
+Cloud-Init takes the user and the network from a NoCloud seed on a disk labelled `cidata`, which the VPS attaches next to the ISO.

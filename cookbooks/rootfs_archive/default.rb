@@ -312,6 +312,63 @@ if ENV['DISABLE_SQUASHFS'] != 'true' and ENV['DISABLE_SEIROFILE'] != 'true' and
 end
 
 #
+# ISO Image
+#
+
+# A VPS that installs a new server from an ISO image attaches a CIDATA disk with the NoCloud seed next to it,
+# so the ISO boots the same live root as the bootable USB and leaves the network to the network-config of the
+# seed. The VPS keeps the ISO attached, so rd.live.ram is left out and the squashfs stays off the memory.
+# The squashfs goes into the ISO as it is, so the ISO outgrows it only by the kernel, the initrd and GRUB.
+# Only the kernels for virtual machines (cloud on Debian, virtual on Ubuntu) build it.
+if ENV['DISABLE_SQUASHFS'] != 'true' and ENV['DISABLE_ISO'] != 'true' and
+    node[:target][:architecture].eql?('amd64') and node[:target][:role].eql?('server') and
+    node[:target][:kernel].match?(/^(?:cloud|virtual)/)
+  # ISO 9660 takes up to 32 upper case letters, digits and underscores, which the kernel name would overflow.
+  iso_label = %w{distribution suite role}.map{|k| node[:target][k] }.join('_').upcase.tr('-', '_')
+  iso_file  = File.join(output_dir, 'live.iso')
+  iso_grub  = File.join(output_dir, '.grub.cfg')
+
+  %w{grub-common grub-pc-bin grub-efi-amd64-bin xorriso mtools}.each do |pkg|
+    package pkg
+  end
+
+  file iso_grub do
+    owner   'root'
+    group   'root'
+    mode    '0644'
+    content [
+      'set default=0',
+      'set timeout=1',
+      '',
+      "menuentry 'live' {",
+      # dracut looks for LiveOS/squashfs.img on the live device by default.
+      "\tlinux /boot/vmlinuz root=live:CDLABEL=#{iso_label} ds=nocloud",
+      "\tinitrd /boot/initrd.img",
+      '}',
+      '',
+    ].join("\n")
+    not_if "test -f #{iso_file}"
+  end
+
+  # The graft points put the images into the ISO without copying them to a staging directory first.
+  execute [
+    "grub-mkrescue -o #{iso_file}",
+    'boot/vmlinuz=vmlinuz',
+    'boot/initrd.img=initrd.img',
+    "boot/grub/grub.cfg=#{iso_grub}",
+    'LiveOS/squashfs.img=rootfs.squashfs',
+    "-- -volid #{iso_label}",
+  ].join(' ') do
+    cwd output_dir
+    not_if "test -f #{iso_file}"
+  end
+
+  file iso_grub do
+    action :delete
+  end
+end
+
+#
 # Checksum Archive
 #
 
