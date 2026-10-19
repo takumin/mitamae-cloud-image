@@ -85,7 +85,7 @@ jobs:
       RELEASE_DIR: ${{ matrix.target.dir }}
       # The default half of the memory is too small for the nvidia-cuda roles, and 8G
       # ran out while dracut wrote the initrd
-      TARGET_TMPFS_SIZE: 12G
+      TARGET_TMPFS_SIZE: 10G
       # The tarball doubles the object storage usage, and nothing fetches it
       DISABLE_TARBALL: 'true'
     steps:
