@@ -1,0 +1,10 @@
+<%-
+  # Before the first run diverts it, the packaged file is still at its original path.
+  distrib = ::File.exist?(@distrib) ? ::File.read(@distrib) : ::File.read(@distrib.sub(/\.distrib$/, ''))
+  distrib = distrib[0, distrib.rindex('</addons>')]
+-%>
+<%= distrib -%>
+<%- @addons.each do |id| -%>
+  <addon optional="true"><%= id %></addon>
+<%- end -%>
+</addons>
