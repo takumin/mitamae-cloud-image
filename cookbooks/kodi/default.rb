@@ -89,6 +89,13 @@ node[:kodi][:remote] = car if node[:kodi][:remote].nil?
 node[:kodi][:video_sources] ||= car ? ['/srv/share/movie'] : []
 
 #
+# Public Variables - Startup Directory
+#
+
+# The car has no library to browse, so Kodi opens the video files right after the home screen.
+node[:kodi][:startup_directory] ||= car ? node[:kodi][:video_sources].first.to_s : ''
+
+#
 # Public Variables - Display Calibration
 #
 
@@ -117,6 +124,7 @@ node.validate! do
       network_online: boolean,
       remote: boolean,
       video_sources: array_of(match(%r{^/.+[^/]$})),
+      startup_directory: match(%r{^(?:/.+[^/])?$}),
       calibration: {
         modes: array_of(match(/^[0-9]+x[0-9]+i? @ [0-9]+\.[0-9]{6} Hz$/)),
         pixel_ratio: match(/^[0-9]+\.[0-9]+$/),
@@ -132,6 +140,9 @@ end
 language_addon = "resource.language.#{node[:kodi][:language]}"
 kodi_home      = "#{node[:kodi][:directory][:path]}/.kodi"
 appliance_xml  = '/usr/share/kodi/system/settings/appliance.xml'
+addon_manifest = '/usr/share/kodi/system/addon-manifest.xml'
+startup_addon  = 'service.mitamae.startup'
+startup_dir    = "/usr/share/kodi/addons/#{startup_addon}"
 cec_settings   = "#{kodi_home}/userdata/peripheral_data/cec_CEC_Adapter.xml"
 sources_xml    = "#{kodi_home}/userdata/sources.xml"
 guisettings    = "#{kodi_home}/userdata/guisettings.xml"
@@ -357,6 +368,46 @@ template appliance_xml do
   mode      '0644'
   source    'templates/appliance.xml.erb'
   variables distrib: "#{appliance_xml}.distrib"
+end
+
+#
+# Startup Directory
+#
+
+unless node[:kodi][:startup_directory].empty?
+  directory startup_dir do
+    owner 'root'
+    group 'root'
+    mode  '0755'
+  end
+
+  template "#{startup_dir}/addon.xml" do
+    owner  'root'
+    group  'root'
+    mode   '0644'
+    source 'templates/startup/addon.xml.erb'
+    variables id: startup_addon
+  end
+
+  template "#{startup_dir}/service.py" do
+    owner  'root'
+    group  'root'
+    mode   '0644'
+    source 'templates/startup/service.py.erb'
+  end
+
+  # Kodi registers a newly found add-on as disabled unless its manifest lists it.
+  execute "dpkg-divert --local --rename --divert #{addon_manifest}.distrib --add #{addon_manifest}" do
+    not_if "test \"$(dpkg-divert --truename #{addon_manifest})\" = #{addon_manifest}.distrib"
+  end
+
+  template addon_manifest do
+    owner     'root'
+    group     'root'
+    mode      '0644'
+    source    'templates/addon-manifest.xml.erb'
+    variables distrib: "#{addon_manifest}.distrib", addons: [startup_addon]
+  end
 end
 
 #

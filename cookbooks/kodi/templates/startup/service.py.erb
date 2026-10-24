@@ -1,0 +1,15 @@
+import xbmc
+import xbmcvfs
+
+DIRECTORY = '<%= node[:kodi][:startup_directory] %>/'
+
+monitor = xbmc.Monitor()
+
+# The startup window replaces any window activated before it is shown.
+while not xbmc.getCondVisibility('Window.IsActive(home)'):
+    if monitor.waitForAbort(0.5):
+        raise SystemExit
+
+# Without the USB disk the window would only show an error.
+if xbmcvfs.exists(DIRECTORY):
+    xbmc.executebuiltin(f'ActivateWindow(Videos,{DIRECTORY},return)')
