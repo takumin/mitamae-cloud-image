@@ -55,6 +55,15 @@ set -eu
 # - arm64
 : "${ARCH:="amd64"}"
 
+# diskform Binary
+# With it, install-to-disk.sh, diskform and the declaration go in /install on the boot partition.
+# Build it statically, since the live root may have an older glibc than the build host:
+# cargo build --release --target x86_64-unknown-linux-musl
+: "${DISKFORM:=""}"
+
+# diskform Declaration
+: "${DISKFORM_DECLARATION:="$(cd "$(dirname "$0")"; pwd)/diskform/laptop.yaml"}"
+
 ################################################################################
 # Local Variables
 ################################################################################
@@ -186,6 +195,14 @@ cp "${DESTDIR}/rootfs.squashfs" "${LIVEUSB}/LiveOS/squashfs.img"
 
 # Packages
 cp "${DESTDIR}/packages.manifest" "${LIVEUSB}/LiveOS/packages.manifest"
+
+# Installer
+if [ "x${DISKFORM}" != "x" ]; then
+	mkdir -p "${LIVEUSB}/install"
+	cp "${DISKFORM}" "${LIVEUSB}/install/diskform"
+	cp "$(cd "$(dirname "$0")"; pwd)/install-to-disk.sh" "${LIVEUSB}/install/install-to-disk.sh"
+	cp "${DISKFORM_DECLARATION}" "${LIVEUSB}/install/diskform.yaml"
+fi
 
 ################################################################################
 # Grub

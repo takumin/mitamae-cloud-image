@@ -124,3 +124,28 @@ The amd64 `server` builds with the kernels for virtual machines (`cloud` on Debi
 for a VPS that installs a new server from an ISO image.
 The squashfs goes into the ISO as it is, so the ISO outgrows it only by the kernel, the initrd and GRUB (about 12M).
 Cloud-Init takes the user and the network from a NoCloud seed on a disk labelled `cidata`, which the VPS attaches next to the ISO.
+
+# Disk Install
+
+The amd64 builds with the kernels for bare metal (`generic*`), other than the `minimal` roles, can be installed from the bootable USB onto a disk,
+laid out by [diskform](https://github.com/takumin/diskform) and booted with systemd-boot on UEFI.
+Give `generate-bootable-usb.sh` a static diskform and a declaration (`scripts/diskform/laptop.yaml` by default), which go in `/install` on the boot partition:
+
+```sh
+cargo build --release --target x86_64-unknown-linux-musl  # in diskform
+sudo env DISTRIB=debian RELEASE=trixie KERNEL=generic-backports PROFILE=desktop \
+  DISKFORM=/path/to/diskform/target/x86_64-unknown-linux-musl/release/diskform \
+  ./scripts/generate-bootable-usb.sh <USB by-id>
+```
+
+Boot the USB on the machine and run the installer:
+
+```sh
+sudo mount /dev/disk/by-label/BOOT /mnt
+sudo /mnt/install/install-to-disk.sh /mnt/install/diskform.yaml
+```
+
+It applies and mounts the declaration, extracts `LiveOS/squashfs.img`, writes the fstab from the mounts, installs systemd-boot with the kernels and the initrds of the image, and copies the NoCloud seed of the cidata partition (or `SEED_DIR`) into `/var/lib/cloud/seed/nocloud`.
+diskform refuses a disk with existing storage; erase it first with `sudo /mnt/install/diskform destroy --all /mnt/install/diskform.yaml`.
+The EFI system partition is mounted at `/efi`, `/boot` or `/boot/efi`, where bootctl finds it, and the kernel updates reach it through kernel-install.
+Turn off Secure Boot, since the shim is not installed.

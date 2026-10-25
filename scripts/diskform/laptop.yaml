@@ -1,0 +1,29 @@
+# The internal NVMe SSD of a laptop: an EFI system partition for systemd-boot and a btrfs for the rest.
+# install-to-disk.sh takes the mounts below for the fstab, and the ESP has room for a few kernels and initrds.
+version: 1
+
+disk:
+  sys0:
+    match:
+      path: /dev/disk/by-id/nvme-*
+      min_size: 128GB
+    table: gpt
+    partitions:
+    - {name: esp, size: 1GiB, type: esp, label: esp}
+    - {name: root, size: 100%, label: root}
+
+filesystem:
+  efi:
+    device: disk.sys0.esp
+    format: vfat
+    label: EFI
+    mount: /efi
+    mount_options: [umask=0077]
+  root:
+    device: disk.sys0.root
+    format: btrfs
+    label: root
+    mount_options: ["compress=zstd:1", noatime]
+    subvolumes:
+      root: {path: "@", mount: /}
+      home: {path: "@home", mount: /home}
